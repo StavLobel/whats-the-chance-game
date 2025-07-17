@@ -1,3 +1,9 @@
+// Copyright (c) Stav Lobel
+// stavlobel@gmail.com
+// All rights reserved.
+//
+// This file is part of the 'What's the Chance?' web application.
+
 // This is a basic Flutter widget test.
 //
 // To perform an interaction with a widget in your test, use the WidgetTester
