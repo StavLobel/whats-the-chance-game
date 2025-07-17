@@ -36,3 +36,5 @@ node_modules/
 
 # Cursor
 .cursor/ 
+# Firebase service account key
+backend/firebase-service-account.json 

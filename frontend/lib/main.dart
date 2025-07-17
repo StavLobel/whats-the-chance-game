@@ -294,10 +294,62 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
+  bool _emailTouched = false;
+  bool _passwordTouched = false;
+  bool _confirmPasswordTouched = false;
   String? _errorMessage;
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailFocus.addListener(() {
+      if (_emailFocus.hasFocus) {
+        setState(() {
+          _emailTouched = false;
+        });
+      } else {
+        setState(() {
+          _emailTouched = true;
+        });
+      }
+    });
+    _passwordFocus.addListener(() {
+      if (_passwordFocus.hasFocus) {
+        setState(() {
+          _passwordTouched = false;
+        });
+      } else {
+        setState(() {
+          _passwordTouched = true;
+        });
+      }
+    });
+    _confirmPasswordFocus.addListener(() {
+      if (_confirmPasswordFocus.hasFocus) {
+        setState(() {
+          _confirmPasswordTouched = false;
+        });
+      } else {
+        setState(() {
+          _confirmPasswordTouched = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
+    super.dispose();
+  }
 
   bool get _isEmailValid {
     final email = _emailController.text.trim();
@@ -408,6 +460,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       const SizedBox(height: 24),
                       TextField(
                         controller: _emailController,
+                        focusNode: _emailFocus,
                         textAlign: TextAlign.right,
                         decoration: InputDecoration(
                           hintText: 'כתובת אימייל',
@@ -422,6 +475,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       const SizedBox(height: 16),
                       TextField(
                         controller: _passwordController,
+                        focusNode: _passwordFocus,
                         textAlign: TextAlign.right,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
@@ -440,6 +494,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       const SizedBox(height: 16),
                       TextField(
                         controller: _confirmPasswordController,
+                        focusNode: _confirmPasswordFocus,
                         textAlign: TextAlign.right,
                         obscureText: _obscureConfirmPassword,
                         decoration: InputDecoration(
@@ -456,11 +511,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         onChanged: (_) => setState(() {}),
                       ),
                       const SizedBox(height: 8),
-                      if (!_isEmailValid && _emailController.text.isNotEmpty)
+                      if (!_isEmailValid && _emailTouched && !_emailFocus.hasFocus)
                         const Text('כתובת אימייל לא תקינה', style: TextStyle(color: Colors.red, fontSize: 14), textAlign: TextAlign.right),
-                      if (!_isPasswordValid && _passwordController.text.isNotEmpty)
+                      if (!_isPasswordValid && _passwordTouched && !_passwordFocus.hasFocus)
                         const Text('הסיסמה חייבת להיות לפחות 8 תווים, לכלול אות, מספר ותו מיוחד', style: TextStyle(color: Colors.red, fontSize: 14), textAlign: TextAlign.right),
-                      if (!_doPasswordsMatch && _confirmPasswordController.text.isNotEmpty)
+                      if (!_doPasswordsMatch && _confirmPasswordTouched && !_confirmPasswordFocus.hasFocus)
                         const Text('הסיסמאות אינן תואמות', style: TextStyle(color: Colors.red, fontSize: 14), textAlign: TextAlign.right),
                       const SizedBox(height: 16),
                       ElevatedButton(

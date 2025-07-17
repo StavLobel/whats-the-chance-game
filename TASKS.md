@@ -5,22 +5,24 @@
 ### 1.1. Project Setup & Infrastructure
 - Set up GitHub repository and branching strategy ✅
 - Set up CI/CD with GitHub Actions (including Black, Bandit, build, deploy) ✅
-- **Next:** Dockerize backend (FastAPI) and frontend (Flutter web)
+- Dockerize backend (FastAPI) and frontend (Flutter web) ✅
 - **Next:** Set up Hostinger server for deployment
 - **Next:** Configure deployment scripts and secrets (SSH/SCP/rsync)
 - **Next:** Test local builds and deployment pipeline
-- Configure Firebase (Firestore, Realtime DB, Cloud Functions)
+- **Next:** Setup Firebase (Firestore) database
 
 ### 1.2. Backend Development (FastAPI)
-- User management (registration, login, profile)
+- User management (registration, login, profile) ✅
 - Mission management (CRUD, statuses, appeals, cancellation)
 - Real-time notification endpoints
 - Security (authentication, password encryption, data protection)
 - Integration with Firebase (Firestore, Realtime DB, Cloud Functions)
 - Error handling and logging
+- **Next:** Connect backend to Firebase DB
+- **Next:** Enable Google/Apple/Meta registration endpoints
 
 ### 1.3. Frontend Development (Flutter)
-- User registration/login screens (Hebrew, RTL)
+- User registration/login screens (Hebrew, RTL) ✅
 - User profile screen
 - Challenge board (mission list, statuses, color coding, RTL)
 - Mission creation form (Hebrew input, user tagging)
@@ -29,6 +31,8 @@
 - Notification UI (real-time, Hebrew, RTL)
 - Results display (numbers, status, color coding)
 - Full Hebrew i18n and RTL support
+- **Next:** Enable Google/Apple/Meta registration in UI
+- **Next:** Create a dummy main page to verify login flow
 
 ### 1.4. Design (Figma)
 - Wireframes, mockups, and prototypes for all screens
