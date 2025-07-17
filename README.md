@@ -118,4 +118,4 @@ For more details, see [`SRD.md`](SRD.md) and the rules in [`.cursor/rules/`](.cu
 
 ---
 
-> Built with ❤️ for Hebrew speakers and RTL-first UX! 
+> Built with ❤️ by Stav Lobel! 
