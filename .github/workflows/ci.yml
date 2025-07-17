@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - production
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (Python FastAPI)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black bandit pytest
+      - name: Lint with Black
+        run: black --check .
+      - name: Security scan with Bandit
+        run: bandit -r .
+      - name: Run tests
+        run: pytest
+
+  frontend:
+    name: Frontend (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Format check
+        run: flutter format --set-exit-if-changed .
+      - name: Run tests
+        run: flutter test 
