@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+.venv/
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.idea/
+
+# Node/Firebase
+node_modules/
+.firebase/
+
+# General
+.DS_Store
+.env
+*.log
+*.sqlite3
+*.db
+
+# VSCode
+.vscode/
+
+# Cursor
+.cursor/ 
