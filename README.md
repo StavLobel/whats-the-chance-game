@@ -119,13 +119,3 @@ For more details, see [`SRD.md`](SRD.md) and the rules in [`.cursor/rules/`](.cu
 ---
 
 > Built with ❤️ for Hebrew speakers and RTL-first UX! 
-
----
-
-## © Copyright
-
-Copyright (c) Stav Lobel
-stavlobel@gmail.com
-All rights reserved.
-
-This project and its source code are the intellectual property of Stav Lobel. Unauthorized copying, distribution, or use is prohibited without explicit permission. 
