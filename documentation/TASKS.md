@@ -51,6 +51,29 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 ## 🎯 Development Phases
 
+### Phase 0: Infrastructure & Protection Setup
+
+**Priority: Critical (Foundational)**
+
+#### Major Tasks
+
+1. **Branch Protection & CI/CD Configuration** 🔒
+   - **Status**: Identified during testing, needs configuration
+   - Configure main branch protection rules
+   - Require pull request reviews before merging
+   - Require status checks to pass before merging
+   - Update CI/CD pipeline to trigger on pull requests
+   - Test and verify protection workflow
+   - **GitHub Issue**: [#18](https://github.com/StavLobel/whats-the-chance-game/issues/18)
+
+#### Minor Tasks
+
+- [ ] Configure branch protection rules in GitHub
+- [ ] Update GitHub Actions workflow for PR triggers
+- [ ] Add status check requirements
+- [ ] Test protection workflow
+- [ ] Update documentation with new workflow
+
 ### Phase 1: Foundation & TDD Setup
 
 **Priority: Critical**
@@ -253,8 +276,9 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 - ✅ Initial project setup complete
 - ✅ SRD and task planning complete
-- ✅ All major tasks have corresponding GitHub issues (#4-#16)
-- ⏳ Phase 1: Testing infrastructure setup (Current)
+- ✅ All major tasks have corresponding GitHub issues (#4-#18)
+- ⏳ Phase 0: Branch protection & CI/CD configuration (Current)
+- ⏳ Phase 1: Testing infrastructure setup
 - ⏳ Phase 2: Frontend core features
 - ⏳ Phase 3: Backend development
 - ⏳ Phase 4: Integration & testing
