@@ -1,3 +1,10 @@
+---
+description: Backend API development standards for FastAPI with Firebase
+globs:
+  - "backend/**/*.py"
+alwaysApply: false
+---
+
 # Backend API Guidelines
 
 ## FastAPI Standards
@@ -49,7 +56,3 @@ class APIResponse(BaseModel):
 - Generate Allure reports
 - Test Firebase integration with mocks
 - Achieve 90%+ test coverage
-description:
-globs:
-alwaysApply: false
----

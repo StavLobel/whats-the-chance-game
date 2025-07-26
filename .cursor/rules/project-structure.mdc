@@ -1,3 +1,9 @@
+---
+description: Project structure and organization guidelines
+globs:
+alwaysApply: true
+---
+
 # Project Structure Guidelines
 
 ## Directory Organization
@@ -50,7 +56,3 @@ backend/
 - Document API endpoints in FastAPI
 - Add JSDoc comments for complex functions
 - Maintain up-to-date SRD.md file
-description:
-globs:
-alwaysApply: false
----

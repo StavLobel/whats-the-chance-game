@@ -1,3 +1,11 @@
+---
+description: Frontend component development standards for React/TypeScript
+globs:
+  - "src/components/**/*.{ts,tsx}"
+  - "src/pages/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
 # Frontend Component Guidelines
 
 ## React Component Standards
@@ -49,7 +57,3 @@ export const ComponentName: React.FC<ComponentProps> = ({
 - Use Firebase hooks for authentication
 - Implement real-time listeners for Firestore
 - Handle offline states appropriately
-description:
-globs:
-alwaysApply: false
----
