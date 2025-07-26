@@ -11,6 +11,9 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 > 🧪 **Development Approach: Test-Driven Development (TDD)**  
 > This project follows strict TDD methodology with comprehensive testing using Vitest + React Testing Library (frontend) and Pytest + Playwright (backend).
 
+> 🌿 **Git Workflow: Feature Branch + Test-Based Merging**  
+> Each task uses a dedicated feature branch. Code is merged to main only after passing all tests (100% pass rate, 90%+ coverage) and code review approval.
+
 ## 🎮 What is "What's the Chance?"
 
 "What's the Chance?" is a real-time social game where players challenge each other with entertaining tasks. The twist? Whether you have to complete the challenge depends on a game of chance using number matching!
@@ -24,6 +27,7 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
   - Backend API - FastAPI development guidelines
   - Project Structure - Organization and naming conventions
   - GitHub Issue Tracking - Task completion workflow
+  - Git Workflow - Branch management and merge requirements
 
 ### How It Works
 

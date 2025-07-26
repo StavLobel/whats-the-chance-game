@@ -5,11 +5,16 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 ## 📋 Task Completion Workflow
 
 ### When Completing Any Task:
-1. **Update GitHub Issue**: Close the corresponding issue with implementation summary
-2. **Update TASKS.md**: Mark task as completed with completion date
-3. **Update Documentation**: Ensure README.md, SRD.md, and API docs are current
-4. **Commit Message**: Use format `✅ Complete [Task Name] - Closes #[issue-number]`
-5. **Quality Check**: Ensure all tests pass and code follows project standards
+1. **Create Feature Branch**: `git checkout -b feature/issue-number-task-name`
+2. **Implement with TDD**: Write tests first, then implementation
+3. **Run All Tests**: Ensure 100% test pass rate and 90%+ coverage
+4. **Create Pull Request**: From feature branch to main
+5. **Pass CI/CD Checks**: All automated tests must pass
+6. **Code Review**: Get approval from team member
+7. **Merge to Main**: Only after all checks pass
+8. **Update GitHub Issue**: Close with implementation summary
+9. **Update TASKS.md**: Mark task as completed with completion date
+10. **Update Documentation**: Ensure README.md, SRD.md, and API docs are current
 
 ### Issue Management:
 - All major tasks have corresponding GitHub issues for tracking
