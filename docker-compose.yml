@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # Frontend Development
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - dev
+
+  # Backend Development
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - dev
+
+  # Frontend Production
+  frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.prod
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=https://api.whatsthechance.com
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - prod
+
+  # Backend Production
+  backend-prod:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - prod
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - prod
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - frontend-prod
+      - backend-prod
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - prod
+
+  # Testing Environment
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - NODE_ENV=test
+      - CI=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - whats-the-chance-network
+    profiles:
+      - test
+
+volumes:
+  redis_data:
+
+networks:
+  whats-the-chance-network:
+    driver: bridge 

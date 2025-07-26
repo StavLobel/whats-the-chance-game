@@ -1,0 +1,170 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whats-the-chance-backend"
+version = "0.1.0"
+description = "Backend API for What's the Chance? social game"
+authors = [
+    {name = "Stav Lobel", email = "stavlobel@gmail.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["game", "api", "fastapi", "firebase", "social"]
+dependencies = [
+    "fastapi>=0.104.1,<0.105.0",
+    "uvicorn[standard]>=0.24.0,<0.25.0",
+    "pydantic>=2.5.0,<3.0.0",
+    "pydantic-settings>=2.1.0,<3.0.0",
+    "firebase-admin>=6.2.0,<7.0.0",
+    "google-cloud-firestore>=2.13.1,<3.0.0",
+    "python-jose[cryptography]>=3.3.0,<4.0.0",
+    "passlib[bcrypt]>=1.7.4,<2.0.0",
+    "python-multipart>=0.0.6,<1.0.0",
+    "redis>=5.0.1,<6.0.0",
+    "aioredis>=2.0.1,<3.0.0",
+    "httpx>=0.25.2,<1.0.0",
+    "structlog>=23.2.0,<24.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3,<8.0.0",
+    "pytest-asyncio>=0.21.1,<1.0.0",
+    "pytest-cov>=4.1.0,<5.0.0",
+    "pytest-mock>=3.12.0,<4.0.0",
+    "playwright>=1.40.0,<2.0.0",
+    "allure-pytest>=2.13.2,<3.0.0",
+    "black>=23.11.0,<24.0.0",
+    "isort>=5.12.0,<6.0.0",
+    "flake8>=6.1.0,<7.0.0",
+    "mypy>=1.7.1,<2.0.0",
+    "pre-commit>=3.6.0,<4.0.0",
+    "rich>=13.7.0,<14.0.0",
+    "bandit>=1.7.5,<2.0.0",
+]
+test = [
+    "pytest>=7.4.3,<8.0.0",
+    "pytest-asyncio>=0.21.1,<1.0.0",
+    "pytest-cov>=4.1.0,<5.0.0",
+    "playwright>=1.40.0,<2.0.0",
+    "allure-pytest>=2.13.2,<3.0.0",
+]
+prod = [
+    "gunicorn>=21.2.0,<22.0.0",
+    "sentry-sdk[fastapi]>=1.38.0,<2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/StavLobel/whats-the-chance-game"
+Repository = "https://github.com/StavLobel/whats-the-chance-game"
+Issues = "https://github.com/StavLobel/whats-the-chance-game/issues"
+
+[project.scripts]
+whats-the-chance-api = "app.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["app"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "firebase_admin.*",
+    "google.cloud.*",
+    "playwright.*",
+    "allure.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "e2e: marks tests as end-to-end tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv", ".venv"]
+skips = ["B101", "B601"] 
