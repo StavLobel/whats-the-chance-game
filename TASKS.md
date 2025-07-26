@@ -2,6 +2,21 @@
 
 This document breaks down the Software Requirements Document (SRD) into actionable development tasks, organized by major features and priority.
 
+## 📋 Task Completion Workflow
+
+### When Completing Any Task:
+1. **Update GitHub Issue**: Close the corresponding issue with implementation summary
+2. **Update TASKS.md**: Mark task as completed with completion date
+3. **Update Documentation**: Ensure README.md, SRD.md, and API docs are current
+4. **Commit Message**: Use format `✅ Complete [Task Name] - Closes #[issue-number]`
+5. **Quality Check**: Ensure all tests pass and code follows project standards
+
+### Issue Management:
+- All major tasks have corresponding GitHub issues for tracking
+- Use appropriate labels (bug, feature, enhancement, etc.)
+- Include acceptance criteria in issue descriptions
+- Link issues to related tasks in this document
+
 ## 🎯 Development Phases
 
 ### Phase 1: Foundation & TDD Setup

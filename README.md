@@ -19,6 +19,11 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 - **[Software Requirements Document (SRD)](./SRD.md)** - Complete technical specifications
 - **[Development Tasks](./TASKS.md)** - Breakdown of major and minor development tasks
 - **[Cursor Rules](./.cursor/rules/)** - Development guidelines and coding standards
+  - TDD Approach - Test-driven development methodology
+  - Frontend Components - React/TypeScript standards
+  - Backend API - FastAPI development guidelines
+  - Project Structure - Organization and naming conventions
+  - GitHub Issue Tracking - Task completion workflow
 
 ### How It Works
 
