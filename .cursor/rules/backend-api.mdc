@@ -1,0 +1,55 @@
+# Backend API Guidelines
+
+## FastAPI Standards
+- Use FastAPI for all API endpoints
+- Implement proper Pydantic models for request/response validation
+- Follow RESTful API design principles
+- Use dependency injection for shared services
+
+## Required API Endpoints
+- `POST /challenge/resolve` - Process challenge number matching
+- `GET /user/{id}/challenges` - Retrieve user's challenges
+- `POST /notification/send` - Send push notifications
+- `GET /challenge/{id}` - Get specific challenge details
+- `POST /challenge/{id}/respond` - Respond to challenge
+
+## Security Implementation
+- Validate Firebase Auth tokens on all protected routes
+- Scope data access to authenticated users only
+- Implement proper CORS settings
+- Use environment variables for sensitive configuration
+
+## Firebase Integration
+- Use Firebase Admin SDK for server-side operations
+- Implement Firestore database operations
+- Set up Firebase Cloud Messaging (FCM) for notifications
+- Configure Firestore security rules
+
+## API Response Format
+```python
+from pydantic import BaseModel
+from typing import Optional
+
+class APIResponse(BaseModel):
+    success: bool
+    data: Optional[dict] = None
+    message: Optional[str] = None
+    error: Optional[str] = None
+```
+
+## Error Handling
+- Use HTTPException for API errors
+- Implement global exception handlers
+- Log errors appropriately for debugging
+- Return consistent error response format
+
+## Testing Requirements
+- Write Pytest tests for all endpoints
+- Use Playwright for E2E testing
+- Generate Allure reports
+- Test Firebase integration with mocks
+- Achieve 90%+ test coverage
+description:
+globs:
+alwaysApply: false
+---

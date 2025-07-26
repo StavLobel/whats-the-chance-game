@@ -1,4 +1,48 @@
----
+# Test-Driven Development Guidelines
+
+Follow strict TDD methodology for all feature development:
+
+## TDD Cycle
+1. **RED**: Write a failing test first
+2. **GREEN**: Write minimal code to make the test pass
+3. **REFACTOR**: Improve code quality while keeping tests green
+
+## Frontend Testing (Vitest + React Testing Library)
+- Write unit tests for all React components
+- Test user interactions and component behavior
+- Mock external dependencies (Firebase, API calls)
+- Aim for 90%+ code coverage
+- Use descriptive test names that explain expected behavior
+
+## Backend Testing (Pytest + Playwright)
+- Write unit tests for all API endpoints
+- Integration tests for Firebase interactions
+- E2E tests for complete user flows
+- Generate Allure reports for all test runs
+
+## Test Structure
+```typescript
+describe('Component/Feature Name', () => {
+  beforeEach(() => {
+    // Setup test environment
+  });
+
+  it('should [expected behavior] when [condition]', () => {
+    // Arrange
+    // Act  
+    // Assert
+  });
+});
+```
+
+## Key Testing Scenarios
+- User authentication flow
+- Challenge creation and resolution
+- Real-time notifications
+- Number matching logic
+- Error handling and edge cases
+
+Never implement features without corresponding tests!
 description:
 globs:
 alwaysApply: false
