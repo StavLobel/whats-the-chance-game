@@ -1,73 +1,110 @@
-# Welcome to your Lovable project
+# What's the Chance? 🎲
 
-## Project info
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-3178C6?style=flat&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5.4.1-646CFF?style=flat&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.11-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![Radix UI](https://img.shields.io/badge/Radix_UI-Components-161618?style=flat&logo=radixui&logoColor=white)
 
-**URL**: https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c
+The ultimate social game of chance and challenges! Dare your friends and see if fate is on your side.
 
-## How can I edit this code?
+## 🎮 What is "What's the Chance?"
 
-There are several ways of editing your application.
+"What's the Chance?" is a fun social game where players challenge each other with entertaining tasks. The twist? Whether you have to complete the challenge depends on a game of chance using number matching!
 
-**Use Lovable**
+### How It Works
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c) and start prompting.
+1. **Challenge Someone** - Create a fun challenge and tag a friend (e.g., "What's the chance you'll sing karaoke?")
+2. **Pick Numbers** - Set a range (1-10, 1-50, etc.) and both players secretly pick a number within that range
+3. **Reveal & Decide** - If the numbers match, the challenge must be completed! If not, you're off the hook
 
-Changes made via Lovable will be committed automatically to this repo.
+## ✨ Features
 
-**Use your preferred IDE**
+- 🎯 **Simple Rules** - Easy to learn, impossible to put down
+- 👥 **Social Gaming** - Perfect for parties, friend groups, and team building
+- 🎨 **Beautiful UI** - Modern design with smooth animations
+- 📱 **Responsive** - Works great on all devices
+- ⚡ **Instant Play** - No registration required, start playing immediately
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
 
-Follow these steps:
+- Node.js (v18 or higher)
+- npm or bun
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+```bash
+git clone https://github.com/StavLobel/whats-the-chance-game.git
+cd whats-the-chance-game
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server:
+```bash
+npm run dev
+# or
+bun dev
+```
 
-**Use GitHub Codespaces**
+4. Open your browser and navigate to `http://localhost:8080`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🛠️ Built With
 
-## What technologies are used for this project?
+- **[React 18](https://reactjs.org/)** - UI library
+- **[TypeScript](https://www.typescriptlang.org/)** - Type safety
+- **[Vite](https://vitejs.dev/)** - Build tool and dev server
+- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[Radix UI](https://www.radix-ui.com/)** - Accessible component primitives
+- **[shadcn/ui](https://ui.shadcn.com/)** - Beautiful component library
+- **[React Router](https://reactrouter.com/)** - Client-side routing
+- **[Lucide React](https://lucide.dev/)** - Beautiful icons
 
-This project is built with:
+## 📁 Project Structure
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+src/
+├── components/          # Reusable UI components
+│   └── ui/             # shadcn/ui components
+├── pages/              # Application pages
+├── types/              # TypeScript type definitions
+├── data/               # Mock data and constants
+├── hooks/              # Custom React hooks
+└── lib/                # Utilities and helpers
+```
 
-## How can I deploy this project?
+## 🎯 Available Scripts
 
-Simply open [Lovable](https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c) and click on Share -> Publish.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build in development mode
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-## Can I connect a custom domain to my Lovable project?
+## 🤝 Contributing
 
-Yes, you can!
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📄 License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙋‍♂️ Author
+
+**Stav Lobel** - [GitHub](https://github.com/StavLobel)
+
+---
+
+⭐ If you enjoyed this project, please give it a star on GitHub!
