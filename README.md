@@ -8,9 +8,17 @@
 
 The ultimate social game of chance and challenges! Dare your friends and see if fate is on your side.
 
+> 🧪 **Development Approach: Test-Driven Development (TDD)**  
+> This project follows strict TDD methodology with comprehensive testing using Vitest + React Testing Library (frontend) and Pytest + Playwright (backend).
+
 ## 🎮 What is "What's the Chance?"
 
-"What's the Chance?" is a fun social game where players challenge each other with entertaining tasks. The twist? Whether you have to complete the challenge depends on a game of chance using number matching!
+"What's the Chance?" is a real-time social game where players challenge each other with entertaining tasks. The twist? Whether you have to complete the challenge depends on a game of chance using number matching!
+
+### 📋 Documentation
+- **[Software Requirements Document (SRD)](./SRD.md)** - Complete technical specifications
+- **[Development Tasks](./TASKS.md)** - Breakdown of major and minor development tasks
+- **[Cursor Rules](./.cursor/rules/)** - Development guidelines and coding standards
 
 ### How It Works
 
@@ -59,6 +67,7 @@ bun dev
 
 ## 🛠️ Built With
 
+### Frontend
 - **[React 18](https://reactjs.org/)** - UI library
 - **[TypeScript](https://www.typescriptlang.org/)** - Type safety
 - **[Vite](https://vitejs.dev/)** - Build tool and dev server
@@ -67,6 +76,13 @@ bun dev
 - **[shadcn/ui](https://ui.shadcn.com/)** - Beautiful component library
 - **[React Router](https://reactrouter.com/)** - Client-side routing
 - **[Lucide React](https://lucide.dev/)** - Beautiful icons
+- **[Vitest](https://vitest.dev/)** + **[React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)** - Testing
+
+### Backend (Planned)
+- **[Python FastAPI](https://fastapi.tiangolo.com/)** - Backend API framework
+- **[Firebase](https://firebase.google.com/)** - Authentication, Firestore, FCM
+- **[Pytest](https://pytest.org/)** + **[Playwright](https://playwright.dev/)** - Backend testing
+- **[Allure](https://allurereport.org/)** - Test reporting
 
 ## 📁 Project Structure
 
