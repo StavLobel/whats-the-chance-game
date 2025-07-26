@@ -33,10 +33,10 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 
 ### 📋 Documentation
 
-- **[Software Requirements Document (SRD)](./SRD.md)** - Complete technical specifications
-- **[Development Tasks](./TASKS.md)** - Breakdown of major and minor development tasks
-- **[Version Management](./VERSIONING.md)** - Semantic versioning and release process
-- **[Changelog](./CHANGELOG.md)** - Complete version history and changes
+- **[Software Requirements Document (SRD)](./documentation/SRD.md)** - Complete technical specifications
+- **[Development Tasks](./documentation/TASKS.md)** - Breakdown of major and minor development tasks
+- **[Version Management](./documentation/VERSIONING.md)** - Semantic versioning and release process
+- **[Changelog](./documentation/CHANGELOG.md)** - Complete version history and changes
 - **[Cursor Rules](./.cursor/rules/)** - Development guidelines and coding standards
 - **[Original Design Reference](https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c)** - Lovable project for visual reference
 
