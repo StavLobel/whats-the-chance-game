@@ -1,13 +1,19 @@
 # Software Requirements Document (SRD) – "What's the Chance?" App (Full System)
 
 > ⚙️ **Development Approach: Test-Driven Development (TDD)**  
-This project is developed using a TDD approach. Each feature starts with writing unit/integration tests (using tools like Vitest or Pytest + Playwright), followed by implementation, and only then refactoring. This ensures robust, predictable, and maintainable code.
+> This project is developed using a TDD approach. Each feature starts with writing unit/integration tests (using tools like Vitest or Pytest + Playwright), followed by implementation, and only then refactoring. This ensures robust, predictable, and maintainable code.
 
 ## 🧭 Overview
 
 "What's the Chance?" is a real-time social game where users challenge each other to complete funny or outrageous tasks — but whether they follow through depends on luck. The game revolves around number guessing: if two users choose the same number in a defined range, the challenge must be completed.
 
 This SRD includes specifications for the frontend and backend, outlines the use of Firebase and Python, and details deployment via a Hostinger VPS.
+
+### 📋 **Design Reference**
+
+- **Original Implementation**: [Lovable Project](https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c)
+- **Purpose**: Reference for UI/UX design, layout, and user experience
+- **Status**: Existing implementation provides foundation for development
 
 ---
 
@@ -56,11 +62,13 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 ## 🧩 Core Features
 
 ### Authentication
+
 - Firebase Authentication (Google, email/password)
 - Session persistence
 - Show user avatars/usernames in challenges
 
 ### Challenge Flow
+
 - User creates a challenge and tags another
 - Challenged user receives notification
 - Accept challenge → set range → both pick numbers
@@ -68,12 +76,14 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 - Users receive results in real-time
 
 ### Notifications
+
 - New challenge received
 - Challenge accepted
 - Challenge resolved (match or no match)
 - Firebase Cloud Messaging (FCM) integration
 
 ### Realtime Sync
+
 - Firebase Firestore for live updates
 - Snapshot listeners for user-specific challenge status
 
@@ -82,6 +92,7 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 ## 📦 Technology Stack
 
 ### Frontend
+
 - React 18, TypeScript
 - Tailwind CSS, shadcn/ui
 - Radix UI, Lucide icons
@@ -89,6 +100,7 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 - Vitest + Testing Library
 
 ### Backend
+
 - Python (FastAPI)
 - Pytest + Playwright (integration & E2E tests)
 - Allure Reports (HTML + CI reports)
@@ -151,12 +163,15 @@ backend/
 ## 🧱 Data Models
 
 ### User
+
 - `id`, `username`, `email`, `avatar`, `auth_provider`, `created_at`
 
 ### Challenge
+
 - `id`, `from_user`, `to_user`, `description`, `range`, `from_number`, `to_number`, `status`, `result`, `created_at`
 
 ### Notification
+
 - `id`, `user_id`, `challenge_id`, `type`, `read`, `created_at`
 
 ---
@@ -179,4 +194,4 @@ backend/
 - Challenge history/log
 - Reactions and comments
 - Group challenge support
-- Leaderboard 
+- Leaderboard

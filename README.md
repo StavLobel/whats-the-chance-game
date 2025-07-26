@@ -38,6 +38,7 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 - **[Version Management](./VERSIONING.md)** - Semantic versioning and release process
 - **[Changelog](./CHANGELOG.md)** - Complete version history and changes
 - **[Cursor Rules](./.cursor/rules/)** - Development guidelines and coding standards
+- **[Original Design Reference](https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c)** - Lovable project for visual reference
 
 ### How It Works
 
