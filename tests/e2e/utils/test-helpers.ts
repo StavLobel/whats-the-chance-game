@@ -6,9 +6,9 @@ export class TestHelpers {
   }
 
   static async takeScreenshot(page: Page, name: string) {
-    await page.screenshot({ 
+    await page.screenshot({
       path: `test-results/screenshots/${name}.png`,
-      fullPage: true 
+      fullPage: true,
     });
   }
 
@@ -22,14 +22,14 @@ export class TestHelpers {
     // Check for basic accessibility features
     const headings = await page.locator('h1, h2, h3, h4, h5, h6').count();
     expect(headings).toBeGreaterThan(0);
-    
+
     // Check for alt text on images
     const images = await page.locator('img').all();
     for (const img of images) {
       const alt = await img.getAttribute('alt');
       expect(alt).toBeTruthy();
     }
-    
+
     // Check for proper button roles
     const buttons = await page.locator('button').all();
     for (const button of buttons) {
@@ -41,16 +41,16 @@ export class TestHelpers {
 
   static async verifyNoConsoleErrors(page: Page) {
     const consoleErrors: string[] = [];
-    
-    page.on('console', (msg) => {
+
+    page.on('console', msg => {
       if (msg.type() === 'error') {
         consoleErrors.push(msg.text());
       }
     });
-    
+
     // Wait a bit for any console errors to appear
     await page.waitForTimeout(1000);
-    
+
     if (consoleErrors.length > 0) {
       console.log('Console errors detected:', consoleErrors);
       throw new Error(`Console errors detected: ${consoleErrors.join(', ')}`);
@@ -64,7 +64,7 @@ export class TestHelpers {
     });
   }
 
-  static async mockApiResponse(page: Page, url: string, response: any) {
+  static async mockApiResponse(page: Page, url: string, response: unknown) {
     await page.route(url, async route => {
       await route.fulfill({
         status: 200,
@@ -82,13 +82,16 @@ export class TestHelpers {
   }
 
   static async setLocalStorage(page: Page, key: string, value: string) {
-    await page.evaluate(({ key, value }) => {
-      localStorage.setItem(key, value);
-    }, { key, value });
+    await page.evaluate(
+      ({ key, value }) => {
+        localStorage.setItem(key, value);
+      },
+      { key, value }
+    );
   }
 
   static async getLocalStorage(page: Page, key: string): Promise<string | null> {
-    return await page.evaluate((key) => {
+    return await page.evaluate(key => {
       return localStorage.getItem(key);
     }, key);
   }
@@ -108,4 +111,4 @@ export class TestHelpers {
     expect(navigationTiming.load).toBeLessThan(5000);
     expect(navigationTiming.domComplete).toBeLessThan(5000);
   }
-} 
+}
