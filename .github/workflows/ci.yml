@@ -45,10 +45,24 @@ jobs:
           flags: frontend
           name: frontend-coverage
 
-      - name: Run E2E tests
+      - name: Run E2E tests with Playwright
         run: |
           npx playwright install --with-deps
-          npm run test:e2e
+          npx playwright test --reporter=allure-playwright
+        continue-on-error: true
+
+      - name: Generate Frontend Allure report
+        if: always()
+        run: |
+          npx allure generate allure-results --clean -o frontend-allure-report
+
+      - name: Upload Frontend Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-allure-report
+          path: frontend-allure-report/
+          retention-days: 30
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -95,10 +109,17 @@ jobs:
           flake8 .
           mypy .
 
-      - name: Run unit tests
+      - name: Run unit tests with Allure
         working-directory: ./backend
         run: |
-          pytest --cov=app --cov-report=xml --cov-report=html
+          pytest tests/unit/ --cov=app --cov-report=xml --cov-report=html --alluredir=allure-results
+        continue-on-error: true
+
+      - name: Run integration tests with Allure
+        working-directory: ./backend
+        run: |
+          pytest tests/integration/ --alluredir=allure-results
+        continue-on-error: true
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -107,17 +128,19 @@ jobs:
           flags: backend
           name: backend-coverage
 
-      - name: Run E2E tests
+      - name: Generate Backend Allure report
+        if: always()
         working-directory: ./backend
         run: |
-          playwright install --with-deps
-          pytest tests/e2e/ --allure-results-dir=allure-results
-
-      - name: Generate Allure report
-        if: always()
-        run: |
-          npm install -g allure-commandline
           allure generate allure-results --clean -o allure-report
+
+      - name: Upload Backend Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-allure-report
+          path: backend/allure-report/
+          retention-days: 30
 
       - name: Upload Allure report
         uses: actions/upload-artifact@v4
@@ -194,6 +217,83 @@ jobs:
         run: |
           echo "Deploying to production server..."
           # Add deployment script here
+
+  # Deploy Allure Reports to GitHub Pages
+  deploy-allure-reports:
+    name: Deploy Allure Reports
+    needs: [frontend-test, backend-test]
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Frontend Allure report
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-allure-report
+          path: ./allure-reports/frontend/
+        continue-on-error: true
+
+      - name: Download Backend Allure report
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-allure-report
+          path: ./allure-reports/backend/
+        continue-on-error: true
+
+      - name: Create index page
+        run: |
+          mkdir -p ./allure-reports
+          cat > ./allure-reports/index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Test Reports - What's the Chance Game</title>
+              <style>
+                  body { font-family: Arial, sans-serif; margin: 40px; }
+                  .container { max-width: 800px; margin: 0 auto; }
+                  .report-link { display: block; padding: 20px; margin: 10px 0; 
+                                background: #f5f5f5; text-decoration: none; 
+                                border-radius: 5px; color: #333; }
+                  .report-link:hover { background: #e0e0e0; }
+                  h1 { color: #2c3e50; }
+                  .timestamp { color: #7f8c8d; font-size: 14px; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>Test Reports - What's the Chance Game</h1>
+                  <p class="timestamp">Generated: \$(date)</p>
+                  <a href="./frontend/index.html" class="report-link">
+                      <h3>Frontend Test Report (Playwright)</h3>
+                      <p>End-to-end tests, component tests, and UI validation</p>
+                  </a>
+                  <a href="./backend/index.html" class="report-link">
+                      <h3>Backend Test Report (Pytest)</h3>
+                      <p>Unit tests, integration tests, and API testing</p>
+                  </a>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./allure-reports
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
 
   # Release
   release:
