@@ -45,7 +45,7 @@ export const createMockUser = (overrides = {}) => ({
   uid: 'test-user-id',
   email: 'test@example.com',
   displayName: 'Test User',
-  photoURL: 'https://example.com/avatar.jpg',
+  photoURL: null,
   ...overrides,
 });
 
@@ -53,7 +53,7 @@ export const createMockChallenge = (overrides = {}) => ({
   id: 'test-challenge-id',
   fromUser: 'user1',
   toUser: 'user2',
-  description: "What's the chance you'll sing in public?",
+  description: 'Test challenge description',
   status: 'pending' as const,
   createdAt: new Date(),
   ...overrides,
@@ -93,7 +93,7 @@ export const mockFirebaseUser = {
   uid: 'test-user-id',
   email: 'test@example.com',
   displayName: 'Test User',
-  photoURL: 'https://example.com/avatar.jpg',
+  photoURL: null,
   emailVerified: true,
   getIdToken: () => Promise.resolve('mock-token'),
   delete: () => Promise.resolve(),
