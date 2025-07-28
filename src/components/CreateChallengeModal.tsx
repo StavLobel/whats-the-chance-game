@@ -14,6 +14,7 @@ interface CreateChallengeModalProps {
 }
 
 export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModalProps) {
+  // open is used in the Dialog component below
   const [task, setTask] = useState('');
   const [targetUser, setTargetUser] = useState('');
   const [tags, setTags] = useState<string[]>([]);

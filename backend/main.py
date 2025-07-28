@@ -75,15 +75,9 @@ async def root():
 
 
 # Include routers
+app.include_router(challenges.router, prefix="/api/challenges", tags=["challenges"])
 app.include_router(
-    challenges.router, 
-    prefix="/api/challenges", 
-    tags=["challenges"]
-)
-app.include_router(
-    notifications.router, 
-    prefix="/api/notifications", 
-    tags=["notifications"]
+    notifications.router, prefix="/api/notifications", tags=["notifications"]
 )
 
 if __name__ == "__main__":

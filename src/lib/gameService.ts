@@ -10,7 +10,6 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-  Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Challenge, GameSession } from '@/types/challenge';
@@ -99,8 +98,6 @@ export class GameService {
    */
   private async calculateResult(challengeId: string, numbers: Record<string, number>): Promise<void> {
     const challengeRef = doc(this.challengesCollection, challengeId);
-    const challengeDoc = await getDoc(challengeRef);
-    const challengeData = challengeDoc.data() as Challenge;
 
     const numberValues = Object.values(numbers);
     const isMatch = numberValues[0] === numberValues[1];
@@ -206,7 +203,7 @@ export class GameService {
   /**
    * Listen to real-time updates for a specific challenge
    */
-  subscribeToChallenge(challengeId: string, callback: (challenge: Challenge | null) => void) {
+  subscribeToChallenge(challengeId: string, callback: (challenge: Challenge | null) => void) { // eslint-disable-line no-unused-vars
     const challengeRef = doc(this.challengesCollection, challengeId);
     
     return onSnapshot(challengeRef, (doc) => {
