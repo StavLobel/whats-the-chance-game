@@ -2,14 +2,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Clock, User, Zap } from "lucide-react";
+import { Clock, Zap } from "lucide-react";
 import { Challenge } from "@/types/challenge";
 
 interface ChallengeCardProps {
   challenge: Challenge;
-  onAccept?: (id: string) => void;
-  onReject?: (id: string) => void;
-  onClick?: (id: string) => void;
+  onAccept?: (_id: string) => void;
+  onReject?: (_id: string) => void;
+  onClick?: (_id: string) => void;
 }
 
 export function ChallengeCard({ challenge, onAccept, onReject, onClick }: ChallengeCardProps) {

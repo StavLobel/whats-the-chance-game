@@ -1,7 +1,8 @@
-import pytest
-import allure
 from datetime import datetime, timedelta
 from unittest.mock import Mock
+
+import allure
+import pytest
 
 # These imports will be updated when we create the actual models
 # from app.models.user import User
