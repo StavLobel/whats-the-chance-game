@@ -21,6 +21,11 @@ class UserBase(BaseModel):
     display_name: Optional[str] = Field(
         None, max_length=100, description="User display name"
     )
+    first_name: Optional[str] = Field(
+        None, max_length=50, description="User first name"
+    )
+    last_name: Optional[str] = Field(None, max_length=50, description="User last name")
+    username: Optional[str] = Field(None, max_length=30, description="Unique username")
     photo_url: Optional[str] = Field(None, description="User profile photo URL")
 
 
@@ -36,6 +41,35 @@ class UserCreate(UserBase):
             raise ValueError("Display name cannot be empty if provided")
         return v.strip() if v else None
 
+    @validator("first_name")
+    def validate_first_name(cls, v):
+        """Validate first name if provided."""
+        if v is not None and not v.strip():
+            raise ValueError("First name cannot be empty if provided")
+        return v.strip() if v else None
+
+    @validator("last_name")
+    def validate_last_name(cls, v):
+        """Validate last name if provided."""
+        if v is not None and not v.strip():
+            raise ValueError("Last name cannot be empty if provided")
+        return v.strip() if v else None
+
+    @validator("username")
+    def validate_username(cls, v):
+        """Validate username if provided."""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("Username cannot be empty if provided")
+            if len(v) < 3:
+                raise ValueError("Username must be at least 3 characters long")
+            if not v.replace("_", "").replace("-", "").isalnum():
+                raise ValueError(
+                    "Username can only contain letters, numbers, underscores, and hyphens"
+                )
+        return v
+
 
 class UserUpdate(BaseModel):
     """Schema for updating user profile."""
@@ -43,6 +77,11 @@ class UserUpdate(BaseModel):
     display_name: Optional[str] = Field(
         None, max_length=100, description="User display name"
     )
+    first_name: Optional[str] = Field(
+        None, max_length=50, description="User first name"
+    )
+    last_name: Optional[str] = Field(None, max_length=50, description="User last name")
+    username: Optional[str] = Field(None, max_length=30, description="Unique username")
     photo_url: Optional[str] = Field(None, description="User profile photo URL")
 
     @validator("display_name")
@@ -51,6 +90,35 @@ class UserUpdate(BaseModel):
         if v is not None and not v.strip():
             raise ValueError("Display name cannot be empty if provided")
         return v.strip() if v else None
+
+    @validator("first_name")
+    def validate_first_name(cls, v):
+        """Validate first name if provided."""
+        if v is not None and not v.strip():
+            raise ValueError("First name cannot be empty if provided")
+        return v.strip() if v else None
+
+    @validator("last_name")
+    def validate_last_name(cls, v):
+        """Validate last name if provided."""
+        if v is not None and not v.strip():
+            raise ValueError("Last name cannot be empty if provided")
+        return v.strip() if v else None
+
+    @validator("username")
+    def validate_username(cls, v):
+        """Validate username if provided."""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("Username cannot be empty if provided")
+            if len(v) < 3:
+                raise ValueError("Username must be at least 3 characters long")
+            if not v.replace("_", "").replace("-", "").isalnum():
+                raise ValueError(
+                    "Username can only contain letters, numbers, underscores, and hyphens"
+                )
+        return v
 
 
 class User(UserBase):
@@ -114,7 +182,8 @@ class UserSearch(BaseModel):
     """Schema for user search parameters."""
 
     query: Optional[str] = Field(
-        None, description="Search query for display name or email"
+        None,
+        description="Search query for display name, username, first name, last name, or email",
     )
     limit: int = Field(
         default=10, ge=1, le=100, description="Maximum number of results"
