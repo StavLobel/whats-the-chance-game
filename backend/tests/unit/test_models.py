@@ -7,6 +7,7 @@ from unittest.mock import Mock
 # from app.models.user import User
 # from app.models.challenge import Challenge
 
+
 @allure.epic("Backend Models")
 @allure.feature("User Model")
 class TestUserModel:
@@ -19,21 +20,21 @@ class TestUserModel:
         """Test creating a user with valid data."""
         with allure.step("Prepare valid user data"):
             user_data = mock_user_data
-            
+
         with allure.step("Create user instance"):
             # This would use the actual User model when implemented
             user = {
-                'uid': user_data['uid'],
-                'email': user_data['email'],
-                'display_name': user_data['display_name'],
-                'created_at': user_data['created_at']
+                "uid": user_data["uid"],
+                "email": user_data["email"],
+                "display_name": user_data["display_name"],
+                "created_at": user_data["created_at"],
             }
-            
+
         with allure.step("Verify user attributes"):
-            assert user['uid'] == 'test-user-id'
-            assert user['email'] == 'test@example.com'
-            assert user['display_name'] == 'Test User'
-            assert user['created_at'] is not None
+            assert user["uid"] == "test-user-id"
+            assert user["email"] == "test@example.com"
+            assert user["display_name"] == "Test User"
+            assert user["created_at"] is not None
 
     @allure.story("User Validation")
     @allure.severity(allure.severity_level.NORMAL)
@@ -44,7 +45,7 @@ class TestUserModel:
             valid_email = "test@example.com"
             assert "@" in valid_email
             assert "." in valid_email.split("@")[1]
-            
+
         with allure.step("Test invalid email"):
             invalid_email = "invalid-email"
             assert "@" not in invalid_email
@@ -57,7 +58,7 @@ class TestUserModel:
         with allure.step("Create user without display name"):
             email = "test@example.com"
             default_name = email.split("@")[0]
-            
+
         with allure.step("Verify default display name"):
             assert default_name == "test"
 
@@ -74,23 +75,23 @@ class TestChallengeModel:
         """Test creating a challenge with valid data."""
         with allure.step("Prepare valid challenge data"):
             challenge_data = mock_challenge_data
-            
+
         with allure.step("Create challenge instance"):
             challenge = {
-                'id': challenge_data['id'],
-                'title': challenge_data['title'],
-                'description': challenge_data['description'],
-                'creator_id': challenge_data['creator_id'],
-                'target_number': challenge_data['target_number'],
-                'status': challenge_data['status']
+                "id": challenge_data["id"],
+                "title": challenge_data["title"],
+                "description": challenge_data["description"],
+                "creator_id": challenge_data["creator_id"],
+                "target_number": challenge_data["target_number"],
+                "status": challenge_data["status"],
             }
-            
+
         with allure.step("Verify challenge attributes"):
-            assert challenge['id'] == 'test-challenge-id'
-            assert challenge['title'] == 'Test Challenge'
-            assert challenge['creator_id'] == 'test-user-id'
-            assert challenge['target_number'] == 42
-            assert challenge['status'] == 'active'
+            assert challenge["id"] == "test-challenge-id"
+            assert challenge["title"] == "Test Challenge"
+            assert challenge["creator_id"] == "test-user-id"
+            assert challenge["target_number"] == 42
+            assert challenge["status"] == "active"
 
     @allure.story("Challenge Validation")
     @allure.severity(allure.severity_level.NORMAL)
@@ -101,11 +102,11 @@ class TestChallengeModel:
             range_min, range_max = 1, 100
             target_number = 42
             assert range_min <= target_number <= range_max
-            
+
         with allure.step("Test invalid range - below minimum"):
             target_number = 0
             assert not (range_min <= target_number <= range_max)
-            
+
         with allure.step("Test invalid range - above maximum"):
             target_number = 101
             assert not (range_min <= target_number <= range_max)
@@ -116,16 +117,16 @@ class TestChallengeModel:
     def test_challenge_status_transitions(self):
         """Test valid challenge status transitions."""
         with allure.step("Test initial status"):
-            status = 'active'
-            assert status == 'active'
-            
+            status = "active"
+            assert status == "active"
+
         with allure.step("Test completed status"):
-            status = 'completed'
-            assert status in ['active', 'completed', 'expired', 'cancelled']
-            
+            status = "completed"
+            assert status in ["active", "completed", "expired", "cancelled"]
+
         with allure.step("Test expired status"):
-            status = 'expired'
-            assert status in ['active', 'completed', 'expired', 'cancelled']
+            status = "expired"
+            assert status in ["active", "completed", "expired", "cancelled"]
 
     @allure.story("Challenge Expiration")
     @allure.severity(allure.severity_level.NORMAL)
@@ -137,7 +138,7 @@ class TestChallengeModel:
             expires_at = now + timedelta(hours=24)
             is_expired = now > expires_at
             assert not is_expired
-            
+
         with allure.step("Create challenge with past expiration"):
             expires_at = now - timedelta(hours=1)
             is_expired = now > expires_at
@@ -159,7 +160,7 @@ class TestGameLogic:
             target = 42
             is_match = guess == target
             assert is_match is True
-            
+
         with allure.step("Test no match"):
             guess = 35
             target = 42
@@ -177,7 +178,7 @@ class TestGameLogic:
             range_size = 100
             accuracy = 100 - (abs(guess - target) / range_size * 100)
             assert accuracy == 100
-            
+
         with allure.step("Calculate score for close guess"):
             guess = 40
             target = 42
@@ -193,16 +194,16 @@ class TestGameLogic:
         """Test conditions for challenge completion."""
         with allure.step("Test completion with exact match"):
             responses = [
-                {'user_id': 'user1', 'guess': 42, 'is_correct': True},
-                {'user_id': 'user2', 'guess': 35, 'is_correct': False}
+                {"user_id": "user1", "guess": 42, "is_correct": True},
+                {"user_id": "user2", "guess": 35, "is_correct": False},
             ]
-            has_winner = any(response['is_correct'] for response in responses)
+            has_winner = any(response["is_correct"] for response in responses)
             assert has_winner is True
-            
+
         with allure.step("Test completion without match"):
             responses = [
-                {'user_id': 'user1', 'guess': 35, 'is_correct': False},
-                {'user_id': 'user2', 'guess': 30, 'is_correct': False}
+                {"user_id": "user1", "guess": 35, "is_correct": False},
+                {"user_id": "user2", "guess": 30, "is_correct": False},
             ]
-            has_winner = any(response['is_correct'] for response in responses)
-            assert has_winner is False 
+            has_winner = any(response["is_correct"] for response in responses)
+            assert has_winner is False

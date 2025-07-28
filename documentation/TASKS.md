@@ -49,242 +49,137 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 - Include acceptance criteria in issue descriptions
 - Link issues to related tasks in this document
 
-## 🎯 Development Phases
+## �� Development Phases & Logical Order
 
-### Phase 0: Infrastructure & Protection Setup ✅ **COMPLETED**
+### ✅ **COMPLETED PHASES**
+
+#### Phase 0: Infrastructure & Protection Setup ✅ **COMPLETED**
 
 **Priority: Critical (Foundational)**  
 **Status**: ✅ **COMPLETED** - July 27, 2025
 
-#### Major Tasks
+- ✅ **Branch Protection & CI/CD Configuration** 🔒
+  - **GitHub Issue**: [#18](https://github.com/StavLobel/whats-the-chance-game/issues/18) ✅ **CLOSED**
 
-1. **Branch Protection & CI/CD Configuration** 🔒 ✅
-   - **Status**: ✅ **COMPLETED**
-   - ✅ Fixed deprecated GitHub Actions (upload-artifact v3→v4, cache v3→v4)
-   - ✅ Fixed ESLint configuration for flat config format
-   - ✅ Verified pipeline triggers correctly on pull requests
-   - ✅ Tested complete workflow with successful merge
-   - ✅ All quality gates established and functional
-   - **GitHub Issue**: [#18](https://github.com/StavLobel/whats-the-chance-game/issues/18) ✅ **CLOSED**
-
-#### Minor Tasks
-
-- ✅ Configured CI/CD pipeline for PR triggers
-- ✅ Updated GitHub Actions to latest versions
-- ✅ Fixed ESLint configuration issues
-- ✅ Tested protection workflow successfully
-- ✅ Updated documentation with new workflow
-
-### Phase 1: Foundation & TDD Setup ✅ **COMPLETED**
+#### Phase 1: Foundation & TDD Setup ✅ **COMPLETED**
 
 **Priority: Critical**  
 **Status**: ✅ **COMPLETED** - July 27, 2025
 
-#### Major Tasks
+- ✅ **Testing Infrastructure Setup** 🧪
+  - **GitHub Issue**: [#19](https://github.com/StavLobel/whats-the-chance-game/issues/19) ✅ **CLOSED**
+- ✅ **Project Structure & Tooling** 📁
+  - **GitHub Issue**: [#17](https://github.com/StavLobel/whats-the-chance-game/issues/17) ✅ **CLOSED**
 
-1. **Testing Infrastructure Setup** 🧪 ✅ **COMPLETED**
-   - **Status**: ✅ **COMPLETED**
-   - ✅ Set up Vitest + React Testing Library for frontend
-   - ✅ Configure test environment and mocking strategies
-   - ✅ Set up Allure reporting integration (frontend & backend)
-   - ✅ Create testing utilities and helpers
-   - ✅ Establish TDD workflow in CI/CD
-   - **GitHub Issue**: [#19](https://github.com/StavLobel/whats-the-chance-game/issues/19) ✅ **CLOSED**
+#### Phase 2: Frontend Core Features ✅ **COMPLETED**
 
-2. **Project Structure & Tooling** 📁 ✅ **COMPLETED**
-   - **Status**: ✅ **COMPLETED**
-   - ✅ Reorganize project structure according to SRD specifications
-   - ✅ Set up Cursor rules and development guidelines
-   - ✅ Configure ESLint/Prettier with project standards
-   - ✅ Set up pre-commit hooks for code quality
-   - ✅ Create development environment documentation
-   - **GitHub Issue**: [#17](https://github.com/StavLobel/whats-the-chance-game/issues/17) ✅ **CLOSED**
+**Priority: High**  
+**Status**: ✅ **COMPLETED** - July 28, 2025
 
-#### Minor Tasks
+- ✅ **Authentication System Integration** 🔐
+  - **GitHub Issue**: [#6](https://github.com/StavLobel/whats-the-chance-game/issues/6) ✅ **CLOSED**
+- ✅ **UI/UX Enhancement & Polish** 🎨
+  - **GitHub Issue**: [#7](https://github.com/StavLobel/whats-the-chance-game/issues/7) ✅ **CLOSED**
+- ✅ **Hebrew Support for Challenge Descriptions + Dark Mode** 🌍
+  - **GitHub Issue**: [#21](https://github.com/StavLobel/whats-the-chance-game/issues/21) ✅ **CLOSED**
 
-- ✅ Configure Vitest config file
-- ✅ Set up testing utilities
-- ✅ Create mock data generators
-- ✅ Set up test coverage reporting
-- ✅ Configure GitHub Actions for testing
+### 🔄 **CURRENT DEVELOPMENT PHASE**
 
-### Phase 2: Frontend Core Features
+#### Phase 2: Frontend Core Features (Continued)
 
-**Priority: High**
+**Priority: High**  
+**Status**: ⏳ **IN PROGRESS**
 
-#### Major Tasks
+#### Major Tasks (Logical Order)
 
-3. **Authentication System Integration** 🔐
-   - **Status**: UI components exist, need Firebase integration
-   - Firebase Authentication integration with existing UI
-   - Login/Register components with existing design system
-   - Protected route implementation
-   - User session management with existing state
-   - Auth state persistence
+1. **🧹 Clean Up Sample Data and Mock Content** [#23](https://github.com/StavLobel/whats-the-chance-game/issues/23)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: High
+   - Remove all sample data, mock content, and placeholder information
+   - Clean up frontend mock data (challenges, users, statistics)
+   - Clean up backend test fixtures and sample data
+   - Prepare for production-ready implementation
 
-4. **UI/UX Enhancement & Polish** 🎨
-   - **Status**: 90% of UI exists, need refinement
-   - Enhance existing classic menu drawer navigation
-   - Improve responsive layout system
-   - Add light/dark mode toggle to existing UI
-   - Enhance notification system with existing toast components
-   - Polish animations and transitions in existing components
+2. **🎮 Core Game Logic Implementation** [#20](https://github.com/StavLobel/whats-the-chance-game/issues/20)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: Critical
+   - Implement core number matching algorithm
+   - Add challenge resolution logic
+   - Create game state management
+   - Implement win/loss conditions
 
-5. **Challenge Management Enhancement** 🎮
-   - **Status**: Core components exist, need real data integration
+3. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: High
    - Connect existing ChallengeCard components to real data
    - Enhance existing ChallengeDetail with real-time updates
    - Improve existing CreateChallengeModal with validation
    - Add real-time updates to existing number selection interface
-   - Connect existing challenge status tracking to backend
 
-6. **Hebrew Support for Challenge Descriptions + Dark Mode** 🌍 ✅
-   - **Status**: ✅ **COMPLETED** - July 28, 2025
-   - ✅ **RTL Support**: Hebrew text input with automatic RTL detection (`dir="auto"`)
-   - ✅ **Hebrew Font Support**: Heebo font for proper Hebrew display
-   - ✅ **Challenge Descriptions**: Support Hebrew text in challenge descriptions
-   - ✅ **Mock Data**: Hebrew challenge descriptions in mock data
-   - ✅ **Dark Mode**: Complete theme system with light/dark/system options
-   - ✅ **Theme Toggle**: Accessible theme switcher in navigation and landing page
-   - ✅ **Theme Persistence**: User preferences saved in localStorage
-   - ✅ **System Theme**: Respects user's OS theme preference by default
-   - ✅ **Landing Page**: Theme toggle added to landing page with backdrop blur
-   - ✅ **Layout Improvements**: Fixed sidebar spacing and text truncation issues
-   - ✅ **Visual Polish**: Enhanced dark mode gradients and transitions
-   - **GitHub Issue**: [#21](https://github.com/StavLobel/whats-the-chance-game/issues/21) ✅ **CLOSED**
+### 🔄 **UPCOMING PHASES**
 
-#### Minor Tasks
-
-- [ ] **Enhance existing design system** with additional Tailwind utilities
-- [ ] **Improve existing icon system** with more Lucide icons
-- [ ] **Add loading states** to existing components
-- [ ] **Enhance error boundaries** for existing components
-- [ ] **Improve form validation** in existing modals
-- [ ] **Polish existing modal and dialog components**
-- [ ] **Enhance existing notification toast system**
-- [ ] **Improve mobile responsiveness** of existing components
-- [ ] **Add accessibility improvements** to existing UI
-- [ ] **Connect existing mock data** to real Firebase data
-- [ ] **Add real-time updates** to existing challenge cards
-- [ ] **Enhance existing animations** and micro-interactions
-
-### Phase 3: Backend Development
+#### Phase 3: Backend Development
 
 **Priority: High**
 
-#### Major Tasks
-
-6. **Backend Infrastructure** ⚙️
+4. **⚙️ Backend Infrastructure** [#9](https://github.com/StavLobel/whats-the-chance-game/issues/9)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: High
    - FastAPI project setup with tests
    - Firebase Admin SDK integration
    - Database schema and models
    - API endpoint implementation
-   - Security and authentication middleware
 
-7. **Real-time Features** 🔄
+5. **🔄 Real-time Features** [#10](https://github.com/StavLobel/whats-the-chance-game/issues/10)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: High
    - Firestore integration
    - Real-time challenge updates
    - Push notification system (FCM)
    - WebSocket connections for live updates
-   - Offline state handling
 
-#### Minor Tasks
-
-- [ ] API documentation with FastAPI
-- [ ] Database migration system
-- [ ] Error handling middleware
-- [ ] Request/response validation
-- [ ] Rate limiting implementation
-- [ ] Logging and monitoring setup
-- [ ] Environment configuration
-- [ ] Docker containerization
-
-### Phase 4: Integration & Testing
+#### Phase 4: Integration & Testing
 
 **Priority: Medium**
 
-#### Major Tasks
-
-8. **Frontend-Backend Integration** 🔗
+6. **🔗 Frontend-Backend Integration** [#11](https://github.com/StavLobel/whats-the-chance-game/issues/11)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: Medium
    - API client implementation
    - State management for server data
    - Error handling and retry logic
-   - Offline functionality
-   - Data synchronization
 
-9. **End-to-End Testing** 🧪
+7. **🧪 End-to-End Testing** [#12](https://github.com/StavLobel/whats-the-chance-game/issues/12)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: Medium
    - Playwright E2E test setup
    - Complete user flow testing
    - Cross-browser testing
-   - Performance testing
-   - Accessibility testing
 
-#### Minor Tasks
-
-- [ ] API client error handling
-- [ ] Loading states management
-- [ ] Data caching strategies
-- [ ] Optimistic updates
-- [ ] Network error recovery
-- [ ] Performance optimizations
-
-### Phase 5: Deployment & DevOps
+#### Phase 5: Deployment & DevOps
 
 **Priority: Medium**
 
-#### Major Tasks
+8. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: Medium
+   - Hostinger VPS setup with Traefik v3.0
+   - Docker Compose configuration
+   - Let's Encrypt HTTPS certificate automation
 
-10. **Deployment Infrastructure** 🚀
-    - Hostinger VPS setup
-    - Docker Compose configuration
-    - Traefik reverse proxy setup
-    - Let's Encrypt HTTPS certificate automation
-    - Environment variable management
+9. **🔄 CI/CD Pipeline** [#14](https://github.com/StavLobel/whats-the-chance-game/issues/14)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: Medium
+   - GitHub Actions workflow
+   - Automated testing pipeline
+   - Build and deployment automation
 
-11. **CI/CD Pipeline** 🔄
-    - GitHub Actions workflow
-    - Automated testing pipeline
-    - Build and deployment automation
-    - Allure report generation
-    - Environment promotion strategy
-
-#### Minor Tasks
-
-- [ ] Traefik dashboard configuration
-- [ ] Server monitoring setup
-- [ ] Backup strategies
-- [ ] Performance monitoring
-- [ ] Error tracking (Sentry)
-- [ ] Log aggregation
-- [ ] Security hardening
-
-### Phase 6: Advanced Features
-
-**Priority: Low (Future)**
-
-#### Major Tasks
-
-12. **Enhanced Game Features** 🎯
-    - Challenge history and statistics
-    - User profiles and avatars
-    - Achievement system
-    - Social features (friends, leaderboards)
-    - Group challenges
-
-13. **Mobile Experience** 📱
-    - Progressive Web App (PWA) features
-    - Mobile app considerations
-    - Push notification optimization
-    - Offline-first architecture
-    - App store preparation
-
-#### Minor Tasks
-
-- [ ] Advanced animations
-- [ ] Gamification elements
-- [ ] Social sharing features
-- [ ] Analytics integration
-- [ ] A/B testing framework
+10. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: Low
+    - Production deployment workflow
+    - Versioning and release workflow
+    - Advanced testing and monitoring
 
 ## 📊 Success Metrics
 
@@ -296,24 +191,21 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 ## 🔄 Current Status
 
-- ✅ Initial project setup complete
-- ✅ SRD and task planning complete
-- ✅ All major tasks have corresponding GitHub issues (#4-#18)
 - ✅ **Phase 0: Infrastructure & Protection Setup** - **COMPLETED** (July 27, 2025)
-<<<<<<< HEAD
-- ✅ **Phase 1: Testing Infrastructure & Project Structure** - **COMPLETED** (July 27, 2025)
-- ⏳ **Phase 2: Frontend core features** (Current)
-=======
-- ✅ **Phase 1: Testing infrastructure setup** - **COMPLETED** (July 27, 2025)
-- ✅ **Phase 2: Hebrew Support & Dark Mode** - **COMPLETED** (July 28, 2025)
-- ⏳ Phase 2: Remaining Frontend core features
->>>>>>> feature/6-authentication-system-integration
-- ⏳ Phase 3: Backend development
-- ⏳ Phase 4: Integration & testing
-- ⏳ Phase 5: Deployment
-- ⏳ Phase 6: Advanced features (Future)
+- ✅ **Phase 1: Foundation & TDD Setup** - **COMPLETED** (July 27, 2025)
+- ✅ **Phase 2: Frontend Core Features (Part 1)** - **COMPLETED** (July 28, 2025)
+- ⏳ **Phase 2: Frontend Core Features (Part 2)** - **IN PROGRESS** (Current)
+- ⏳ **Phase 3: Backend Development** - **PENDING**
+- ⏳ **Phase 4: Integration & Testing** - **PENDING**
+- ⏳ **Phase 5: Deployment & DevOps** - **PENDING**
+
+## 🎯 Next Immediate Tasks
+
+1. **🧹 Clean Up Sample Data** (#23) - Remove all mock content
+2. **🎮 Core Game Logic** (#20) - Implement number matching algorithm
+3. **🎮 Challenge Management** (#8) - Connect UI to real data
 
 ---
 
-_Last updated: [Current Date]_
+_Last updated: July 28, 2025_
 _See [SRD.md](./SRD.md) for detailed technical specifications_

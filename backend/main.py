@@ -47,19 +47,16 @@ app.add_middleware(
 
 # Security middleware
 app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.vercel.app"]
+    TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "*.vercel.app"]
 )
+
 
 # Health check endpoint
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint for monitoring and load balancers."""
-    return {
-        "status": "healthy",
-        "service": "whats-the-chance-api",
-        "version": "0.1.0"
-    }
+    return {"status": "healthy", "service": "whats-the-chance-api", "version": "0.1.0"}
+
 
 # Root endpoint
 @app.get("/")
@@ -69,8 +66,9 @@ async def root():
         "message": "What's the Chance? API",
         "version": "0.1.0",
         "docs": "/api/docs",
-        "health": "/api/health"
+        "health": "/api/health",
     }
+
 
 # Include routers (uncomment when routers are created)
 # app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
@@ -81,10 +79,4 @@ async def root():
 if __name__ == "__main__":
     # Development server
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=True,
-        log_level="info"
-    ) 
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True, log_level="info")
