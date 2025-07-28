@@ -33,6 +33,16 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
     }
   };
 
+  const getStatusText = (status: Challenge['status']) => {
+    switch (status) {
+      case 'pending': return 'Pending';
+      case 'accepted': return 'Accepted';
+      case 'completed': return 'Completed';
+      case 'rejected': return 'Rejected';
+      default: return 'Unknown';
+    }
+  };
+
   return (
     <Card 
       className="bg-gradient-card hover:shadow-card transition-all duration-300 hover:scale-[1.02] cursor-pointer border-border/50"
@@ -53,13 +63,13 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
           </div>
           <Badge className={`${getStatusColor(challenge.status)} animate-bounce-in`}>
             {getStatusIcon(challenge.status)}
-            {challenge.status}
+            {getStatusText(challenge.status)}
           </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="pb-4">
-        <p className="text-foreground font-medium leading-relaxed">
+        <p className="text-foreground font-medium leading-relaxed" dir="auto">
           "{challenge.description}"
         </p>
         {challenge.range && (

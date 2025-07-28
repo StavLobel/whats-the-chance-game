@@ -1,0 +1,47 @@
+# Traefik Configuration
+api:
+  dashboard: true
+  insecure: true  # Only for development, disable in production
+
+# Entry Points
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+# Providers
+providers:
+  docker:
+    exposedByDefault: false
+    network: whats-the-chance-network
+
+# Certificate Resolvers
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ${ACME_EMAIL}
+      storage: /ssl-certs/acme.json
+      tlsChallenge: {}
+
+# Global configuration
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# Logging
+log:
+  level: INFO
+
+accessLog: {}
+
+# Metrics (optional)
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true 

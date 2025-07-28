@@ -1,13 +1,20 @@
 # What's the Chance? 🎲
 
+<div align="center">
+  <img src="public/logo.png" alt="What's the Chance? Logo" width="200" height="200" />
+</div>
+
 [![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0.2-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.0.0-646CFF?logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![shadcn/ui](https://img.shields.io/badge/shadcn/ui-0.0.4-000000?logo=shadcn)](https://ui.shadcn.com/)
+[![Vitest](https://img.shields.io/badge/Vitest-1.0.0-6E9F18?logo=vitest)](https://vitest.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python)](https://www.python.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-10.7.1-FFCA28?logo=firebase)](https://firebase.google.com/)
 [![Docker](https://img.shields.io/badge/Docker-3.8-2496ED?logo=docker)](https://www.docker.com/)
+[![Traefik](https://img.shields.io/badge/Traefik-v3.0-24A1C1?logo=traefik)](https://traefik.io/)
 [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI/CD-2088FF?logo=github-actions)](https://github.com/features/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/StavLobel/whats-the-chance-game/releases)
@@ -56,6 +63,9 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 - **Push Notifications**: Instant challenge alerts via FCM
 - **Responsive Design**: Works perfectly on all devices
 - **Modern UI**: Beautiful interface with shadcn/ui components
+- **Hebrew/RTL Support**: Hebrew text support for challenge descriptions with RTL layout
+- **Dark Mode**: Complete theme system with light/dark/system options
+- **Theme Toggle**: Accessible theme switcher on landing page and in-game
 - **Offline Support**: Graceful handling of network issues
 
 ## 🛠️ Technology Stack
@@ -70,6 +80,7 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 - **Radix UI** - Accessible primitives
 - **Lucide React** - Icon library
 - **React Router** - Client-side routing
+- **React i18next** - Internationalization (removed - UI in English only)
 - **Vitest** - Unit testing framework
 - **React Testing Library** - Component testing
 - **Playwright** - End-to-end testing
@@ -90,6 +101,7 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 ### DevOps & Quality
 
 - **Docker** - Containerization
+- **Traefik** - Reverse proxy with automatic SSL
 - **GitHub Actions** - CI/CD pipeline
 - **ESLint + Prettier** - Code formatting
 - **Black + isort + mypy** - Python code quality
@@ -320,8 +332,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🏗️ Project Status
 
 **Current Version**: 0.1.0  
-**Status**: Foundation Complete - Ready for Phase 1 Development  
-**Next Milestone**: Testing Infrastructure Setup (Issue #4)
+**Status**: Phase 2 Complete - Hebrew Support & Dark Mode Implemented  
+**Next Milestone**: Remaining Frontend Core Features
 
 ## 🔒 Security Status
 
