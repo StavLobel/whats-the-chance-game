@@ -31,6 +31,7 @@ Track all conversations and interactions with the AI agent for project developme
 - Maintain consistent formatting throughout the log
 
 ## Update Triggers
+- **On new chat initialization**: Read existing chat logs for context and continuity
 - After each user request is completed
 - When new files are created or modified
 - When technical challenges are resolved
@@ -44,7 +45,22 @@ Track all conversations and interactions with the AI agent for project developme
 4. Files modified and created
 5. Next steps and future considerations
 
+## Chat Initialization Process
+- **Read conversation-log.txt**: Review previous development progress and decisions
+- **Read chat-transcript.txt**: Review recent conversation context and user preferences
+- **Identify ongoing tasks**: Note any incomplete work or pending decisions
+- **Maintain continuity**: Reference previous solutions and technical decisions
+- **Update session markers**: Add new session start markers with current date/time
+
 ## Security Note
 - Do not log sensitive information like API keys or passwords
 - Focus on technical implementation and user interactions
 - Keep the log focused on development progress and decisions
+
+## Benefits of Reading Logs on Initialization
+- **Context Continuity**: Understand previous decisions and technical approaches
+- **User Preferences**: Remember user's preferred workflows and communication style
+- **Ongoing Tasks**: Identify incomplete work that needs attention
+- **Technical Decisions**: Reference previous solutions to maintain consistency
+- **Development History**: Build on previous work without repeating mistakes
+- **Session Efficiency**: Reduce time spent re-explaining previous work
