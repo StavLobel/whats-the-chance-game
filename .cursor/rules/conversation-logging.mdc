@@ -1,6 +1,6 @@
 ---
 description: Conversation logging rule to track all AI agent interactions
-globs: ["conversation-log.txt"]
+globs: ["conversation-log.txt", "chat-transcript.txt"]
 alwaysApply: true
 ---
 
@@ -8,6 +8,10 @@ alwaysApply: true
 
 ## Purpose
 Track all conversations and interactions with the AI agent for project development history and reference.
+
+## Log Files
+- **conversation-log.txt**: Development progress and technical implementation details
+- **chat-transcript.txt**: Raw conversation messages with timestamps
 
 ## Requirements
 - Update conversation-log.txt after each significant interaction

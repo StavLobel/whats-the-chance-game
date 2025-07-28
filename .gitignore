@@ -203,6 +203,7 @@ build/
 logs/
 *.log
 conversation-log.txt
+chat-transcript.txt
 
 # Database
 *.db
