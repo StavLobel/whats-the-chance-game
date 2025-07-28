@@ -1,6 +1,10 @@
 version: '3.8'
 
 services:
+  # Note: Traefik is already running on the host server
+  # This application will connect to the existing Traefik instance
+  # via Docker labels and the host's Docker socket
+
   # Frontend Development
   frontend-dev:
     build:
@@ -41,38 +45,68 @@ services:
 
   # Frontend Production
   frontend-prod:
+    container_name: whatsthechance-frontend-prod
     build:
       context: .
       dockerfile: Dockerfile.frontend.prod
-    ports:
-      - "80:80"
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=https://api.whatsthechance.com
+      - VITE_API_URL=https://api.${DOMAIN_NAME}
     networks:
       - whats-the-chance-network
+      - traefik  # Connect to existing Traefik network
     profiles:
-      - prod
+      - production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whatsthechance-frontend.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.whatsthechance-frontend.tls=true"
+      - "traefik.http.routers.whatsthechance-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whatsthechance-frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.whatsthechance-frontend.middlewares=whatsthechance-frontend-headers"
+      - "traefik.http.middlewares.whatsthechance-frontend-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
 
   # Backend Production
   backend-prod:
+    container_name: whatsthechance-backend-prod
     build:
       context: ./backend
-      dockerfile: Dockerfile.prod
-    ports:
-      - "8000:8000"
+      dockerfile: Dockerfile
     environment:
       - ENVIRONMENT=production
       - DEBUG=false
       - API_HOST=0.0.0.0
       - API_PORT=8000
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+    volumes:
+      - ./backend/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - whats-the-chance-network
+      - traefik  # Connect to existing Traefik network
     profiles:
-      - prod
+      - production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whatsthechance-backend.rule=Host(`api.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.whatsthechance-backend.tls=true"
+      - "traefik.http.routers.whatsthechance-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whatsthechance-backend.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolalloworiginlist=https://${DOMAIN_NAME}"
+      - "traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.routers.whatsthechance-backend.middlewares=whatsthechance-backend-cors"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Redis Cache
   redis:
+    container_name: whatsthechance-redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
@@ -81,25 +115,7 @@ services:
     networks:
       - whats-the-chance-network
     profiles:
-      - prod
-
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/logs:/var/log/nginx
-    depends_on:
-      - frontend-prod
-      - backend-prod
-    networks:
-      - whats-the-chance-network
-    profiles:
-      - prod
+      - production
 
   # Testing Environment
   test:
@@ -122,4 +138,6 @@ volumes:
 
 networks:
   whats-the-chance-network:
-    driver: bridge 
+    driver: bridge
+  traefik:
+    external: true  # Use existing Traefik network 

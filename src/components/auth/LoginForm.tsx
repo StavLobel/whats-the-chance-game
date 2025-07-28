@@ -16,6 +16,7 @@ import { Loader2, Mail, Lock, Chrome, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../lib/utils';
 
+
 interface LoginFormProps {
   onSwitchToSignUp?: () => void;
   onSuccess?: () => void;
@@ -60,7 +61,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignUp, onSucces
       await signIn(formData.email, formData.password);
       onSuccess?.();
     } catch (error: unknown) {
-      setErrors((error as Error).message || 'Failed to sign in. Please try again.');
+      setErrors((error as Error).message || 'Sign in failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,7 +74,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignUp, onSucces
       await signInWithGoogle();
       onSuccess?.();
     } catch (error: unknown) {
-      setErrors((error as Error).message || 'Failed to sign in with Google. Please try again.');
+      setErrors((error as Error).message || 'Google sign in failed. Please try again.');
     }
   };
 
@@ -88,7 +89,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignUp, onSucces
       <CardHeader className='space-y-1'>
         <CardTitle className='text-2xl font-bold text-center'>Welcome back!</CardTitle>
         <CardDescription className='text-center'>
-          Sign in to continue your What's the Chance adventure
+          Sign in to continue your adventure in "What's the Chance?"
         </CardDescription>
       </CardHeader>
 

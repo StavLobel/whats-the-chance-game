@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Play, Users, Zap, Trophy, ArrowRight, Dice1, Dice2 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import Game from "./Game";
 
 const Index = () => {
@@ -14,14 +15,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <div className="bg-background/80 backdrop-blur-sm rounded-lg p-1 shadow-lg border border-border/50">
+          <ThemeToggle />
+        </div>
+      </div>
+      
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8 max-w-4xl mx-auto">
           {/* Logo */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow animate-bounce-in">
-              <span className="text-primary-foreground font-bold text-2xl">?</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="What's the Chance? Logo" 
+              className="w-32 h-32 rounded-2xl shadow-glow animate-bounce-in"
+            />
           </div>
 
           {/* Title */}
@@ -104,77 +114,59 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Features */}
-        <div className="mt-24 grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Perfect for Any Group</h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Badge variant="secondary" className="mt-1">
-                  <Trophy className="h-3 w-3" />
-                </Badge>
-                <div>
-                  <h3 className="font-semibold">Party Games</h3>
-                  <p className="text-muted-foreground">Break the ice and get everyone laughing</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Badge variant="secondary" className="mt-1">
-                  <Users className="h-3 w-3" />
-                </Badge>
-                <div>
-                  <h3 className="font-semibold">Friend Groups</h3>
-                  <p className="text-muted-foreground">Create hilarious memories together</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Badge variant="secondary" className="mt-1">
-                  <Zap className="h-3 w-3" />
-                </Badge>
-                <div>
-                  <h3 className="font-semibold">Team Building</h3>
-                  <p className="text-muted-foreground">Fun challenges for work events</p>
-                </div>
-              </div>
-            </div>
+        {/* Perfect for Any Group */}
+        <div className="mt-24 space-y-12">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-4">Perfect for Any Group</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Whether you're with friends, family, or colleagues, What's the Chance? brings everyone together.
+            </p>
           </div>
 
-          <div className="relative">
-            <div className="bg-gradient-card rounded-lg p-8 shadow-card">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-sm">A</span>
-                  </div>
-                  <span className="font-medium">@alice challenged you</span>
-                </div>
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <p className="font-medium">"Do a cartwheel in the yard"</p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1 bg-primary/10 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-primary">7</div>
-                    <div className="text-xs text-muted-foreground">Your pick</div>
-                  </div>
-                  <div className="flex-1 bg-primary/10 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-primary">7</div>
-                    <div className="text-xs text-muted-foreground">Their pick</div>
-                  </div>
-                </div>
-                <div className="bg-gradient-success rounded-lg p-3 text-center">
-                  <span className="text-success-foreground font-bold">🎯 IT'S A MATCH!</span>
-                </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
+                <Trophy className="h-8 w-8 text-primary-foreground" />
               </div>
+              <h3 className="text-xl font-semibold">Party Games</h3>
+              <p className="text-muted-foreground">
+                Break the ice and get everyone laughing with hilarious challenges.
+              </p>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-secondary rounded-full flex items-center justify-center mx-auto">
+                <Users className="h-8 w-8 text-secondary-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold">Friend Groups</h3>
+              <p className="text-muted-foreground">
+                Create unforgettable memories and strengthen friendships.
+              </p>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-success rounded-full flex items-center justify-center mx-auto">
+                <Zap className="h-8 w-8 text-success-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold">Team Building</h3>
+              <p className="text-muted-foreground">
+                Fun challenges perfect for work events and team activities.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Final CTA */}
-        <div className="mt-24 text-center space-y-6">
-          <h2 className="text-3xl font-bold">Ready to Take the Challenge?</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of players having fun with friends. What's the chance you'll love it?
-          </p>
+        {/* Call to Action */}
+        <div className="mt-24 text-center space-y-8">
+          <div className="space-y-4">
+            <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
+              <span className="text-primary-foreground font-bold text-3xl">?</span>
+            </div>
+            <h2 className="text-3xl font-bold">Ready to Take the Challenge?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of players having fun with friends. What's the chance you'll love it?
+            </p>
+          </div>
           <Button 
             variant="game" 
             size="lg" 
