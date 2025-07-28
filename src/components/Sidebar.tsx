@@ -11,16 +11,16 @@ interface SidebarProps {
   notificationCount?: number;
 }
 
-const menuItems = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'my-challenges', label: 'My Challenges', icon: Trophy },
-  { id: 'create', label: 'Create Challenge', icon: Plus },
-  { id: 'notifications', label: 'Notifications', icon: Bell, hasNotification: true },
-  { id: 'friends', label: 'Friends', icon: Users },
-  { id: 'settings', label: 'Settings', icon: Settings },
-];
-
 export function Sidebar({ isOpen, onClose, activeTab, onTabChange, notificationCount = 0 }: SidebarProps) {
+  const menuItems = [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'my-challenges', label: 'My Challenges', icon: Trophy },
+    { id: 'create', label: 'Create Challenge', icon: Plus },
+    { id: 'notifications', label: 'Notifications', icon: Bell, hasNotification: true },
+    { id: 'friends', label: 'Friends', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
     <>
       {/* Backdrop */}
@@ -34,17 +34,15 @@ export function Sidebar({ isOpen, onClose, activeTab, onTabChange, notificationC
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full w-80 bg-gradient-card border-r border-border z-50 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
+          "fixed left-0 top-0 h-full w-80 bg-gradient-card border-r border-border z-50 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border lg:hidden">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">?</span>
-            </div>
-            <h2 className="text-lg font-bold">Menu</h2>
+          <div className="flex items-center">
+            <img src="/logo.png" alt="What's the Chance? Logo" className="w-20 h-20 mr-4" />
+            <h2 className="text-lg font-bold">What's the Chance?</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
@@ -52,7 +50,7 @@ export function Sidebar({ isOpen, onClose, activeTab, onTabChange, notificationC
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -63,7 +61,7 @@ export function Sidebar({ isOpen, onClose, activeTab, onTabChange, notificationC
                 key={item.id}
                 variant={isActive ? "secondary" : "ghost"}
                 className={cn(
-                  "w-full justify-start h-12 text-left transition-all duration-200",
+                  "w-full justify-start h-11 text-left transition-all duration-200 rounded-lg",
                   isActive && "bg-primary/10 text-primary border border-primary/20 shadow-sm"
                 )}
                 onClick={() => {
@@ -74,7 +72,7 @@ export function Sidebar({ isOpen, onClose, activeTab, onTabChange, notificationC
                 <Icon className="mr-3 h-5 w-5" />
                 <span className="flex-1">{item.label}</span>
                 {showNotification && (
-                  <Badge variant="secondary" className="ml-2 h-5 min-w-5 text-xs">
+                  <Badge variant="secondary" className="ml-auto h-5 min-w-5 text-xs">
                     {notificationCount > 9 ? '9+' : notificationCount}
                   </Badge>
                 )}
@@ -84,14 +82,14 @@ export function Sidebar({ isOpen, onClose, activeTab, onTabChange, notificationC
         </nav>
 
         {/* User Profile */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-gradient-to-t from-background/80 to-transparent">
-          <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-            <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center">
+        <div className="p-4 border-t border-border bg-gradient-to-t from-background/80 to-transparent">
+          <div className="flex items-center p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+            <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-primary-foreground font-bold">A</span>
             </div>
-            <div>
-              <p className="font-medium text-foreground">@alice</p>
-              <p className="text-sm text-muted-foreground">Online</p>
+            <div className="min-w-0 flex-1 ml-3">
+              <p className="font-medium text-foreground truncate">@alice</p>
+              <p className="text-sm text-muted-foreground truncate">Online</p>
             </div>
           </div>
         </div>

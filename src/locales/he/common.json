@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "מה הסיכוי?",
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "cancel": "ביטול",
+    "save": "שמור",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "close": "סגור",
+    "back": "חזור",
+    "next": "הבא",
+    "previous": "הקודם",
+    "submit": "שלח",
+    "confirm": "אישור",
+    "yes": "כן",
+    "no": "לא",
+    "add": "הוסף"
+  },
+  "navigation": {
+    "home": "בית",
+    "challenges": "אתגרים",
+    "myChallenges": "האתגרים שלי",
+    "createChallenge": "צור אתגר",
+    "notifications": "התראות",
+    "friends": "חברים",
+    "settings": "הגדרות",
+    "profile": "פרופיל",
+    "logout": "התנתק",
+    "online": "מחובר"
+  },
+  "auth": {
+    "login": "התחבר",
+    "signup": "הרשמה",
+    "logout": "התנתק",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "confirmPassword": "אימות סיסמה",
+    "forgotPassword": "שכחתי סיסמה",
+    "resetPassword": "איפוס סיסמה",
+    "signInWithGoogle": "התחבר עם גוגל",
+    "dontHaveAccount": "אין לך חשבון?",
+    "alreadyHaveAccount": "כבר יש לך חשבון?",
+    "createAccount": "צור חשבון",
+    "signIn": "התחבר",
+    "welcomeBack": "ברוכים הבאים!",
+    "signInToContinue": "התחבר כדי להמשיך את ההרפתקה שלך ב'מה הסיכוי?'",
+    "fillAllFields": "אנא מלא את כל השדות.",
+    "signInFailed": "התחברות נכשלה. אנא נסה שוב.",
+    "googleSignInFailed": "התחברות עם גוגל נכשלה. אנא נסה שוב."
+  },
+  "language": {
+    "hebrew": "עברית",
+    "english": "English",
+    "switchLanguage": "החלף שפה"
+  },
+  "theme": {
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת",
+    "switchTheme": "החלף ערכת נושא"
+  },
+  "home": {
+    "subtitle": "משחק החברתי האולטימטיבי של מזל ואתגרים. אתגר את החברים שלך ותראה אם הגורל לצדך!",
+    "startPlaying": "התחל לשחק",
+    "noRegistration": "אין צורך בהרשמה • התחל מיד",
+    "howItWorks": "איך זה עובד",
+    "howItWorksDesc": "חוקים פשוטים, כיף אינסופי. אתגר חברים ותן למזל להחליט!",
+    "step1": {
+      "title": "1. אתגר מישהו",
+      "description": "צור אתגר כיפי ותג חבר. \"מה הסיכוי שתשיר קריוקי?\""
+    },
+    "step2": {
+      "title": "2. בחר מספרים",
+      "description": "קבע טווח (1-10, 1-50, וכו') ושני השחקנים בוחרים מספר בסתר בטווח הזה."
+    },
+    "step3": {
+      "title": "3. חשף והחלט",
+      "description": "אם המספרים תואמים, האתגר חייב להתבצע! אם לא, אתה פטור."
+    }
+  },
+  "dashboard": {
+    "welcomeBack": "ברוכים הבאים,",
+    "readyForChallenges": "מוכנים לאתגרים כיפיים?",
+    "stats": {
+      "pending": "ממתינים",
+      "completed": "הושלמו",
+      "created": "נוצרו",
+      "matches": "התאמות"
+    },
+    "incomingChallenges": "אתגרים נכנסים",
+    "recentActivity": "פעילות אחרונה"
+  }
+} 

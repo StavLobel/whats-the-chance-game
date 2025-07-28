@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { AuthModal } from './auth/AuthModal';
 import { useAuth } from '@/hooks/useAuth';
+import { ThemeToggle } from './ThemeToggle';
 
 interface NavBarProps {
   onMenuClick: () => void;
@@ -30,14 +31,12 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
             {/* Left: Menu + Logo */}
-            <div className='flex items-center space-x-4'>
+            <div className='flex items-center'>
               <Button variant='ghost' size='icon' onClick={onMenuClick} className='lg:hidden'>
                 <Menu className='h-6 w-6' />
               </Button>
-              <div className='flex items-center space-x-2'>
-                <div className='w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center'>
-                  <span className='text-primary-foreground font-bold text-sm'>?</span>
-                </div>
+              <div className='flex items-center'>
+                <img src='/logo.png' alt="What's the Chance? Logo" className='w-20 h-20 mr-4' />
                 <h1 className='text-xl font-bold bg-gradient-primary bg-clip-text text-transparent'>
                   What's the Chance?
                 </h1>
@@ -45,7 +44,7 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
             </div>
 
             {/* Right: Actions */}
-            <div className='flex items-center space-x-2'>
+            <div className='flex items-center'>
               <Button
                 variant='game'
                 size='sm'
@@ -53,8 +52,9 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
                 className='hidden sm:flex'
               >
                 <Plus className='h-4 w-4' />
-                Challenge
+                Create Challenge
               </Button>
+              <ThemeToggle />
               <Button variant='ghost' size='icon' className='relative'>
                 <Bell className='h-5 w-5' />
                 {notificationCount > 0 && (
@@ -103,8 +103,9 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button variant='ghost' size='icon' onClick={() => setShowAuthModal(true)}>
-                  <User className='h-5 w-5' />
+                <Button variant='ghost' onClick={() => setShowAuthModal(true)}>
+                  <User className='mr-2 h-4 w-4' />
+                  Sign in
                 </Button>
               )}
             </div>
@@ -112,7 +113,10 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
         </div>
       </nav>
 
-      <CreateChallengeModal open={showCreateModal} onOpenChange={setShowCreateModal} />
+      <CreateChallengeModal
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+      />
 
       <AuthModal
         isOpen={showAuthModal}

@@ -75,33 +75,38 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 - ✅ Tested protection workflow successfully
 - ✅ Updated documentation with new workflow
 
-### Phase 1: Foundation & TDD Setup
+### Phase 1: Foundation & TDD Setup ✅ **COMPLETED**
 
-**Priority: Critical**
+**Priority: Critical**  
+**Status**: ✅ **COMPLETED** - July 27, 2025
 
 #### Major Tasks
 
-1. **Testing Infrastructure Setup** 🧪
-   - Set up Vitest + React Testing Library for frontend
-   - Configure test environment and mocking strategies
-   - Set up Allure reporting integration
-   - Create testing utilities and helpers
-   - Establish TDD workflow in CI/CD
+1. **Testing Infrastructure Setup** 🧪 ✅
+   - **Status**: ✅ **COMPLETED**
+   - ✅ Set up Vitest + React Testing Library for frontend
+   - ✅ Configure test environment and mocking strategies
+   - ✅ Set up Allure reporting integration
+   - ✅ Create testing utilities and helpers
+   - ✅ Establish TDD workflow in CI/CD
+   - **GitHub Issue**: [#19](https://github.com/StavLobel/whats-the-chance-game/issues/19) ✅ **CLOSED**
 
-2. **Project Structure & Tooling** 📁
-   - Reorganize project structure according to SRD specifications
-   - Set up Cursor rules and development guidelines
-   - Configure ESLint/Prettier with project standards
-   - Set up pre-commit hooks for code quality
-   - Create development environment documentation
+2. **Project Structure & Tooling** 📁 ✅
+   - **Status**: ✅ **COMPLETED**
+   - ✅ Reorganize project structure according to SRD specifications
+   - ✅ Set up Cursor rules and development guidelines
+   - ✅ Configure ESLint/Prettier with project standards
+   - ✅ Set up pre-commit hooks for code quality
+   - ✅ Create development environment documentation
+   - **GitHub Issue**: [#17](https://github.com/StavLobel/whats-the-chance-game/issues/17) ✅ **CLOSED**
 
 #### Minor Tasks
 
-- [ ] Configure Vitest config file
-- [ ] Set up testing utilities
-- [ ] Create mock data generators
-- [ ] Set up test coverage reporting
-- [ ] Configure GitHub Actions for testing
+- ✅ Configure Vitest config file
+- ✅ Set up testing utilities
+- ✅ Create mock data generators
+- ✅ Set up test coverage reporting
+- ✅ Configure GitHub Actions for testing
 
 ### Phase 2: Frontend Core Features
 
@@ -132,6 +137,21 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - Improve existing CreateChallengeModal with validation
    - Add real-time updates to existing number selection interface
    - Connect existing challenge status tracking to backend
+
+6. **Hebrew Support for Challenge Descriptions + Dark Mode** 🌍 ✅
+   - **Status**: ✅ **COMPLETED** - July 28, 2025
+   - ✅ **RTL Support**: Hebrew text input with automatic RTL detection (`dir="auto"`)
+   - ✅ **Hebrew Font Support**: Heebo font for proper Hebrew display
+   - ✅ **Challenge Descriptions**: Support Hebrew text in challenge descriptions
+   - ✅ **Mock Data**: Hebrew challenge descriptions in mock data
+   - ✅ **Dark Mode**: Complete theme system with light/dark/system options
+   - ✅ **Theme Toggle**: Accessible theme switcher in navigation and landing page
+   - ✅ **Theme Persistence**: User preferences saved in localStorage
+   - ✅ **System Theme**: Respects user's OS theme preference by default
+   - ✅ **Landing Page**: Theme toggle added to landing page with backdrop blur
+   - ✅ **Layout Improvements**: Fixed sidebar spacing and text truncation issues
+   - ✅ **Visual Polish**: Enhanced dark mode gradients and transitions
+   - **GitHub Issue**: [#21](https://github.com/StavLobel/whats-the-chance-game/issues/21) ✅ **CLOSED**
 
 #### Minor Tasks
 
@@ -217,8 +237,8 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 10. **Deployment Infrastructure** 🚀
     - Hostinger VPS setup
     - Docker Compose configuration
-    - Nginx reverse proxy setup
-    - HTTPS certificate configuration
+    - Traefik reverse proxy setup
+    - Let's Encrypt HTTPS certificate automation
     - Environment variable management
 
 11. **CI/CD Pipeline** 🔄
@@ -230,6 +250,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 #### Minor Tasks
 
+- [ ] Traefik dashboard configuration
 - [ ] Server monitoring setup
 - [ ] Backup strategies
 - [ ] Performance monitoring
@@ -279,8 +300,9 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 - ✅ SRD and task planning complete
 - ✅ All major tasks have corresponding GitHub issues (#4-#18)
 - ✅ **Phase 0: Infrastructure & Protection Setup** - **COMPLETED** (July 27, 2025)
-- ⏳ **Phase 1: Testing infrastructure setup** (Current)
-- ⏳ Phase 2: Frontend core features
+- ✅ **Phase 1: Testing infrastructure setup** - **COMPLETED** (July 27, 2025)
+- ✅ **Phase 2: Hebrew Support & Dark Mode** - **COMPLETED** (July 28, 2025)
+- ⏳ Phase 2: Remaining Frontend core features
 - ⏳ Phase 3: Backend development
 - ⏳ Phase 4: Integration & testing
 - ⏳ Phase 5: Deployment

@@ -20,6 +20,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security scanning with Trivy
 - Conventional commits support
 - Comprehensive documentation
+- **Hebrew text support** for challenge descriptions with RTL layout
+- **Dark mode theme system** with light/dark/system options
+- **Theme toggle** accessible on landing page and in-game
+- **System theme detection** respecting user's OS preference
+- **Enhanced UI components** with improved dark mode styling
+- **Layout improvements** fixing sidebar spacing and text truncation
+- **Custom logo integration** across all app interfaces (NavBar, Sidebar, Landing Page, Modals)
+- **Browser favicon** with custom icon for improved brand identity
+- **Logo documentation** in README.md with centered logo display
 
 ### Changed
 
@@ -27,12 +36,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented strict TypeScript configuration
 - Added comprehensive .gitignore
 - Enhanced package.json with proper metadata and scripts
+- **Removed language switcher** - UI now in English only with Hebrew support for challenge descriptions
+- **Enhanced dark mode styling** with improved gradients and transitions
+- **Improved layout structure** with better flex layouts and spacing
 
 ### Fixed
 
 - TypeScript configuration issues
 - Dependency version constraints
 - Build tool configurations
+- **Sidebar layout issues** - Fixed spacing between sidebar and main content
+- **Text truncation** - Resolved user profile text cutoff in sidebar
+- **CSS import warnings** - Fixed Google Fonts import order
+- **Theme persistence** - Improved localStorage handling for theme preferences
 
 ## [0.1.0] - 2025-01-27
 
