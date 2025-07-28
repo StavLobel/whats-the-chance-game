@@ -49,10 +49,10 @@ export class HomePage {
     await this.page.setViewportSize({ width: 375, height: 667 });
     await expect(this.gameTitle).toBeVisible();
     await expect(this.startPlayingButton).toBeVisible();
-    
+
     // Check desktop viewport
     await this.page.setViewportSize({ width: 1200, height: 800 });
     await expect(this.gameTitle).toBeVisible();
     await expect(this.startPlayingButton).toBeVisible();
   }
-} 
+}

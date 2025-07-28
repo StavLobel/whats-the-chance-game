@@ -32,7 +32,10 @@ test.describe('Home Page E2E Tests', () => {
 
     await test.step('Check meta description', async () => {
       const metaDescription = page.locator('meta[name="description"]');
-      await expect(metaDescription).toHaveAttribute('content', expect.stringContaining('social game'));
+      await expect(metaDescription).toHaveAttribute(
+        'content',
+        expect.stringContaining('social game')
+      );
     });
   });
 
@@ -61,7 +64,7 @@ test.describe('Home Page E2E Tests', () => {
     await test.step('Verify game page loads', async () => {
       // Wait for the game component to load
       await page.waitForTimeout(1000);
-      
+
       // The game should show different content than the home page
       await expect(homePage.gameTitle).not.toBeVisible();
     });
@@ -126,7 +129,7 @@ test.describe('Home Page E2E Tests', () => {
     // Create new context with JavaScript disabled
     const context = await browser.newContext({ javaScriptEnabled: false });
     const noJsPage = await context.newPage();
-    
+
     await test.step('Load page without JavaScript', async () => {
       await noJsPage.goto('/');
     });
@@ -138,4 +141,4 @@ test.describe('Home Page E2E Tests', () => {
 
     await context.close();
   });
-}); 
+});

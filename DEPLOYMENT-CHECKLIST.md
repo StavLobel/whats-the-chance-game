@@ -3,18 +3,21 @@
 ## Pre-Deployment Checklist
 
 ### ✅ Server Verification
+
 - [ ] Traefik v2.10 is running (confirmed: `docker ps` shows traefik container)
 - [ ] Existing portfolio app is working (sl-portfolio-prod)
 - [ ] Watchtower is running for auto-updates
 - [ ] Traefik network exists: `docker network ls | grep traefik`
 
 ### ✅ Domain Configuration
+
 - [ ] Choose subdomain: `whatsthechance.yourdomain.com`
 - [ ] Add DNS A record: `whatsthechance.yourdomain.com` → YOUR_VPS_IP
 - [ ] Add DNS A record: `api.whatsthechance.yourdomain.com` → YOUR_VPS_IP
 - [ ] Wait for DNS propagation (can take up to 24 hours)
 
 ### ✅ Environment Setup
+
 - [ ] Clone repository: `git clone https://github.com/StavLobel/whats-the-chance-game.git`
 - [ ] Navigate to project: `cd whats-the-chance-game`
 - [ ] Create `.env` file with correct subdomain
@@ -23,6 +26,7 @@
 ## Deployment Steps
 
 ### 1. Environment Configuration
+
 ```bash
 # Create .env file
 cp .env.example .env
@@ -36,6 +40,7 @@ FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.c
 ```
 
 ### 2. Deploy Application
+
 ```bash
 # Start production services
 docker-compose --profile production up -d
@@ -45,6 +50,7 @@ docker ps | grep whatsthechance
 ```
 
 ### 3. Verify Deployment
+
 - [ ] Frontend accessible: https://whatsthechance.yourdomain.com
 - [ ] Backend API accessible: https://api.whatsthechance.yourdomain.com/api/docs
 - [ ] Traefik dashboard shows new services: http://yourdomain.com:8080
@@ -53,18 +59,21 @@ docker ps | grep whatsthechance
 ## Post-Deployment Verification
 
 ### ✅ Application Health
+
 - [ ] Frontend loads without errors
 - [ ] Backend API responds to health check
 - [ ] Firebase authentication works
 - [ ] Game functionality is operational
 
 ### ✅ Traefik Integration
+
 - [ ] Services appear in Traefik dashboard
 - [ ] SSL certificates are automatically generated
 - [ ] HTTP redirects to HTTPS
 - [ ] CORS headers are properly configured
 
 ### ✅ Monitoring
+
 - [ ] Check application logs: `docker-compose logs -f`
 - [ ] Check Traefik logs: `docker logs -f traefik`
 - [ ] Monitor Traefik dashboard for errors
@@ -75,6 +84,7 @@ docker ps | grep whatsthechance
 ### Common Issues
 
 #### DNS Issues
+
 ```bash
 # Check DNS resolution
 nslookup whatsthechance.yourdomain.com
@@ -82,6 +92,7 @@ nslookup api.whatsthechance.yourdomain.com
 ```
 
 #### Container Issues
+
 ```bash
 # Check container status
 docker ps -a | grep whatsthechance
@@ -92,6 +103,7 @@ docker logs whatsthechance-backend-prod
 ```
 
 #### Traefik Issues
+
 ```bash
 # Check Traefik logs
 docker logs -f traefik
@@ -101,6 +113,7 @@ docker exec traefik traefik version
 ```
 
 #### Network Issues
+
 ```bash
 # Check if containers are on Traefik network
 docker network inspect traefik
@@ -112,6 +125,7 @@ docker exec whatsthechance-backend-prod ping frontend-prod
 ## Maintenance
 
 ### Updates
+
 ```bash
 # Pull latest changes
 git pull origin main
@@ -122,6 +136,7 @@ docker-compose --profile production up -d --build
 ```
 
 ### Backup
+
 ```bash
 # Backup environment configuration
 cp .env .env.backup.$(date +%Y%m%d)
@@ -131,6 +146,7 @@ docker run --rm -v whatsthechance-redis:/data -v $(pwd):/backup alpine tar czf /
 ```
 
 ### Rollback
+
 ```bash
 # If needed, rollback to previous version
 git checkout <previous-commit>
@@ -158,4 +174,4 @@ docker-compose --profile production up -d --build
 **Deployment Status**: Ready for production deployment
 **Traefik Version**: v2.10 (compatible)
 **Network**: External Traefik network integration
-**SSL**: Automatic Let's Encrypt via existing Traefik 
+**SSL**: Automatic Let's Encrypt via existing Traefik

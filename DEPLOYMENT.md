@@ -23,6 +23,7 @@ This document describes how to deploy "What's the Chance?" to production using D
 ### 1. Prerequisites (Already Installed)
 
 Your server already has:
+
 - ✅ Docker and Docker Compose
 - ✅ Traefik v2.10 running (ports 80, 443, 8080)
 - ✅ Let's Encrypt SSL certificates configured
@@ -138,6 +139,7 @@ docker logs -f traefik  # Your Traefik container name from docker ps
 ### Dashboard Access
 
 Your existing Traefik dashboard at `http://yourdomain.com:8080` can be used to monitor:
+
 - Service status
 - Request metrics
 - SSL certificate status
@@ -180,28 +182,31 @@ cp .env .env.backup
 ### Common Issues
 
 1. **SSL Certificate Issues**
+
    ```bash
    # Check your existing Traefik logs
    docker logs traefik  # or your Traefik container name
-   
+
    # Verify DNS pointing to server
    nslookup yourdomain.com
    ```
 
 2. **Service Not Accessible**
+
    ```bash
    # Check service status
    docker-compose ps
-   
+
    # Verify Traefik routing
    curl -H "Host: yourdomain.com" http://localhost/
    ```
 
 3. **Firebase Connection Issues**
+
    ```bash
    # Check backend logs
    docker-compose logs backend-prod
-   
+
    # Verify Firebase credentials
    docker-compose exec backend-prod python -c "import firebase_admin; print('Firebase OK')"
    ```
@@ -241,12 +246,13 @@ Enable response caching by adding middleware:
 
 ```yaml
 labels:
-  - "traefik.http.middlewares.cache.plugin.cache.maxage=3600"
+  - 'traefik.http.middlewares.cache.plugin.cache.maxage=3600'
 ```
 
 ## Security Hardening
 
 1. **Firewall Configuration**
+
    ```bash
    sudo ufw allow 22    # SSH
    sudo ufw allow 80    # HTTP
@@ -255,6 +261,7 @@ labels:
    ```
 
 2. **Docker Security**
+
    ```bash
    # Run containers as non-root user
    # Use read-only file systems where possible
@@ -275,13 +282,14 @@ Set up monitoring with Prometheus metrics (built into Traefik):
 ```yaml
 # Add to traefik service
 labels:
-  - "traefik.http.routers.metrics.rule=Host(`metrics.yourdomain.com`)"
-  - "traefik.http.services.metrics.loadbalancer.server.port=8080"
+  - 'traefik.http.routers.metrics.rule=Host(`metrics.yourdomain.com`)'
+  - 'traefik.http.services.metrics.loadbalancer.server.port=8080'
 ```
 
 ## Support
 
 For deployment issues:
+
 1. Check logs: `docker-compose logs`
 2. Verify configuration: `docker-compose config`
 3. Test connectivity: `curl` commands
@@ -289,4 +297,4 @@ For deployment issues:
 
 ---
 
-This deployment setup provides automatic SSL, high availability, and easy maintenance for the "What's the Chance?" application. 
+This deployment setup provides automatic SSL, high availability, and easy maintenance for the "What's the Chance?" application.

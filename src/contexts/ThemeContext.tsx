@@ -45,7 +45,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       let newResolvedTheme: 'light' | 'dark';
 
       if (theme === 'system') {
-        newResolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        newResolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
       } else {
         newResolvedTheme = theme;
       }
@@ -81,9 +83,5 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     resolvedTheme,
   };
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}; 
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+};
