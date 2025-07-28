@@ -5,11 +5,12 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Clock, Zap } from 'lucide-react';
 import { Challenge } from '@/types/challenge';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ChallengeCardProps {
   challenge: Challenge;
-  onAccept?: (_id: string) => void;
-  onReject?: (_id: string) => void;
-  onClick?: (_id: string) => void;
+  onAccept?: (id: string) => void;
+  onReject?: (id: string) => void;
+  onClick?: (id: string) => void;
 }
 
 export function ChallengeCard({ challenge, onAccept, onReject, onClick }: ChallengeCardProps) {
