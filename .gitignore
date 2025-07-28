@@ -202,6 +202,7 @@ build/
 # Logs
 logs/
 *.log
+conversation-log.txt
 
 # Database
 *.db
