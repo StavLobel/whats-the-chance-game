@@ -1,5 +1,16 @@
 # What's the Chance? - Backend API
 
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Pydantic](https://img.shields.io/badge/Pydantic-2.5.0-9209B1?logo=pydantic)](https://pydantic.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase_Admin-6.2.0-FFCA28?logo=firebase)](https://firebase.google.com/)
+[![Pytest](https://img.shields.io/badge/Pytest-7.4.3-0A9EDC?logo=pytest)](https://pytest.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-1.40.0-2EAD33?logo=playwright)](https://playwright.dev/)
+[![Allure](https://img.shields.io/badge/Allure_Reports-2.24.0-FF6A6A?logo=allure)](https://allure.qatools.ru/)
+[![Bandit](https://img.shields.io/badge/Bandit_Security-1.7.5-FF6B6B?logo=bandit)](https://bandit.readthedocs.io/)
+[![Docker](https://img.shields.io/badge/Docker-3.8-2496ED?logo=docker)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A FastAPI-based backend service for the "What's the Chance?" social game, providing RESTful APIs for challenge management, user authentication, and real-time notifications.
 
 ## 🏗️ Architecture
@@ -7,6 +18,7 @@ A FastAPI-based backend service for the "What's the Chance?" social game, provid
 The backend follows a clean, modular architecture with the following components:
 
 ### Core Structure
+
 ```
 backend/
 ├── app/
@@ -50,23 +62,27 @@ backend/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd whats-the-chance-game/backend
    ```
 
 2. **Create virtual environment**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Set up environment variables**
+
    ```bash
    cp env.example .env
    # Edit .env with your Firebase credentials
@@ -86,12 +102,14 @@ The API will be available at `http://localhost:8000`
 Copy `env.example` to `.env` and configure the following variables:
 
 #### Required Variables
+
 - `SECRET_KEY`: Secret key for JWT token signing
 - `FIREBASE_PROJECT_ID`: Your Firebase project ID
 - `FIREBASE_PRIVATE_KEY`: Firebase service account private key
 - `FIREBASE_CLIENT_EMAIL`: Firebase service account email
 
 #### Optional Variables
+
 - `DEBUG`: Enable debug mode (default: false)
 - `PORT`: Server port (default: 8000)
 - `ALLOWED_ORIGINS`: CORS allowed origins (comma-separated)
@@ -122,12 +140,14 @@ Copy `env.example` to `.env` and configure the following variables:
 ### Interactive Documentation
 
 Once the server is running, visit:
+
 - **Swagger UI**: `http://localhost:8000/api/docs`
 - **ReDoc**: `http://localhost:8000/api/redoc`
 
 ### Core Endpoints
 
 #### Challenges API (`/api/challenges`)
+
 - `POST /` - Create a new challenge
 - `GET /{challenge_id}` - Get challenge details
 - `POST /{challenge_id}/respond` - Respond to a challenge
@@ -136,6 +156,7 @@ Once the server is running, visit:
 - `GET /stats/{user_id}` - Get challenge statistics
 
 #### Notifications API (`/api/notifications`)
+
 - `POST /send` - Send push notification
 - `POST /send/batch` - Send batch notifications
 - `POST /send/topic` - Send topic notification
@@ -204,18 +225,18 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
       - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
       - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
     depends_on:
       - redis
-  
+
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
 ```
 
 ## 🔧 Development
@@ -318,6 +339,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue in the GitHub repository
 - Check the API documentation at `/api/docs`
-- Review the test files for usage examples 
+- Review the test files for usage examples
