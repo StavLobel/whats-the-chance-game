@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { X, Users } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useGame } from '@/hooks/useGame';
 
 interface CreateChallengeModalProps {
   open: boolean;
@@ -17,24 +17,28 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
   const [task, setTask] = useState('');
   const [targetUser, setTargetUser] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createChallenge } = useGame();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!task.trim() || !targetUser.trim()) return;
+    if (!task.trim() || !targetUser.trim() || isSubmitting) return;
 
-    // Mock challenge creation
-    toast({
-      title: 'Challenge sent! 🎲',
-      description: `${targetUser} has been challenged to: ${task}`,
-      duration: 3000,
-    });
-
-    // Reset form
-    setTask('');
-    setTargetUser('');
-    setTags([]);
-    onOpenChange(false);
+    setIsSubmitting(true);
+    try {
+      await createChallenge(targetUser, task);
+      
+      // Reset form
+      setTask('');
+      setTargetUser('');
+      setTags([]);
+      onOpenChange(false);
+    } catch (error) {
+      // Error handling is done in the useGame hook
+      console.error('Failed to create challenge:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addTag = () => {
@@ -127,8 +131,8 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
             >
               Cancel
             </Button>
-            <Button type='submit' className='flex-1'>
-              Send Challenge
+            <Button type='submit' className='flex-1' disabled={isSubmitting}>
+              {isSubmitting ? 'Sending...' : 'Send Challenge'}
             </Button>
           </div>
         </form>
