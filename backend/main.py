@@ -14,33 +14,26 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
+from app.core.config import settings
+from app.routers import challenges, notifications
+
 # Load environment variables
 load_dotenv()
 
-# Import routers (will be created later)
-# from app.routers import auth, challenges, users, notifications
-
 # Create FastAPI app
 app = FastAPI(
-    title="What's the Chance? API",
+    title=settings.app_name,
     description="Backend API for the What's the Chance social game",
-    version="0.1.0",
+    version=settings.app_version,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
+    debug=settings.debug,
 )
 
 # CORS configuration
-origins = [
-    "http://localhost:3000",  # React dev server
-    "http://localhost:8080",  # Vite dev server
-    "https://localhost:3000",
-    "https://localhost:8080",
-    # Add production domains here
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -60,7 +53,8 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "whats-the-chance-api",
-        "version": "0.1.0",
+        "version": settings.app_version,
+        "environment": "development" if settings.debug else "production",
     }
 
 
@@ -69,34 +63,35 @@ async def health_check():
 async def root():
     """Root endpoint with basic API information."""
     return {
-        "message": "What's the Chance? API",
-        "version": "0.1.0",
+        "message": settings.app_name,
+        "version": settings.app_version,
         "docs": "/api/docs",
         "health": "/api/health",
+        "endpoints": {
+            "challenges": "/api/challenges",
+            "notifications": "/api/notifications",
+        },
     }
 
 
-# Include routers (uncomment when routers are created)
-# app.include_router(
-#     auth.router, prefix="/api/auth", tags=["authentication"]
-# )
-# app.include_router(
-#     users.router, prefix="/api/users", tags=["users"]
-# )
-# app.include_router(
-#     challenges.router, prefix="/api/challenges", tags=["challenges"]
-# )
-# app.include_router(
-#     notifications.router, prefix="/api/notifications", tags=["notifications"]
-# )
+# Include routers
+app.include_router(
+    challenges.router, 
+    prefix="/api/challenges", 
+    tags=["challenges"]
+)
+app.include_router(
+    notifications.router, 
+    prefix="/api/notifications", 
+    tags=["notifications"]
+)
 
 if __name__ == "__main__":
     # Development server
-    port = int(os.getenv("PORT", 8000))
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=True,
-        log_level="info",
+        host=settings.host,
+        port=settings.port,
+        reload=settings.debug,
+        log_level=settings.log_level.lower(),
     )
