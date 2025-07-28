@@ -7,7 +7,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  onTabChange: (tabId: string) => void;
   notificationCount?: number;
 }
 
@@ -86,10 +86,10 @@ export function Sidebar({
         <div className='p-4 border-t border-border bg-gradient-to-t from-background/80 to-transparent'>
           <div className='flex items-center p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200'>
             <div className='w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0'>
-              <span className='text-primary-foreground font-bold'>A</span>
+              <span className='text-primary-foreground font-bold'>U</span>
             </div>
             <div className='min-w-0 flex-1 ml-3'>
-              <p className='font-medium text-foreground truncate'>@alice</p>
+              <p className='font-medium text-foreground truncate'>@user</p>
               <p className='text-sm text-muted-foreground truncate'>Online</p>
             </div>
           </div>

@@ -6,9 +6,9 @@ import { ChallengeDetail } from '@/components/ChallengeDetail';
 import { CreateChallengeModal } from '@/components/CreateChallengeModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { mockGameState } from '@/data/mockData';
+import { EmptyState } from '@/components/EmptyState';
 import { Challenge } from '@/types/challenge';
-import { Plus, Trophy, Bell, Users } from 'lucide-react';
+import { Plus, Trophy, Bell, Users, Target, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 type TabType = 'home' | 'my-challenges' | 'create' | 'notifications' | 'friends' | 'settings';
@@ -20,21 +20,23 @@ export default function Game() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { toast } = useToast();
 
-  const { currentUser, challenges } = mockGameState;
+  // TODO: Replace with real data from Firebase/API
+  const currentUser = { username: 'user' };
+  const challenges: Challenge[] = [];
   const incomingChallenges = challenges.filter(
-    c => c.to_user === currentUser.username && c.status === 'pending'
+    (c: Challenge) => c.to_user === currentUser.username && c.status === 'pending'
   );
-  const myChallenges = challenges.filter(c => c.from_user === currentUser.username);
+  const myChallenges = challenges.filter((c: Challenge) => c.from_user === currentUser.username);
   const notificationCount = incomingChallenges.length;
 
   const handleAcceptChallenge = (id: string) => {
-    const challenge = challenges.find(c => c.id === id);
+    const challenge = challenges.find((c: Challenge) => c.id === id);
     if (challenge) {
       setSelectedChallenge(challenge);
     }
   };
 
-  const handleRejectChallenge = (id: string) => {
+  const handleRejectChallenge = () => {
     toast({
       title: 'Challenge declined',
       description: 'You have declined the challenge.',
@@ -76,7 +78,7 @@ export default function Game() {
               </div>
               <div className='bg-gradient-card p-4 rounded-lg text-center shadow-card'>
                 <div className='text-2xl font-bold text-success'>
-                  {challenges.filter(c => c.status === 'completed').length}
+                  {challenges.filter((c: Challenge) => c.status === 'completed').length}
                 </div>
                 <div className='text-sm text-muted-foreground'>Completed</div>
               </div>
@@ -91,37 +93,61 @@ export default function Game() {
             </div>
 
             {/* Incoming Challenges */}
-            {incomingChallenges.length > 0 && (
-              <div className='space-y-4'>
-                <div className='flex items-center gap-2'>
-                  <h2 className='text-xl font-semibold'>Incoming Challenges</h2>
+            <div className='space-y-4'>
+              <div className='flex items-center gap-2'>
+                <h2 className='text-xl font-semibold'>Incoming Challenges</h2>
+                {incomingChallenges.length > 0 && (
                   <Badge variant='secondary'>{incomingChallenges.length}</Badge>
-                </div>
+                )}
+              </div>
+              {incomingChallenges.length > 0 ? (
                 <div className='grid gap-4'>
-                  {incomingChallenges.map(challenge => (
+                  {incomingChallenges.map((challenge: Challenge) => (
                     <ChallengeCard
                       key={challenge.id}
                       challenge={challenge}
                       onAccept={() => handleAcceptChallenge(challenge.id)}
-                      onReject={() => handleRejectChallenge(challenge.id)}
+                      onReject={() => handleRejectChallenge()}
                     />
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <EmptyState
+                  icon={<Target className='w-12 h-12' />}
+                  title='No incoming challenges'
+                  description="You don't have any pending challenges right now. Create a challenge to get started!"
+                  action={{
+                    label: 'Create Challenge',
+                    onClick: () => setShowCreateModal(true),
+                  }}
+                />
+              )}
+            </div>
 
             {/* Recent Activity */}
             <div className='space-y-4'>
               <h2 className='text-xl font-semibold'>Recent Activity</h2>
-              <div className='grid gap-4'>
-                {challenges.slice(0, 3).map(challenge => (
-                  <ChallengeCard
-                    key={challenge.id}
-                    challenge={challenge}
-                    onClick={() => setSelectedChallenge(challenge)}
-                  />
-                ))}
-              </div>
+              {challenges.length > 0 ? (
+                <div className='grid gap-4'>
+                  {challenges.slice(0, 3).map((challenge: Challenge) => (
+                    <ChallengeCard
+                      key={challenge.id}
+                      challenge={challenge}
+                      onClick={() => setSelectedChallenge(challenge)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={<Zap className='w-12 h-12' />}
+                  title='No recent activity'
+                  description="You haven't participated in any challenges yet. Start by creating or accepting a challenge!"
+                  action={{
+                    label: 'Create Challenge',
+                    onClick: () => setShowCreateModal(true),
+                  }}
+                />
+              )}
             </div>
           </div>
         );
@@ -136,15 +162,27 @@ export default function Game() {
                 Create New
               </Button>
             </div>
-            <div className='grid gap-4'>
-              {myChallenges.map(challenge => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={challenge}
-                  onClick={() => setSelectedChallenge(challenge)}
-                />
-              ))}
-            </div>
+            {myChallenges.length > 0 ? (
+              <div className='grid gap-4'>
+                {myChallenges.map((challenge: Challenge) => (
+                  <ChallengeCard
+                    key={challenge.id}
+                    challenge={challenge}
+                    onClick={() => setSelectedChallenge(challenge)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={<Trophy className='w-12 h-12' />}
+                title='No challenges created'
+                description="You haven't created any challenges yet. Start by creating your first challenge!"
+                action={{
+                  label: 'Create Challenge',
+                  onClick: () => setShowCreateModal(true),
+                }}
+              />
+            )}
           </div>
         );
 
@@ -152,10 +190,11 @@ export default function Game() {
         return (
           <div className='space-y-6'>
             <h1 className='text-2xl font-bold'>Notifications</h1>
-            <div className='text-center py-12'>
-              <Bell className='mx-auto h-12 w-12 text-muted-foreground mb-4' />
-              <p className='text-muted-foreground'>No new notifications</p>
-            </div>
+            <EmptyState
+              icon={<Bell className='w-12 h-12' />}
+              title='No notifications'
+              description="You're all caught up! No new notifications at the moment."
+            />
           </div>
         );
 
@@ -163,10 +202,11 @@ export default function Game() {
         return (
           <div className='space-y-6'>
             <h1 className='text-2xl font-bold'>Friends</h1>
-            <div className='text-center py-12'>
-              <Users className='mx-auto h-12 w-12 text-muted-foreground mb-4' />
-              <p className='text-muted-foreground'>Friend features coming soon!</p>
-            </div>
+            <EmptyState
+              icon={<Users className='w-12 h-12' />}
+              title='Friend features coming soon'
+              description="We're working on bringing you amazing social features. Stay tuned!"
+            />
           </div>
         );
 
@@ -174,10 +214,11 @@ export default function Game() {
         return (
           <div className='space-y-6'>
             <h1 className='text-2xl font-bold'>Settings</h1>
-            <div className='text-center py-12'>
-              <Trophy className='mx-auto h-12 w-12 text-muted-foreground mb-4' />
-              <p className='text-muted-foreground'>Settings panel coming soon!</p>
-            </div>
+            <EmptyState
+              icon={<Trophy className='w-12 h-12' />}
+              title='Settings panel coming soon'
+              description="We're working on bringing you comprehensive settings. Stay tuned!"
+            />
           </div>
         );
 
