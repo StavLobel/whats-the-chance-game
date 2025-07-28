@@ -1,0 +1,35 @@
+{
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No new notifications",
+    "loading": "Loading notifications...",
+    "error": "Error loading notifications"
+  },
+  "types": {
+    "challengeCreated": "New challenge created",
+    "challengeJoined": "Someone joined your challenge",
+    "challengeCompleted": "Challenge completed",
+    "guessSubmitted": "New guess in your challenge",
+    "challengeWon": "You won a challenge!",
+    "challengeLost": "You lost a challenge",
+    "newMessage": "New message",
+    "system": "System message"
+  },
+  "messages": {
+    "challengeCreated": "{{creator}} created a new challenge: {{title}}",
+    "challengeJoined": "{{user}} joined your challenge: {{title}}",
+    "challengeCompleted": "Challenge '{{title}}' completed",
+    "guessSubmitted": "{{user}} submitted a guess in your challenge",
+    "challengeWon": "You won challenge '{{title}}'!",
+    "challengeLost": "You lost challenge '{{title}}'",
+    "newMessage": "New message from {{sender}}",
+    "system": "System message: {{message}}"
+  },
+  "actions": {
+    "view": "View",
+    "dismiss": "Dismiss",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread"
+  }
+} 

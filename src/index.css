@@ -1,6 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Apply Hebrew font for RTL */
+[dir="rtl"] * {
+  font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
 
 /* Design system for "What's the Chance?" game app
 All colors MUST be HSL.
@@ -61,6 +77,7 @@ All colors MUST be HSL.
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-theme: all 0.2s ease-in-out;
 
     --radius: 0.5rem;
 
@@ -85,17 +102,17 @@ All colors MUST be HSL.
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 217.2 32.6% 17.5%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 217.2 32.6% 17.5%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 260 85% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 20 95% 65%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -108,7 +125,19 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 260 85% 60%;
+
+    /* Game-specific gradients for dark mode */
+    --gradient-primary: linear-gradient(135deg, hsl(260 85% 60%), hsl(280 80% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(20 95% 65%), hsl(345 85% 65%));
+    --gradient-success: linear-gradient(135deg, hsl(145 80% 50%), hsl(160 75% 55%));
+    --gradient-card: linear-gradient(145deg, hsl(217.2 32.6% 17.5%), hsl(222.2 84% 4.9%));
+    
+    /* Shadows for dark mode */
+    --shadow-primary: 0 10px 30px -10px hsl(260 85% 60% / 0.3);
+    --shadow-glow: 0 0 40px hsl(280 80% 70% / 0.4);
+    --shadow-card: 0 4px 20px -2px hsl(0 0% 0% / 0.3);
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -127,5 +156,51 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    transition: var(--transition-theme);
+  }
+  
+  /* Smooth theme transitions */
+  * {
+    transition: var(--transition-theme);
+  }
+}
+
+@layer components {
+  /* Dark mode specific improvements */
+  .dark .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .dark .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .dark .shadow-primary {
+    box-shadow: var(--shadow-primary);
+  }
+  
+  .dark .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  /* Enhanced dark mode styling */
+  .dark .border-border\/50 {
+    border-color: hsl(var(--border) / 0.5);
+  }
+  
+  .dark .bg-muted\/50 {
+    background-color: hsl(var(--muted) / 0.5);
+  }
+  
+  .dark .bg-primary\/10 {
+    background-color: hsl(var(--primary) / 0.1);
+  }
+  
+  .dark .bg-primary\/20 {
+    background-color: hsl(var(--primary) / 0.2);
+  }
+  
+  .dark .from-background\/80 {
+    background: linear-gradient(to top, hsl(var(--background) / 0.8), transparent);
   }
 }

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { vi, beforeAll, afterAll } from 'vitest';
+// vi, beforeAll, afterAll are available globally when globals: true in vitest config
 
 // Mock Firebase
 vi.mock('firebase/app', () => ({
@@ -56,17 +56,10 @@ vi.mock('@tanstack/react-query', async () => {
   };
 });
 
-// Global test utilities
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-
-// Mock window.matchMedia
+// Mock window.matchMedia for theme detection
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -77,6 +70,24 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({

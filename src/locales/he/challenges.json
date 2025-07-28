@@ -1,0 +1,71 @@
+{
+  "challenge": {
+    "title": "כותרת האתגר",
+    "description": "תיאור האתגר",
+    "number": "מספר",
+    "guess": "ניחוש",
+    "create": "צור אתגר",
+    "edit": "ערוך אתגר",
+    "delete": "מחק אתגר",
+    "view": "צפה באתגר",
+    "join": "הצטרף לאתגר",
+    "leave": "עזוב אתגר",
+    "submit": "שלח ניחוש",
+    "cancel": "ביטול",
+    "save": "שמור",
+    "close": "סגור",
+    "challengedYou": "אתגר אותך",
+    "range": "טווח",
+    "decline": "דחה",
+    "accept": "קבל אתגר"
+  },
+  "form": {
+    "titlePlaceholder": "הכנס כותרת לאתגר...",
+    "descriptionPlaceholder": "תאר את האתגר...",
+    "numberPlaceholder": "הכנס מספר בין 1-100",
+    "guessPlaceholder": "הכנס את הניחוש שלך...",
+    "titleRequired": "כותרת האתגר נדרשת",
+    "descriptionRequired": "תיאור האתגר נדרש",
+    "numberRequired": "מספר נדרש",
+    "numberRange": "המספר חייב להיות בין 1 ל-100",
+    "guessRequired": "ניחוש נדרש",
+    "guessRange": "הניחוש חייב להיות בין 1 ל-100",
+    "whatsTheChallenge": "מה האתגר?",
+    "taskPlaceholder": "למשל, עשה עמידת ידיים למשך 30 שניות",
+    "challengeSomeone": "אתגר מישהו"
+  },
+  "status": {
+    "active": "פעיל",
+    "completed": "הושלם",
+    "expired": "פג תוקף",
+    "pending": "ממתין",
+    "won": "ניצחת!",
+    "lost": "הפסדת",
+    "draw": "תיקו"
+  },
+  "messages": {
+    "challengeCreated": "האתגר נוצר בהצלחה!",
+    "challengeUpdated": "האתגר עודכן בהצלחה!",
+    "challengeDeleted": "האתגר נמחק בהצלחה!",
+    "guessSubmitted": "הניחוש נשלח בהצלחה!",
+    "challengeJoined": "הצטרפת לאתגר בהצלחה!",
+    "challengeLeft": "עזבת את האתגר בהצלחה!",
+    "noChallenges": "אין אתגרים זמינים",
+    "loadingChallenges": "טוען אתגרים...",
+    "errorLoading": "שגיאה בטעינת אתגרים",
+    "hasBeenChallenged": "אתגר",
+    "challengeDeclined": "האתגר נדחה",
+    "challengeDeclinedDesc": "דחית את האתגר."
+  },
+  "details": {
+    "createdBy": "נוצר על ידי",
+    "createdAt": "נוצר ב",
+    "expiresAt": "פג תוקף ב",
+    "participants": "משתתפים",
+    "guesses": "ניחושים",
+    "yourGuess": "הניחוש שלך",
+    "correctNumber": "המספר הנכון",
+    "accuracy": "דיוק",
+    "points": "נקודות"
+  }
+} 

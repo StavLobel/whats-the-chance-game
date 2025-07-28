@@ -32,6 +32,8 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 
 - Fully **responsive design** (mobile-first)
 - **Modern visuals** using shadcn/ui and Tailwind CSS
+- **Hebrew as default language** with RTL (Right-to-Left) layout support
+- **Language switching** between Hebrew and English
 - **Classic menu drawer** with:
   - Home
   - My Challenges
@@ -41,6 +43,7 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 - Light/dark mode support
 - Smooth modal animations and transitions
 - Notification bell icon in the top navbar
+- **Hebrew text input support** for challenges and user content
 
 ---
 
@@ -97,6 +100,7 @@ This SRD includes specifications for the frontend and backend, outlines the use 
 - Tailwind CSS, shadcn/ui
 - Radix UI, Lucide icons
 - React Router
+- React i18next (internationalization)
 - Vitest + Testing Library
 
 ### Backend
@@ -179,7 +183,7 @@ backend/
 ## 🚀 Deployment (Hostinger VPS)
 
 - Docker Compose setup for frontend and FastAPI backend
-- Nginx reverse proxy + HTTPS certificate
+- Traefik reverse proxy with automatic Let's Encrypt SSL
 - Firebase API keys stored securely in `.env`
 - GitHub Actions CI/CD to:
   - Run tests with Allure

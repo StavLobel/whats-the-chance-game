@@ -53,9 +53,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
       <DialogContent className="sm:max-w-md bg-gradient-card">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">?</span>
-            </div>
+            <img src="/logo.png" alt="What's the Chance? Logo" className="w-16 h-16" />
             Create Challenge
           </DialogTitle>
         </DialogHeader>
@@ -73,6 +71,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
               onChange={(e) => setTask(e.target.value)}
               className="resize-none"
               rows={3}
+              dir="auto"
             />
           </div>
 
@@ -89,6 +88,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
                 value={targetUser}
                 onChange={(e) => setTargetUser(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                dir="auto"
               />
               <Button type="button" onClick={addTag} size="sm" variant="outline">
                 Add
@@ -96,18 +96,18 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
             </div>
           </div>
 
-          {/* Tagged Users */}
+          {/* Tags */}
           {tags.length > 0 && (
             <div className="space-y-2">
-              <Label className="text-foreground font-medium">Tagged users:</Label>
+              <Label className="text-foreground font-medium">Challenged Users</Label>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                    @{tag}
+                    {tag}
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="ml-1 hover:bg-background/20 rounded-full p-0.5"
+                      className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -117,22 +117,12 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-            >
+          {/* Submit */}
+          <div className="flex gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="game"
-              disabled={!task.trim() || tags.length === 0}
-              className="flex-1"
-            >
+            <Button type="submit" className="flex-1">
               Send Challenge
             </Button>
           </div>
