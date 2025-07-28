@@ -384,5 +384,4 @@ class FirebaseService:
             return False
 
 
-# Create global Firebase service instance
-firebase_service = FirebaseService()
+# Firebase service will be initialized when needed
