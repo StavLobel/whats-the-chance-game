@@ -7,7 +7,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   activeTab: string;
-  onTabChange: (tabId: string) => void;
+  onTabChange: (tabId: string) => void; // eslint-disable-line no-unused-vars
   notificationCount?: number;
 }
 
