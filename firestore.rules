@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Users can read and write challenges they created or are involved in
+    match /challenges/{challengeId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.fromUser == request.auth.uid || 
+         resource.data.toUser == request.auth.uid);
+    }
+    
+    // Users can read and write notifications sent to them
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && 
+        resource.data.toUser == request.auth.uid;
+    }
+    
+    // Users can read and write game sessions they're involved in
+    match /gameSessions/{sessionId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.fromUser == request.auth.uid || 
+         resource.data.toUser == request.auth.uid);
+    }
+  }
+} 
