@@ -6,12 +6,13 @@ This is the main entry point for the FastAPI application.
 Follows the project structure outlined in the SRD.
 """
 
+import os
+
+import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-import uvicorn
-import os
-from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
