@@ -7,19 +7,19 @@ export const mockUsers = {
     uid: 'user-1',
     email: 'user1@example.com',
     displayName: 'User One',
-    photoURL: 'https://example.com/avatar1.jpg',
+    photoURL: null,
   },
   user2: {
     uid: 'user-2',
     email: 'user2@example.com',
     displayName: 'User Two',
-    photoURL: 'https://example.com/avatar2.jpg',
+    photoURL: null,
   },
   admin: {
     uid: 'admin-1',
     email: 'admin@example.com',
     displayName: 'Admin User',
-    photoURL: 'https://example.com/admin.jpg',
+    photoURL: null,
   },
 };
 
@@ -27,8 +27,8 @@ export const mockUsers = {
 export const mockChallenges = {
   active: {
     id: 'challenge-1',
-    title: 'Guess the Number',
-    description: 'Can you guess the number between 1 and 100?',
+    title: 'Test Challenge',
+    description: 'This is a test challenge for testing purposes',
     creatorId: 'user-1',
     targetNumber: 42,
     createdAt: '2025-01-01T10:00:00Z',
@@ -45,8 +45,8 @@ export const mockChallenges = {
   },
   expired: {
     id: 'challenge-2',
-    title: "Time's Up",
-    description: 'This challenge has expired',
+    title: 'Expired Test Challenge',
+    description: 'This test challenge has expired',
     creatorId: 'user-1',
     targetNumber: 7,
     createdAt: '2025-01-01T00:00:00Z',
@@ -57,8 +57,8 @@ export const mockChallenges = {
   },
   completed: {
     id: 'challenge-3',
-    title: 'Completed Challenge',
-    description: 'This challenge has been completed',
+    title: 'Completed Test Challenge',
+    description: 'This test challenge has been completed',
     creatorId: 'user-2',
     targetNumber: 15,
     createdAt: '2025-01-01T10:00:00Z',
@@ -84,7 +84,7 @@ export const mockNotifications = {
     userId: 'user-2',
     type: 'new_challenge',
     title: 'New Challenge Available',
-    message: 'User One has created a new challenge: Guess the Number',
+    message: 'User One has created a new test challenge',
     data: {
       challengeId: 'challenge-1',
       creatorId: 'user-1',
@@ -110,7 +110,7 @@ export const mockNotifications = {
     userId: 'user-1',
     type: 'challenge_won',
     title: 'Congratulations!',
-    message: 'You won the challenge: Completed Challenge',
+    message: 'You won the test challenge',
     data: {
       challengeId: 'challenge-3',
     },
