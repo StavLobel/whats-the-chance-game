@@ -16,7 +16,6 @@ import { Loader2, Mail, Lock, Chrome, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../lib/utils';
 
-
 interface LoginFormProps {
   onSwitchToSignUp?: () => void;
   onSuccess?: () => void;

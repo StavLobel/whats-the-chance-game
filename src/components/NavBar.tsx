@@ -113,10 +113,7 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
         </div>
       </nav>
 
-      <CreateChallengeModal
-        open={showCreateModal}
-        onOpenChange={setShowCreateModal}
-      />
+      <CreateChallengeModal open={showCreateModal} onOpenChange={setShowCreateModal} />
 
       <AuthModal
         isOpen={showAuthModal}

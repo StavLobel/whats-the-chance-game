@@ -1,19 +1,19 @@
 # Traefik Configuration
 api:
   dashboard: true
-  insecure: true  # Only for development, disable in production
+  insecure: true # Only for development, disable in production
 
 # Entry Points
 entryPoints:
   web:
-    address: ":80"
+    address: ':80'
     http:
       redirections:
         entrypoint:
           to: websecure
           scheme: https
   websecure:
-    address: ":443"
+    address: ':443'
 
 # Providers
 providers:
@@ -44,4 +44,4 @@ accessLog: {}
 metrics:
   prometheus:
     addEntryPointsLabels: true
-    addServicesLabels: true 
+    addServicesLabels: true

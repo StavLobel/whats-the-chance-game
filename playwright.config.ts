@@ -16,18 +16,24 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],
-    ['allure-playwright', { 
-      outputFolder: 'allure-results',
-      environmentInfo: {
-        framework: 'Playwright',
-        os: process.platform,
-        node_version: process.version,
-        branch: process.env.GITHUB_REF_NAME || 'local',
-        build_url: process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID
-          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
-          : 'local'
-      }
-    }],
+    [
+      'allure-playwright',
+      {
+        outputFolder: 'allure-results',
+        environmentInfo: {
+          framework: 'Playwright',
+          os: process.platform,
+          node_version: process.version,
+          branch: process.env.GITHUB_REF_NAME || 'local',
+          build_url:
+            process.env.GITHUB_SERVER_URL &&
+            process.env.GITHUB_REPOSITORY &&
+            process.env.GITHUB_RUN_ID
+              ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+              : 'local',
+        },
+      },
+    ],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -36,10 +42,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    
+
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
-    
+
     /* Record video on failure */
     video: 'retain-on-failure',
   },
@@ -89,4 +95,4 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
-}); 
+});

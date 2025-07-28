@@ -11,7 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend.dev
     ports:
-      - "5173:5173"
+      - '5173:5173'
     volumes:
       - .:/app
       - /app/node_modules
@@ -29,7 +29,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./backend:/app
       - /app/__pycache__
@@ -54,17 +54,17 @@ services:
       - VITE_API_URL=https://api.${DOMAIN_NAME}
     networks:
       - whats-the-chance-network
-      - traefik  # Connect to existing Traefik network
+      - traefik # Connect to existing Traefik network
     profiles:
       - production
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whatsthechance-frontend.rule=Host(`${DOMAIN_NAME}`)"
-      - "traefik.http.routers.whatsthechance-frontend.tls=true"
-      - "traefik.http.routers.whatsthechance-frontend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.whatsthechance-frontend.loadbalancer.server.port=80"
-      - "traefik.http.routers.whatsthechance-frontend.middlewares=whatsthechance-frontend-headers"
-      - "traefik.http.middlewares.whatsthechance-frontend-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.whatsthechance-frontend.rule=Host(`${DOMAIN_NAME}`)'
+      - 'traefik.http.routers.whatsthechance-frontend.tls=true'
+      - 'traefik.http.routers.whatsthechance-frontend.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.whatsthechance-frontend.loadbalancer.server.port=80'
+      - 'traefik.http.routers.whatsthechance-frontend.middlewares=whatsthechance-frontend-headers'
+      - 'traefik.http.middlewares.whatsthechance-frontend-headers.headers.customRequestHeaders.X-Forwarded-Proto=https'
 
   # Backend Production
   backend-prod:
@@ -84,21 +84,21 @@ services:
       - ./backend/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - whats-the-chance-network
-      - traefik  # Connect to existing Traefik network
+      - traefik # Connect to existing Traefik network
     profiles:
       - production
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whatsthechance-backend.rule=Host(`api.${DOMAIN_NAME}`)"
-      - "traefik.http.routers.whatsthechance-backend.tls=true"
-      - "traefik.http.routers.whatsthechance-backend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.whatsthechance-backend.loadbalancer.server.port=8000"
-      - "traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolalloworiginlist=https://${DOMAIN_NAME}"
-      - "traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
-      - "traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolallowheaders=*"
-      - "traefik.http.routers.whatsthechance-backend.middlewares=whatsthechance-backend-cors"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.whatsthechance-backend.rule=Host(`api.${DOMAIN_NAME}`)'
+      - 'traefik.http.routers.whatsthechance-backend.tls=true'
+      - 'traefik.http.routers.whatsthechance-backend.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.whatsthechance-backend.loadbalancer.server.port=8000'
+      - 'traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolalloworiginlist=https://${DOMAIN_NAME}'
+      - 'traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS'
+      - 'traefik.http.middlewares.whatsthechance-backend-cors.headers.accesscontrolallowheaders=*'
+      - 'traefik.http.routers.whatsthechance-backend.middlewares=whatsthechance-backend-cors'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -109,7 +109,7 @@ services:
     container_name: whatsthechance-redis
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     networks:
@@ -140,4 +140,4 @@ networks:
   whats-the-chance-network:
     driver: bridge
   traefik:
-    external: true  # Use existing Traefik network 
+    external: true # Use existing Traefik network

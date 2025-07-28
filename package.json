@@ -45,6 +45,10 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "format:python": "cd backend && python3 -m black . && python3 -m isort .",
+    "format:python:check": "cd backend && python3 -m black --check . && python3 -m isort --check-only .",
+    "format:all": "npm run format && npm run format:python",
+    "format:check:all": "npm run format:check && npm run format:python:check",
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
@@ -135,6 +139,10 @@
     ],
     "*.{js,jsx,json,md}": [
       "prettier --write"
+    ],
+    "*.py": [
+      "python3 -m black",
+      "python3 -m isort"
     ]
   },
   "browserslist": {

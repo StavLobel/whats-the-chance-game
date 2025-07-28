@@ -1,7 +1,12 @@
 import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Sun, Moon, Monitor } from 'lucide-react';
 
 interface ThemeToggleProps {
@@ -19,9 +24,9 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
 
   const getThemeIcon = () => {
     if (theme === 'system') {
-      return <Monitor className="h-4 w-4" />;
+      return <Monitor className='h-4 w-4' />;
     }
-    return resolvedTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />;
+    return resolvedTheme === 'dark' ? <Moon className='h-4 w-4' /> : <Sun className='h-4 w-4' />;
   };
 
   const getThemeLabel = () => {
@@ -34,40 +39,31 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant={variant}
-          size={size}
-          className={className}
-          aria-label="Switch theme"
-        >
+        <Button variant={variant} size={size} className={className} aria-label='Switch theme'>
           {getThemeIcon()}
-          {size !== 'icon' && (
-            <span className="mr-2">
-              {getThemeLabel()}
-            </span>
-          )}
+          {size !== 'icon' && <span className='mr-2'>{getThemeLabel()}</span>}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align='end'>
         <DropdownMenuItem
           onClick={() => setTheme('light')}
           className={`cursor-pointer ${theme === 'light' ? 'bg-accent' : ''}`}
         >
-          <Sun className="h-4 w-4 mr-2" />
+          <Sun className='h-4 w-4 mr-2' />
           <span>Light</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme('dark')}
           className={`cursor-pointer ${theme === 'dark' ? 'bg-accent' : ''}`}
         >
-          <Moon className="h-4 w-4 mr-2" />
+          <Moon className='h-4 w-4 mr-2' />
           <span>Dark</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme('system')}
           className={`cursor-pointer ${theme === 'system' ? 'bg-accent' : ''}`}
         >
-          <Monitor className="h-4 w-4 mr-2" />
+          <Monitor className='h-4 w-4 mr-2' />
           <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -75,4 +71,4 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   );
 };
 
-export default ThemeToggle; 
+export default ThemeToggle;
