@@ -48,7 +48,8 @@ app.add_middleware(
 
 # Security middleware
 app.add_middleware(
-    TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "*.vercel.app"]
+    TrustedHostMiddleware,
+    allowed_hosts=["localhost", "127.0.0.1", "*.vercel.app"],
 )
 
 
@@ -56,7 +57,11 @@ app.add_middleware(
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint for monitoring and load balancers."""
-    return {"status": "healthy", "service": "whats-the-chance-api", "version": "0.1.0"}
+    return {
+        "status": "healthy",
+        "service": "whats-the-chance-api",
+        "version": "0.1.0",
+    }
 
 
 # Root endpoint
@@ -72,12 +77,26 @@ async def root():
 
 
 # Include routers (uncomment when routers are created)
-# app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
-# app.include_router(users.router, prefix="/api/users", tags=["users"])
-# app.include_router(challenges.router, prefix="/api/challenges", tags=["challenges"])
-# app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
+# app.include_router(
+#     auth.router, prefix="/api/auth", tags=["authentication"]
+# )
+# app.include_router(
+#     users.router, prefix="/api/users", tags=["users"]
+# )
+# app.include_router(
+#     challenges.router, prefix="/api/challenges", tags=["challenges"]
+# )
+# app.include_router(
+#     notifications.router, prefix="/api/notifications", tags=["notifications"]
+# )
 
 if __name__ == "__main__":
     # Development server
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True, log_level="info")
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=port,
+        reload=True,
+        log_level="info",
+    )

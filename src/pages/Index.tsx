@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Play, Users, Zap, Trophy, ArrowRight, Dice1, Dice2 } from 'lucide-react';
+import { Play, Users, Zap, Trophy, ArrowRight, Dice1 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import Game from './Game';
 
