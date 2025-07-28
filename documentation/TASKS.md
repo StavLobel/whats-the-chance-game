@@ -152,6 +152,10 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ Security and token validation middleware
    - ✅ Complete documentation and deployment configuration
    - ✅ Docker support and production-ready setup
+   - ✅ **👤 User Schema Enhancement** - Added firstName, lastName, username fields
+   - ✅ **🗄️ Firebase Database Structure** - Complete user profiles, stats, and settings collections
+   - ✅ **🧪 Test Users Creation** - Comprehensive test users with full profiles
+   - ✅ **🔒 Security Enhancement** - Removed secrets from git history, enhanced .gitignore
 
 5. **🔄 Real-time Features** [#10](https://github.com/StavLobel/whats-the-chance-game/issues/10)
    - **Status**: ⏳ **PENDING**
