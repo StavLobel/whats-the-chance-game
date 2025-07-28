@@ -80,7 +80,7 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 - **Radix UI** - Accessible primitives
 - **Lucide React** - Icon library
 - **React Router** - Client-side routing
-- **React i18next** - Internationalization (removed - UI in English only)
+- **React Query** - Data fetching and caching
 - **Vitest** - Unit testing framework
 - **React Testing Library** - Component testing
 - **Playwright** - End-to-end testing
