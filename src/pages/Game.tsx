@@ -7,9 +7,12 @@ import { CreateChallengeModal } from '@/components/CreateChallengeModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/EmptyState';
+import { LoadingState } from '@/components/LoadingState';
+import { ErrorState } from '@/components/ErrorState';
 import { Challenge } from '@/types/challenge';
 import { Plus, Trophy, Bell, Users, Target, Zap } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useGame } from '@/hooks/useGame';
+import { useAuth } from '@/hooks/useAuth';
 
 type TabType = 'home' | 'my-challenges' | 'create' | 'notifications' | 'friends' | 'settings';
 
@@ -18,15 +21,21 @@ export default function Game() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const { toast } = useToast();
+  const { user } = useAuth();
+  const {
+    challenges,
+    loading,
+    error,
+    getIncomingChallenges,
+    getOutgoingChallenges,
+    getActiveChallenges,
+    getCompletedChallenges,
+  } = useGame();
 
-  // TODO: Replace with real data from Firebase/API
-  const currentUser = { username: 'user' };
-  const challenges: Challenge[] = [];
-  const incomingChallenges = challenges.filter(
-    (c: Challenge) => c.to_user === currentUser.username && c.status === 'pending'
-  );
-  const myChallenges = challenges.filter((c: Challenge) => c.from_user === currentUser.username);
+  const incomingChallenges = getIncomingChallenges();
+  const myChallenges = getOutgoingChallenges();
+  const activeChallenges = getActiveChallenges();
+  const completedChallenges = getCompletedChallenges();
   const notificationCount = incomingChallenges.length;
 
   const handleAcceptChallenge = (id: string) => {
@@ -37,11 +46,8 @@ export default function Game() {
   };
 
   const handleRejectChallenge = () => {
-    toast({
-      title: 'Challenge declined',
-      description: 'You have declined the challenge.',
-      duration: 3000,
-    });
+    // This will be handled by the ChallengeDetail component
+    console.log('Challenge rejected');
   };
 
   const handleTabChange = (tab: string) => {
@@ -50,6 +56,22 @@ export default function Game() {
       setShowCreateModal(true);
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return <LoadingState message="Loading challenges..." />;
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <ErrorState
+        title="Failed to load challenges"
+        message={error}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   const renderTabContent = () => {
     if (selectedChallenge) {
@@ -65,7 +87,7 @@ export default function Game() {
             {/* Welcome Header */}
             <div className='text-center space-y-2 p-6 bg-gradient-card rounded-lg shadow-card'>
               <h1 className='text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent'>
-                Welcome back, @{currentUser.username}!
+                Welcome back, @{user?.displayName || user?.email || 'user'}!
               </h1>
               <p className='text-muted-foreground'>Ready for some fun challenges?</p>
             </div>

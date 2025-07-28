@@ -5,15 +5,24 @@ export interface User {
 
 export interface Challenge {
   id: string;
-  from_user: string;
-  to_user: string;
+  fromUser: string;
+  toUser: string;
   description: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'in_progress';
-  range?: number;
-  from_number?: number;
-  to_number?: number;
-  created_at: string;
+  status: 'pending' | 'accepted' | 'active' | 'completed';
+  range?: { min: number; max: number };
+  numbers?: { fromUser: number; toUser: number };
   result?: 'match' | 'no_match';
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+export interface GameSession {
+  id: string;
+  challengeId: string;
+  players: string[];
+  status: 'waiting' | 'active' | 'completed';
+  numbers: Record<string, number>;
+  result?: boolean;
 }
 
 export interface MockGameState {

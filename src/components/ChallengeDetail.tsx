@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,8 @@ import { Slider } from '@/components/ui/slider';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from 'lucide-react';
 import { Challenge } from '@/types/challenge';
-import { useToast } from '@/hooks/use-toast';
+import { useGame } from '@/hooks/useGame';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ChallengeDetailProps {
   challenge: Challenge;
@@ -20,38 +21,67 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
   const [range, setRange] = useState([10]);
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const { toast } = useToast();
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenge);
+  const { acceptChallenge, rejectChallenge, submitNumber, subscribeToChallenge } = useGame();
+  const { user } = useAuth();
 
-  // Mock numbers for demonstration
-  const mockUserNumber = 7;
-  const mockOpponentNumber = 7;
-  const isMatch = mockUserNumber === mockOpponentNumber;
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const unsubscribe = subscribeToChallenge(challenge.id, (updatedChallenge) => {
+      if (updatedChallenge) {
+        setCurrentChallenge(updatedChallenge);
+        
+        // Update phase based on challenge status
+        if (updatedChallenge.status === 'accepted' && !updatedChallenge.numbers) {
+          setPhase('pick_number');
+        } else if (updatedChallenge.status === 'active') {
+          setPhase('waiting');
+        } else if (updatedChallenge.status === 'completed') {
+          setPhase('reveal');
+          setShowResult(true);
+        }
+      }
+    });
 
-  const handleAccept = () => {
-    setPhase('set_range');
+    return () => unsubscribe();
+  }, [challenge.id, subscribeToChallenge]);
+
+  // Determine if current user is the challenger or challengee
+  const isChallenger = user?.uid === currentChallenge.fromUser;
+  const isChallengee = user?.uid === currentChallenge.toUser;
+
+  const handleAccept = async () => {
+    try {
+      const maxRange = range[0] || 10;
+      await acceptChallenge(currentChallenge.id, { min: 1, max: maxRange });
+      setPhase('pick_number');
+    } catch (error) {
+      console.error('Failed to accept challenge:', error);
+    }
   };
 
-  const handleReject = () => {
-    toast({
-      title: 'Challenge declined',
-      description: 'You have declined this challenge.',
-    });
-    onBack();
+  const handleReject = async () => {
+    try {
+      await rejectChallenge(currentChallenge.id);
+      onBack();
+    } catch (error) {
+      console.error('Failed to reject challenge:', error);
+    }
   };
 
   const handleSetRange = () => {
     setPhase('pick_number');
   };
 
-  const handleNumberSelect = (number: number) => {
-    setSelectedNumber(number);
-    setPhase('waiting');
-
-    // Simulate waiting then reveal
-    setTimeout(() => {
-      setPhase('reveal');
-      setShowResult(true);
-    }, 2000);
+  const handleNumberSelect = async (number: number) => {
+    try {
+      setSelectedNumber(number);
+      setPhase('waiting');
+      await submitNumber(currentChallenge.id, number);
+    } catch (error) {
+      console.error('Failed to submit number:', error);
+      setPhase('pick_number');
+    }
   };
 
   const getDiceIcon = (number: number) => {
@@ -123,7 +153,7 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
             </div>
 
             <div className='grid grid-cols-5 gap-3 max-h-60 overflow-y-auto'>
-              {Array.from({ length: range[0] }, (_, i) => i + 1).map(number => {
+              {Array.from({ length: range[0] || 10 }, (_, i) => i + 1).map(number => {
                 const DiceIcon = getDiceIcon(number);
                 return (
                   <Button
@@ -132,7 +162,7 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
                     onClick={() => handleNumberSelect(number)}
                     className='aspect-square flex flex-col items-center justify-center h-16'
                   >
-                    {number <= 6 ? <DiceIcon className='h-6 w-6 mb-1' /> : null}
+                    {number <= 6 && DiceIcon ? <DiceIcon className='h-6 w-6 mb-1' /> : null}
                     <span className='text-sm font-bold'>{number}</span>
                   </Button>
                 );
@@ -171,7 +201,7 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
                 </CardHeader>
                 <CardContent>
                   <div className='text-3xl font-bold text-primary animate-number-reveal'>
-                    {mockUserNumber}
+                    {(currentChallenge.numbers as Record<string, number>)?.[user?.uid || ''] || '?'}
                   </div>
                 </CardContent>
               </Card>
@@ -179,31 +209,31 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
               <Card className='text-center'>
                 <CardHeader className='pb-2'>
                   <CardTitle className='text-sm text-muted-foreground'>
-                    @{challenge.from_user}
+                    @{currentChallenge.fromUser}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='text-3xl font-bold text-primary animate-number-reveal'>
-                    {mockOpponentNumber}
+                    {(currentChallenge.numbers as Record<string, number>)?.[currentChallenge.fromUser] || '?'}
                   </div>
                 </CardContent>
               </Card>
             </div>
 
             <Card
-              className={`text-center ${isMatch ? 'bg-gradient-success' : 'bg-muted'} animate-bounce-in`}
+              className={`text-center ${currentChallenge.result === 'match' ? 'bg-gradient-success' : 'bg-muted'} animate-bounce-in`}
             >
               <CardContent className='pt-6'>
                 <div className='text-2xl font-bold mb-2'>
-                  {isMatch ? (
+                  {currentChallenge.result === 'match' ? (
                     <span className='text-success-foreground'>🎯 IT'S A MATCH!</span>
                   ) : (
                     <span className='text-muted-foreground'>❌ No Match</span>
                   )}
                 </div>
-                <p className={isMatch ? 'text-success-foreground' : 'text-muted-foreground'}>
-                  {isMatch
-                    ? `You must complete the challenge: "${challenge.description}"`
+                <p className={currentChallenge.result === 'match' ? 'text-success-foreground' : 'text-muted-foreground'}>
+                  {currentChallenge.result === 'match'
+                    ? `You must complete the challenge: "${currentChallenge.description}"`
                     : "You're off the hook this time!"}
                 </p>
               </CardContent>
@@ -230,11 +260,11 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
         <div className='flex items-center gap-3 flex-1'>
           <Avatar className='h-10 w-10'>
             <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-              {challenge.from_user.charAt(0).toUpperCase()}
+                              {challenge.fromUser.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className='font-medium'>@{challenge.from_user}</p>
+                          <p className='font-medium'>@{challenge.fromUser}</p>
             <Badge variant='secondary' className='text-xs'>
               {challenge.status}
             </Badge>
