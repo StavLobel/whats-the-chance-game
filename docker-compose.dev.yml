@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: whats-the-chance-backend-dev
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./backend:/app
       - /app/__pycache__
@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: whats-the-chance-frontend-dev
     ports:
-      - "8080:8080"
+      - '8080:8080'
     volumes:
       - .:/app
       - /app/node_modules
@@ -38,4 +38,4 @@ services:
 
 networks:
   app-network:
-    driver: bridge 
+    driver: bridge

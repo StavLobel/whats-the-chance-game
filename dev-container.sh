@@ -15,20 +15,20 @@ case "$1" in
         echo "🌐 Frontend: http://localhost:8080"
         echo "🔧 Backend: http://localhost:8000"
         ;;
-    
+
     "stop")
         echo "🛑 Stopping development containers..."
         docker-compose -f $COMPOSE_FILE down
         echo "✅ Containers stopped!"
         ;;
-    
+
     "restart")
         echo "🔄 Restarting development containers..."
         docker-compose -f $COMPOSE_FILE down
         docker-compose -f $COMPOSE_FILE up -d
         echo "✅ Containers restarted!"
         ;;
-    
+
     "rebuild")
         echo "🏗️ Rebuilding and starting containers..."
         docker-compose -f $COMPOSE_FILE down
@@ -36,7 +36,7 @@ case "$1" in
         docker-compose -f $COMPOSE_FILE up -d
         echo "✅ Containers rebuilt and started!"
         ;;
-    
+
     "logs")
         SERVICE=${2:-""}
         if [ -z "$SERVICE" ]; then
@@ -47,18 +47,18 @@ case "$1" in
             docker-compose -f $COMPOSE_FILE logs -f $SERVICE
         fi
         ;;
-    
+
     "status")
         echo "📊 Container status:"
         docker-compose -f $COMPOSE_FILE ps
         ;;
-    
+
     "shell")
         SERVICE=${2:-"backend"}
         echo "🐚 Opening shell in $SERVICE container..."
         docker-compose -f $COMPOSE_FILE exec $SERVICE /bin/bash
         ;;
-    
+
     *)
         echo "🐳 Development Container Management"
         echo ""
@@ -66,7 +66,7 @@ case "$1" in
         echo ""
         echo "Commands:"
         echo "  start     - Start all development containers"
-        echo "  stop      - Stop all development containers" 
+        echo "  stop      - Stop all development containers"
         echo "  restart   - Restart all development containers"
         echo "  rebuild   - Rebuild and start containers (use after code changes)"
         echo "  logs      - Show logs (optional: specify service name)"
@@ -78,4 +78,4 @@ case "$1" in
         echo "  $0 logs backend"
         echo "  $0 shell frontend"
         ;;
-esac 
+esac

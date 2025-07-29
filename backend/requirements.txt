@@ -51,4 +51,4 @@ click==8.1.7
 rich==13.7.0
 
 # Production
-gunicorn==21.2.0 
+gunicorn==21.2.0

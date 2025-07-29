@@ -42,16 +42,13 @@ describe('GameService', () => {
 
       const result = await gameService.createChallenge('user1', 'user2', 'Test challenge');
 
-      expect(addDoc).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          fromUser: 'user1',
-          toUser: 'user2',
-          description: 'Test challenge',
-          status: 'pending',
-          createdAt: expect.any(Date),
-        }
-      );
+      expect(addDoc).toHaveBeenCalledWith(expect.any(Object), {
+        fromUser: 'user1',
+        toUser: 'user2',
+        description: 'Test challenge',
+        status: 'pending',
+        createdAt: expect.any(Date),
+      });
       expect(result).toBe('challenge-123');
     });
   });
@@ -64,7 +61,7 @@ describe('GameService', () => {
         description: 'Test challenge',
         status: 'pending',
       };
-      
+
       mockGetDoc.mockResolvedValue({
         data: () => mockChallengeData,
       });
@@ -73,13 +70,10 @@ describe('GameService', () => {
 
       await gameService.acceptChallenge('challenge-123', { min: 1, max: 10 });
 
-      expect(mockUpdateDoc).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          status: 'accepted',
-          range: { min: 1, max: 10 },
-        }
-      );
+      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.any(Object), {
+        status: 'accepted',
+        range: { min: 1, max: 10 },
+      });
     });
   });
 
@@ -92,7 +86,7 @@ describe('GameService', () => {
         status: 'accepted',
         numbers: {},
       };
-      
+
       mockGetDoc.mockResolvedValue({
         data: () => mockChallengeData,
       });
@@ -100,13 +94,10 @@ describe('GameService', () => {
 
       await gameService.submitNumber('challenge-123', 'user1', 5);
 
-      expect(mockUpdateDoc).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          numbers: { user1: 5 },
-          status: 'active',
-        }
-      );
+      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.any(Object), {
+        numbers: { user1: 5 },
+        status: 'active',
+      });
     });
 
     it('should calculate result when both players have submitted numbers', async () => {
@@ -117,7 +108,7 @@ describe('GameService', () => {
         status: 'accepted',
         numbers: { user1: 5 },
       };
-      
+
       mockGetDoc.mockResolvedValue({
         data: () => mockChallengeData,
       });
@@ -130,14 +121,11 @@ describe('GameService', () => {
       await gameService.submitNumber('challenge-123', 'user2', 5);
 
       // Should call calculateResult which updates the challenge status
-      expect(mockUpdateDoc).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          status: 'completed',
-          result: 'match',
-          completedAt: expect.any(Date),
-        }
-      );
+      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.any(Object), {
+        status: 'completed',
+        result: 'match',
+        completedAt: expect.any(Date),
+      });
     });
   });
 
@@ -147,12 +135,9 @@ describe('GameService', () => {
 
       await gameService.rejectChallenge('challenge-123');
 
-      expect(mockUpdateDoc).toHaveBeenCalledWith(
-        expect.any(Object),
-        {
-          status: 'rejected',
-        }
-      );
+      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.any(Object), {
+        status: 'rejected',
+      });
     });
   });
-}); 
+});

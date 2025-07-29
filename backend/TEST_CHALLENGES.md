@@ -308,7 +308,7 @@ After importing test challenges:
 
 ---
 
-**Created**: January 29, 2025  
-**Updated**: January 29, 2025  
-**Project**: whats-the-chance-game  
+**Created**: January 29, 2025
+**Updated**: January 29, 2025
+**Project**: whats-the-chance-game
 **Environment**: Development/Testing

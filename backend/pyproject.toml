@@ -167,4 +167,4 @@ exclude_lines = [
 
 [tool.bandit]
 exclude_dirs = ["tests", "venv", ".venv"]
-skips = ["B101", "B601"] 
+skips = ["B101", "B601"]

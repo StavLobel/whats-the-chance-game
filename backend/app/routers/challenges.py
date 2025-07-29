@@ -109,8 +109,8 @@ async def test_challenges(
     """
     Test endpoint to get all challenges with optimized user lookups.
     """
-    import time
     import asyncio
+    import time
 
     start_time = time.time()
 

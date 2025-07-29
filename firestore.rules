@@ -5,25 +5,25 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    
+
     // Users can read and write challenges they created or are involved in
     match /challenges/{challengeId} {
-      allow read, write: if request.auth != null && 
-        (resource.data.from_user == request.auth.uid || 
+      allow read, write: if request.auth != null &&
+        (resource.data.from_user == request.auth.uid ||
          resource.data.to_user == request.auth.uid);
     }
-    
+
     // Users can read and write notifications sent to them
     match /notifications/{notificationId} {
-      allow read, write: if request.auth != null && 
+      allow read, write: if request.auth != null &&
         resource.data.to_user == request.auth.uid;
     }
-    
+
     // Users can read and write game sessions they're involved in
     match /gameSessions/{sessionId} {
-      allow read, write: if request.auth != null && 
-        (resource.data.from_user == request.auth.uid || 
+      allow read, write: if request.auth != null &&
+        (resource.data.from_user == request.auth.uid ||
          resource.data.to_user == request.auth.uid);
     }
   }
-} 
+}

@@ -9,11 +9,11 @@ interface ErrorStateProps {
   className?: string;
 }
 
-export function ErrorState({ 
-  title = 'Something went wrong', 
+export function ErrorState({
+  title = 'Something went wrong',
   message = 'There was an error loading the data. Please try again.',
   onRetry,
-  className 
+  className,
 }: ErrorStateProps) {
   return (
     <div className={cn('text-center py-12', className)}>
@@ -30,4 +30,4 @@ export function ErrorState({
       )}
     </div>
   );
-} 
+}

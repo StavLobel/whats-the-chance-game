@@ -50,4 +50,4 @@ exec uvicorn main:app \
     --port ${PORT:-8000} \
     --workers ${WORKERS:-4} \
     --log-level info \
-    --access-log 
+    --access-log

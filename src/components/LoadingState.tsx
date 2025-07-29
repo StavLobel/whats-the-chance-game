@@ -7,7 +7,11 @@ interface LoadingStateProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function LoadingState({ message = 'Loading...', className, size = 'md' }: LoadingStateProps) {
+export function LoadingState({
+  message = 'Loading...',
+  className,
+  size = 'md',
+}: LoadingStateProps) {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
@@ -20,4 +24,4 @@ export function LoadingState({ message = 'Loading...', className, size = 'md' }:
       <p className='text-sm text-muted-foreground'>{message}</p>
     </div>
   );
-} 
+}

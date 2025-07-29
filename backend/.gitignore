@@ -130,4 +130,4 @@ dmypy.json
 
 # Firebase service account keys
 firebase-service-account.json
-*-firebase-adminsdk-*.json 
+*-firebase-adminsdk-*.json

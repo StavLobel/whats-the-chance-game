@@ -59,14 +59,14 @@ export default function Game() {
 
   // Show loading state
   if (loading) {
-    return <LoadingState message="Loading challenges..." />;
+    return <LoadingState message='Loading challenges...' />;
   }
 
   // Show error state
   if (error) {
     return (
       <ErrorState
-        title="Failed to load challenges"
+        title='Failed to load challenges'
         message={error}
         onRetry={() => window.location.reload()}
       />

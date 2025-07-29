@@ -28,10 +28,10 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
 
   // Subscribe to real-time updates
   useEffect(() => {
-    const unsubscribe = subscribeToChallenge(challenge.id, (updatedChallenge) => {
+    const unsubscribe = subscribeToChallenge(challenge.id, updatedChallenge => {
       if (updatedChallenge) {
         setCurrentChallenge(updatedChallenge);
-        
+
         // Update phase based on challenge status
         if (updatedChallenge.status === 'accepted' && !updatedChallenge.numbers) {
           setPhase('pick_number');
@@ -210,7 +210,9 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
                 </CardHeader>
                 <CardContent>
                   <div className='text-3xl font-bold text-primary animate-number-reveal'>
-                    {(currentChallenge.numbers as Record<string, number>)?.[currentChallenge.from_user] || '?'}
+                    {(currentChallenge.numbers as Record<string, number>)?.[
+                      currentChallenge.from_user
+                    ] || '?'}
                   </div>
                 </CardContent>
               </Card>
@@ -227,7 +229,13 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
                     <span className='text-muted-foreground'>❌ No Match</span>
                   )}
                 </div>
-                <p className={currentChallenge.result === 'match' ? 'text-success-foreground' : 'text-muted-foreground'}>
+                <p
+                  className={
+                    currentChallenge.result === 'match'
+                      ? 'text-success-foreground'
+                      : 'text-muted-foreground'
+                  }
+                >
                   {currentChallenge.result === 'match'
                     ? `You must complete the challenge: "${currentChallenge.description}"`
                     : "You're off the hook this time!"}
@@ -256,11 +264,11 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
         <div className='flex items-center gap-3 flex-1'>
           <Avatar className='h-10 w-10'>
             <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-                              {challenge.from_user.charAt(0).toUpperCase()}
+              {challenge.from_user.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-                          <p className='font-medium'>@{challenge.from_user}</p>
+            <p className='font-medium'>@{challenge.from_user}</p>
             <Badge variant='secondary' className='text-xs'>
               {challenge.status}
             </Badge>

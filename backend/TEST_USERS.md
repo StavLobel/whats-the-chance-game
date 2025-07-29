@@ -146,9 +146,9 @@ The user profiles now include additional fields:
 
 The database structure has been verified and includes:
 
-✅ **Firebase Auth**: Users with custom claims  
-✅ **Collection: users**: Profile documents with all fields  
-✅ **Collection: user_stats**: Statistics documents for game tracking  
+✅ **Firebase Auth**: Users with custom claims
+✅ **Collection: users**: Profile documents with all fields
+✅ **Collection: user_stats**: Statistics documents for game tracking
 ✅ **Collection: user_settings**: Settings documents for user preferences
 
 ## Creation Script
@@ -198,8 +198,8 @@ The new schema supports:
 
 ---
 
-**Created**: January 28, 2025  
-**Updated**: January 28, 2025 (Added firstName, lastName, username fields)  
-**Database Updated**: January 28, 2025 (Complete Firestore structure)  
-**Project**: whats-the-chance-game  
+**Created**: January 28, 2025
+**Updated**: January 28, 2025 (Added firstName, lastName, username fields)
+**Database Updated**: January 28, 2025 (Complete Firestore structure)
+**Project**: whats-the-chance-game
 **Environment**: Development/Testing

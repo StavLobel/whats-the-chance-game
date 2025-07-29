@@ -28,7 +28,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
     setIsSubmitting(true);
     try {
       await createChallenge(targetUser, task);
-      
+
       // Reset form
       setTask('');
       setTargetUser('');

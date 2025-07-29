@@ -1,6 +1,6 @@
 # Software Requirements Document (SRD) – "What's the Chance?" App (Full System)
 
-> ⚙️ **Development Approach: Test-Driven Development (TDD)**  
+> ⚙️ **Development Approach: Test-Driven Development (TDD)**
 > This project is developed using a TDD approach. Each feature starts with writing unit/integration tests (using tools like Vitest or Pytest + Playwright), followed by implementation, and only then refactoring. This ensures robust, predictable, and maintainable code.
 
 ## 🧭 Overview
