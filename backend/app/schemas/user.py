@@ -11,7 +11,7 @@ This module defines the data models for:
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserBase(BaseModel):
@@ -24,15 +24,9 @@ class UserBase(BaseModel):
     first_name: Optional[str] = Field(
         None, max_length=50, description="User first name"
     )
-    last_name: Optional[str] = Field(
-        None, max_length=50, description="User last name"
-    )
-    username: Optional[str] = Field(
-        None, max_length=30, description="Unique username"
-    )
-    photo_url: Optional[str] = Field(
-        None, description="User profile photo URL"
-    )
+    last_name: Optional[str] = Field(None, max_length=50, description="User last name")
+    username: Optional[str] = Field(None, max_length=30, description="Unique username")
+    photo_url: Optional[str] = Field(None, description="User profile photo URL")
 
 
 class UserCreate(UserBase):
@@ -40,28 +34,32 @@ class UserCreate(UserBase):
 
     uid: str = Field(..., description="Firebase user UID")
 
-    @validator("display_name")
+    @field_validator("display_name")
+    @classmethod
     def validate_display_name(cls, v):
         """Validate display name if provided."""
         if v is not None and not v.strip():
             raise ValueError("Display name cannot be empty if provided")
         return v.strip() if v else None
 
-    @validator("first_name")
+    @field_validator("first_name")
+    @classmethod
     def validate_first_name(cls, v):
         """Validate first name if provided."""
         if v is not None and not v.strip():
             raise ValueError("First name cannot be empty if provided")
         return v.strip() if v else None
 
-    @validator("last_name")
+    @field_validator("last_name")
+    @classmethod
     def validate_last_name(cls, v):
         """Validate last name if provided."""
         if v is not None and not v.strip():
             raise ValueError("Last name cannot be empty if provided")
         return v.strip() if v else None
 
-    @validator("username")
+    @field_validator("username")
+    @classmethod
     def validate_username(cls, v):
         """Validate username if provided."""
         if v is not None:
@@ -86,38 +84,36 @@ class UserUpdate(BaseModel):
     first_name: Optional[str] = Field(
         None, max_length=50, description="User first name"
     )
-    last_name: Optional[str] = Field(
-        None, max_length=50, description="User last name"
-    )
-    username: Optional[str] = Field(
-        None, max_length=30, description="Unique username"
-    )
-    photo_url: Optional[str] = Field(
-        None, description="User profile photo URL"
-    )
+    last_name: Optional[str] = Field(None, max_length=50, description="User last name")
+    username: Optional[str] = Field(None, max_length=30, description="Unique username")
+    photo_url: Optional[str] = Field(None, description="User profile photo URL")
 
-    @validator("display_name")
+    @field_validator("display_name")
+    @classmethod
     def validate_display_name(cls, v):
         """Validate display name if provided."""
         if v is not None and not v.strip():
             raise ValueError("Display name cannot be empty if provided")
         return v.strip() if v else None
 
-    @validator("first_name")
+    @field_validator("first_name")
+    @classmethod
     def validate_first_name(cls, v):
         """Validate first name if provided."""
         if v is not None and not v.strip():
             raise ValueError("First name cannot be empty if provided")
         return v.strip() if v else None
 
-    @validator("last_name")
+    @field_validator("last_name")
+    @classmethod
     def validate_last_name(cls, v):
         """Validate last name if provided."""
         if v is not None and not v.strip():
             raise ValueError("Last name cannot be empty if provided")
         return v.strip() if v else None
 
-    @validator("username")
+    @field_validator("username")
+    @classmethod
     def validate_username(cls, v):
         """Validate username if provided."""
         if v is not None:
@@ -149,17 +145,13 @@ class User(UserBase):
 class UserProfile(User):
     """Extended user model with game statistics."""
 
-    total_challenges: int = Field(
-        default=0, description="Total challenges created"
-    )
+    total_challenges: int = Field(default=0, description="Total challenges created")
     challenges_won: int = Field(default=0, description="Challenges won")
     challenges_lost: int = Field(default=0, description="Challenges lost")
     win_rate: float = Field(
         default=0.0, ge=0.0, le=1.0, description="Win rate percentage"
     )
-    last_active: Optional[datetime] = Field(
-        None, description="Last activity timestamp"
-    )
+    last_active: Optional[datetime] = Field(None, description="Last activity timestamp")
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat()}
@@ -172,18 +164,14 @@ class UserStats(BaseModel):
     total_challenges: int = Field(..., description="Total challenges created")
     challenges_won: int = Field(..., description="Challenges won")
     challenges_lost: int = Field(..., description="Challenges lost")
-    win_rate: float = Field(
-        ..., ge=0.0, le=1.0, description="Win rate percentage"
-    )
+    win_rate: float = Field(..., ge=0.0, le=1.0, description="Win rate percentage")
     total_matches: int = Field(..., description="Total matches played")
     matches_won: int = Field(..., description="Matches won")
     matches_lost: int = Field(..., description="Matches lost")
     average_response_time: Optional[float] = Field(
         None, description="Average response time in seconds"
     )
-    last_active: Optional[datetime] = Field(
-        None, description="Last activity timestamp"
-    )
+    last_active: Optional[datetime] = Field(None, description="Last activity timestamp")
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat()}
@@ -208,9 +196,7 @@ class UserSearch(BaseModel):
     limit: int = Field(
         default=10, ge=1, le=100, description="Maximum number of results"
     )
-    offset: int = Field(
-        default=0, ge=0, description="Number of results to skip"
-    )
+    offset: int = Field(default=0, ge=0, description="Number of results to skip")
 
 
 class UserSearchResult(BaseModel):
@@ -227,9 +213,7 @@ class UserActivity(BaseModel):
     uid: str = Field(..., description="User UID")
     activity_type: str = Field(..., description="Type of activity")
     timestamp: datetime = Field(..., description="Activity timestamp")
-    metadata: Optional[dict] = Field(
-        None, description="Additional activity metadata"
-    )
+    metadata: Optional[dict] = Field(None, description="Additional activity metadata")
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat()}
@@ -238,9 +222,7 @@ class UserActivity(BaseModel):
 class UserActivityList(BaseModel):
     """Schema for list of user activities."""
 
-    activities: List[UserActivity] = Field(
-        ..., description="List of user activities"
-    )
+    activities: List[UserActivity] = Field(..., description="List of user activities")
     total: int = Field(..., description="Total number of activities")
     page: int = Field(..., description="Current page number")
     per_page: int = Field(..., description="Number of activities per page")

@@ -106,9 +106,7 @@ async def send_notification(
             "read": False,
         }
 
-        await firebase_service.create_document(
-            "notification_history", history_doc
-        )
+        await firebase_service.create_document("notification_history", history_doc)
 
         return {
             "success": True,
@@ -409,9 +407,7 @@ async def unregister_fcm_token(
             )
 
         # Delete token
-        success = await firebase_service.delete_document(
-            "fcm_tokens", token_doc["id"]
-        )
+        success = await firebase_service.delete_document("fcm_tokens", token_doc["id"])
 
         if not success:
             raise HTTPException(
@@ -468,9 +464,7 @@ async def subscribe_to_topic(
         token_strings = [token_doc["token"] for token_doc in tokens]
 
         # Subscribe to topic
-        success = await firebase_service.subscribe_to_topic(
-            token_strings, topic
-        )
+        success = await firebase_service.subscribe_to_topic(token_strings, topic)
 
         if not success:
             raise HTTPException(
@@ -485,9 +479,7 @@ async def subscribe_to_topic(
             "subscribed_at": datetime.utcnow(),
         }
 
-        await firebase_service.create_document(
-            "topic_subscriptions", subscription_doc
-        )
+        await firebase_service.create_document("topic_subscriptions", subscription_doc)
 
         return {
             "success": True,
@@ -540,9 +532,7 @@ async def unsubscribe_from_topic(
         token_strings = [token_doc["token"] for token_doc in tokens]
 
         # Unsubscribe from topic
-        success = await firebase_service.unsubscribe_from_topic(
-            token_strings, topic
-        )
+        success = await firebase_service.unsubscribe_from_topic(token_strings, topic)
 
         if not success:
             raise HTTPException(
@@ -655,9 +645,7 @@ async def get_notification_history(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Error getting notification history for user {user_id}: {e}"
-        )
+        logger.error(f"Error getting notification history for user {user_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve notification history",
@@ -697,9 +685,7 @@ async def get_notification_stats(
 
         # Calculate statistics
         total_sent = len(notifications)
-        total_delivered = len(
-            [n for n in notifications if n.get("delivered", False)]
-        )
+        total_delivered = len([n for n in notifications if n.get("delivered", False)])
         total_read = len([n for n in notifications if n.get("read", False)])
 
         delivery_rate = total_delivered / total_sent if total_sent > 0 else 0.0
@@ -708,9 +694,7 @@ async def get_notification_stats(
         # Calculate by type
         by_type = {}
         for notification in notifications:
-            notification_type = notification.get(
-                "notification_type", "unknown"
-            )
+            notification_type = notification.get("notification_type", "unknown")
             by_type[notification_type] = by_type.get(notification_type, 0) + 1
 
         return NotificationStats(
@@ -725,9 +709,7 @@ async def get_notification_stats(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Error getting notification stats for user {user_id}: {e}"
-        )
+        logger.error(f"Error getting notification stats for user {user_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve notification statistics",

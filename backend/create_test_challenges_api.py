@@ -16,6 +16,7 @@ Features:
 import asyncio
 import json
 import random
+
 # TODO: Add datetime when needed for time operations
 from typing import Any, Dict, List
 
@@ -287,9 +288,7 @@ def create_test_challenges_data() -> List[Dict[str, Any]]:
         }
         # Ensure they're different
         while numbers["from_user"] == numbers["to_user"]:
-            numbers["to_user"] = random.randint(
-                range_data["min"], range_data["max"]
-            )
+            numbers["to_user"] = random.randint(range_data["min"], range_data["max"])
 
         language = "english" if i % 2 == 0 else "hebrew"
         description = random.choice(CHALLENGE_DESCRIPTIONS[language])
@@ -348,9 +347,7 @@ def print_challenge_summary(challenges: List[Dict[str, Any]]):
 
         # Count ranges
         if "range" in challenge:
-            range_key = (
-                f"{challenge['range']['min']}-{challenge['range']['max']}"
-            )
+            range_key = f"{challenge['range']['min']}-{challenge['range']['max']}"
             range_counts[range_key] = range_counts.get(range_key, 0) + 1
 
     print("\n📈 Status Distribution:")
@@ -395,9 +392,7 @@ async def create_challenges_directly():
         print("\n📋 Next Steps:")
         print("   1. Start the FastAPI backend: python main.py")
         print("   2. Use the challenge data in test_challenges_data.json")
-        print(
-            "   3. Import challenges manually or create a script with proper auth"
-        )
+        print("   3. Import challenges manually or create a script with proper auth")
         print("   4. Test the challenges in the frontend application")
         print("   5. Verify different statuses are displayed correctly")
         print("   6. Test Hebrew and English text rendering")

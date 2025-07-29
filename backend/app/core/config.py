@@ -44,16 +44,16 @@ class Settings(BaseSettings):
 
     # Firebase Settings
     firebase_project_id: str = Field(...)
+    firebase_service_account_path: Optional[str] = Field(
+        default="firebase-service-account.json",
+        description="Path to Firebase service account JSON file",
+    )
     firebase_private_key_id: Optional[str] = Field(default=None)
     firebase_private_key: Optional[str] = Field(default=None)
     firebase_client_email: Optional[str] = Field(default=None)
     firebase_client_id: Optional[str] = Field(default=None)
-    firebase_auth_uri: str = Field(
-        default="https://accounts.google.com/o/oauth2/auth"
-    )
-    firebase_token_uri: str = Field(
-        default="https://oauth2.googleapis.com/token"
-    )
+    firebase_auth_uri: str = Field(default="https://accounts.google.com/o/oauth2/auth")
+    firebase_token_uri: str = Field(default="https://oauth2.googleapis.com/token")
     firebase_auth_provider_x509_cert_url: str = Field(
         default="https://www.googleapis.com/oauth2/v1/certs"
     )

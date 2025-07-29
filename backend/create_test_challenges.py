@@ -98,9 +98,7 @@ def initialize_firebase():
 def generate_challenge_id() -> str:
     """Generate a unique challenge ID."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    random_suffix = "".join(
-        random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6)
-    )
+    random_suffix = "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6))
     return f"challenge_{timestamp}_{random_suffix}"
 
 
@@ -340,9 +338,7 @@ def print_challenge_summary(challenges: List[Dict[str, Any]]):
 
         # Count ranges
         if "range" in challenge:
-            range_key = (
-                f"{challenge['range']['min']}-{challenge['range']['max']}"
-            )
+            range_key = f"{challenge['range']['min']}-{challenge['range']['max']}"
             range_counts[range_key] = range_counts.get(range_key, 0) + 1
 
     print("\n📈 Status Distribution:")

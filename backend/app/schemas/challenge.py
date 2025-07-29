@@ -11,7 +11,7 @@ This module defines the data models for:
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ChallengeBase(BaseModel):
@@ -27,17 +27,19 @@ class ChallengeBase(BaseModel):
 class ChallengeCreate(ChallengeBase):
     """Schema for creating a new challenge."""
 
-    @validator("from_user", "to_user")
+    @field_validator("from_user", "to_user")
+    @classmethod
     def validate_user_ids(cls, v):
         """Validate that user IDs are not empty."""
         if not v or not v.strip():
             raise ValueError("User ID cannot be empty")
         return v.strip()
 
-    @validator("to_user")
-    def validate_different_users(cls, v, values):
+    @field_validator("to_user")
+    @classmethod
+    def validate_different_users(cls, v, info):
         """Validate that from_user and to_user are different."""
-        if "from_user" in values and v == values["from_user"]:
+        if "from_user" in info.data and v == info.data["from_user"]:
             raise ValueError("Cannot create challenge for yourself")
         return v
 
@@ -48,50 +50,37 @@ class ChallengeRange(BaseModel):
     min: int = Field(..., ge=1, le=100, description="Minimum number in range")
     max: int = Field(..., ge=1, le=100, description="Maximum number in range")
 
-    @validator("max")
-    def validate_max_greater_than_min(cls, v, values):
+    @field_validator("max")
+    @classmethod
+    def validate_max_greater_than_min(cls, v, info):
         """Validate that max is greater than min."""
-        if "min" in values and v <= values["min"]:
-            raise ValueError(
-                "Maximum number must be greater than minimum number"
-            )
+        if "min" in info.data and v <= info.data["min"]:
+            raise ValueError("Maximum number must be greater than minimum number")
         return v
 
 
 class ChallengeNumbers(BaseModel):
     """Schema for challenge number submissions."""
 
-    from_user: int = Field(
-        ..., ge=1, description="Number chosen by challenge creator"
-    )
-    to_user: int = Field(
-        ..., ge=1, description="Number chosen by challenge recipient"
-    )
+    from_user: int = Field(..., ge=1, description="Number chosen by challenge creator")
+    to_user: int = Field(..., ge=1, description="Number chosen by challenge recipient")
 
 
 class ChallengeResponse(BaseModel):
     """Schema for responding to a challenge."""
 
-    range: ChallengeRange = Field(
-        ..., description="Number range for the challenge"
-    )
-    accepted: bool = Field(
-        ..., description="Whether the challenge is accepted"
-    )
+    range: ChallengeRange = Field(..., description="Number range for the challenge")
+    accepted: bool = Field(..., description="Whether the challenge is accepted")
 
 
 class ChallengeUpdate(BaseModel):
     """Schema for updating challenge status."""
 
-    status: str = Field(
-        ..., pattern="^(pending|accepted|rejected|active|completed)$"
-    )
+    status: str = Field(..., pattern="^(pending|accepted|rejected|active|completed)$")
     range: Optional[ChallengeRange] = Field(
         None, description="Number range (if accepted)"
     )
-    numbers: Optional[ChallengeNumbers] = Field(
-        None, description="Submitted numbers"
-    )
+    numbers: Optional[ChallengeNumbers] = Field(None, description="Submitted numbers")
     result: Optional[str] = Field(
         None, pattern="^(match|no_match)$", description="Challenge result"
     )
@@ -106,17 +95,11 @@ class Challenge(BaseModel):
     to_user: str = Field(..., description="User ID of the challenge recipient")
     status: str = Field(..., description="Challenge status")
     range: Optional[ChallengeRange] = Field(None, description="Number range")
-    numbers: Optional[ChallengeNumbers] = Field(
-        None, description="Submitted numbers"
-    )
+    numbers: Optional[ChallengeNumbers] = Field(None, description="Submitted numbers")
     result: Optional[str] = Field(None, description="Challenge result")
-    created_at: datetime = Field(
-        ..., description="Challenge creation timestamp"
-    )
+    created_at: datetime = Field(..., description="Challenge creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    completed_at: Optional[datetime] = Field(
-        None, description="Completion timestamp"
-    )
+    completed_at: Optional[datetime] = Field(None, description="Completion timestamp")
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat()}
@@ -134,18 +117,10 @@ class ChallengeList(BaseModel):
 class ChallengeStats(BaseModel):
     """Schema for challenge statistics."""
 
-    total_challenges: int = Field(
-        ..., description="Total number of challenges"
-    )
-    pending_challenges: int = Field(
-        ..., description="Number of pending challenges"
-    )
-    active_challenges: int = Field(
-        ..., description="Number of active challenges"
-    )
-    completed_challenges: int = Field(
-        ..., description="Number of completed challenges"
-    )
+    total_challenges: int = Field(..., description="Total number of challenges")
+    pending_challenges: int = Field(..., description="Number of pending challenges")
+    active_challenges: int = Field(..., description="Number of active challenges")
+    completed_challenges: int = Field(..., description="Number of completed challenges")
     matches_won: int = Field(..., description="Number of matches won")
     matches_lost: int = Field(..., description="Number of matches lost")
 
@@ -154,11 +129,10 @@ class ChallengeResolveRequest(BaseModel):
     """Schema for resolving a challenge (backend processing)."""
 
     challenge_id: str = Field(..., description="Challenge ID to resolve")
-    numbers: Dict[str, int] = Field(
-        ..., description="Numbers submitted by each user"
-    )
+    numbers: Dict[str, int] = Field(..., description="Numbers submitted by each user")
 
-    @validator("numbers")
+    @field_validator("numbers")
+    @classmethod
     def validate_numbers(cls, v):
         """Validate that numbers are provided for both users."""
         if len(v) != 2:
@@ -174,9 +148,7 @@ class ChallengeResolveResponse(BaseModel):
 
     challenge_id: str = Field(..., description="Challenge ID")
     result: str = Field(..., description="Challenge result (match/no_match)")
-    numbers: Dict[str, int] = Field(
-        ..., description="Numbers submitted by each user"
-    )
+    numbers: Dict[str, int] = Field(..., description="Numbers submitted by each user")
     resolved_at: datetime = Field(..., description="Resolution timestamp")
 
     class Config:

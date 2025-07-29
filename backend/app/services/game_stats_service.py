@@ -39,9 +39,7 @@ class GameStatsService:
         self.firebase = firebase_service
         self.db = firebase_service.db
 
-    async def create_challenge_result(
-        self, challenge_result: ChallengeResult
-    ) -> bool:
+    async def create_challenge_result(self, challenge_result: ChallengeResult) -> bool:
         """
         Store a new challenge result in the database.
 
@@ -74,9 +72,7 @@ class GameStatsService:
             logger.error(f"Failed to store challenge result: {e}")
             return False
 
-    async def _store_number_selections(
-        self, challenge_result: ChallengeResult
-    ) -> None:
+    async def _store_number_selections(self, challenge_result: ChallengeResult) -> None:
         """Store individual number selections for analytics."""
         try:
             # Store from_user number selection
@@ -113,9 +109,7 @@ class GameStatsService:
         except Exception as e:
             logger.error(f"Failed to store number selections: {e}")
 
-    async def _update_user_stats(
-        self, challenge_result: ChallengeResult
-    ) -> None:
+    async def _update_user_stats(self, challenge_result: ChallengeResult) -> None:
         """Update statistics for both users involved in the challenge."""
         try:
             # Update from_user stats
@@ -212,16 +206,12 @@ class GameStatsService:
             stats["updated_at"] = datetime.utcnow()
 
             # Save updated stats
-            await self.firebase.update_document(
-                "user_game_stats", user_id, stats
-            )
+            await self.firebase.update_document("user_game_stats", user_id, stats)
 
         except Exception as e:
             logger.error(f"Failed to update stats for user {user_id}: {e}")
 
-    async def _update_global_stats(
-        self, challenge_result: ChallengeResult
-    ) -> None:
+    async def _update_global_stats(self, challenge_result: ChallengeResult) -> None:
         """Update global game statistics."""
         try:
             # Get existing global stats or create new ones
@@ -261,9 +251,7 @@ class GameStatsService:
 
             # Update time-based stats
             now = datetime.utcnow()
-            today_start = now.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
+            today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
             week_start = today_start - timedelta(days=today_start.weekday())
             month_start = today_start.replace(day=1)
 
@@ -278,9 +266,7 @@ class GameStatsService:
             stats["last_updated"] = now
 
             # Save updated stats
-            await self.firebase.update_document(
-                "global_game_stats", "main", stats
-            )
+            await self.firebase.update_document("global_game_stats", "main", stats)
 
             # Update number and range statistics (this would be done in a separate process)
             await self._update_number_stats(challenge_result)
@@ -293,9 +279,7 @@ class GameStatsService:
         except Exception as e:
             logger.error(f"Failed to update global stats: {e}")
 
-    async def _update_number_stats(
-        self, challenge_result: ChallengeResult
-    ) -> None:
+    async def _update_number_stats(self, challenge_result: ChallengeResult) -> None:
         """Update statistics for individual numbers."""
         try:
             numbers_to_update = [
@@ -327,26 +311,18 @@ class GameStatsService:
                 # For now, we'll update this in a separate aggregation process
 
                 # Save updated stats
-                await self.firebase.update_document(
-                    "number_stats", str(number), stats
-                )
+                await self.firebase.update_document("number_stats", str(number), stats)
 
         except Exception as e:
             logger.error(f"Failed to update number stats: {e}")
 
-    async def _update_range_stats(
-        self, challenge_result: ChallengeResult
-    ) -> None:
+    async def _update_range_stats(self, challenge_result: ChallengeResult) -> None:
         """Update statistics for number ranges."""
         try:
-            range_key = (
-                f"{challenge_result.range_min}_{challenge_result.range_max}"
-            )
+            range_key = f"{challenge_result.range_min}_{challenge_result.range_max}"
 
             # Get existing range stats or create new ones
-            range_stats_doc = await self.firebase.get_document(
-                "range_stats", range_key
-            )
+            range_stats_doc = await self.firebase.get_document("range_stats", range_key)
 
             if range_stats_doc:
                 stats = range_stats_doc
@@ -375,9 +351,7 @@ class GameStatsService:
                 [
                     n
                     for n in numbers_in_range
-                    if challenge_result.range_min
-                    <= n
-                    <= challenge_result.range_max
+                    if challenge_result.range_min <= n <= challenge_result.range_max
                 ]
             ) / len(numbers_in_range)
 
@@ -391,9 +365,7 @@ class GameStatsService:
                 ) / stats["times_used"]
 
             # Save updated stats
-            await self.firebase.update_document(
-                "range_stats", range_key, stats
-            )
+            await self.firebase.update_document("range_stats", range_key, stats)
 
         except Exception as e:
             logger.error(f"Failed to update range stats: {e}")
@@ -401,9 +373,7 @@ class GameStatsService:
     async def get_user_stats(self, user_id: str) -> Optional[UserGameStats]:
         """Get game statistics for a specific user."""
         try:
-            stats_doc = await self.firebase.get_document(
-                "user_game_stats", user_id
-            )
+            stats_doc = await self.firebase.get_document("user_game_stats", user_id)
             if stats_doc:
                 return UserGameStats(**stats_doc)
             return None
@@ -414,9 +384,7 @@ class GameStatsService:
     async def get_global_stats(self) -> Optional[GlobalGameStats]:
         """Get global game statistics."""
         try:
-            stats_doc = await self.firebase.get_document(
-                "global_game_stats", "main"
-            )
+            stats_doc = await self.firebase.get_document("global_game_stats", "main")
             if stats_doc:
                 return GlobalGameStats(**stats_doc)
             return None
@@ -427,9 +395,7 @@ class GameStatsService:
     async def get_number_stats(self, number: int) -> Optional[NumberStats]:
         """Get statistics for a specific number."""
         try:
-            stats_doc = await self.firebase.get_document(
-                "number_stats", str(number)
-            )
+            stats_doc = await self.firebase.get_document("number_stats", str(number))
             if stats_doc:
                 return NumberStats(**stats_doc)
             return None
@@ -443,16 +409,12 @@ class GameStatsService:
         """Get statistics for a specific number range."""
         try:
             range_key = f"{range_min}_{range_max}"
-            stats_doc = await self.firebase.get_document(
-                "range_stats", range_key
-            )
+            stats_doc = await self.firebase.get_document("range_stats", range_key)
             if stats_doc:
                 return RangeStats(**stats_doc)
             return None
         except Exception as e:
-            logger.error(
-                f"Failed to get range stats for {range_min}-{range_max}: {e}"
-            )
+            logger.error(f"Failed to get range stats for {range_min}-{range_max}: {e}")
             return None
 
     async def get_top_numbers(
@@ -470,13 +432,9 @@ class GameStatsService:
 
             # Sort by usage or success rate
             if by_usage:
-                numbers.sort(
-                    key=lambda x: x.get("times_selected", 0), reverse=True
-                )
+                numbers.sort(key=lambda x: x.get("times_selected", 0), reverse=True)
             else:
-                numbers.sort(
-                    key=lambda x: x.get("success_rate", 0.0), reverse=True
-                )
+                numbers.sort(key=lambda x: x.get("success_rate", 0.0), reverse=True)
 
             # Return top N results
             return [NumberStats(**num) for num in numbers[:limit]]
@@ -527,10 +485,7 @@ class GameStatsService:
             challenges.sort(key=lambda x: x.get("completed_at"), reverse=True)
 
             # Return limited results
-            return [
-                ChallengeResult(**challenge)
-                for challenge in challenges[:limit]
-            ]
+            return [ChallengeResult(**challenge) for challenge in challenges[:limit]]
 
         except Exception as e:
             logger.error(f"Failed to get challenge history for {user_id}: {e}")
@@ -587,41 +542,28 @@ class GameStatsService:
 
             # Update total interactions
             stats["total_interactions"] = (
-                stats["total_challenges_sent"]
-                + stats["total_challenges_received"]
+                stats["total_challenges_sent"] + stats["total_challenges_received"]
             )
 
             # Update last interaction
             stats["last_interaction"] = challenge_result.completed_at
 
             # Save updated stats
-            await self.firebase.update_document(
-                "player_interactions", user_id, stats
-            )
+            await self.firebase.update_document("player_interactions", user_id, stats)
 
         except Exception as e:
-            logger.error(
-                f"Failed to update player interaction for {user_id}: {e}"
-            )
+            logger.error(f"Failed to update player interaction for {user_id}: {e}")
 
-    async def _update_player_pairs(
-        self, challenge_result: ChallengeResult
-    ) -> None:
+    async def _update_player_pairs(self, challenge_result: ChallengeResult) -> None:
         """Update player pair interaction statistics."""
         try:
             # Create a consistent pair key (alphabetical order)
-            user1_id = min(
-                challenge_result.from_user, challenge_result.to_user
-            )
-            user2_id = max(
-                challenge_result.from_user, challenge_result.to_user
-            )
+            user1_id = min(challenge_result.from_user, challenge_result.to_user)
+            user2_id = max(challenge_result.from_user, challenge_result.to_user)
             pair_key = f"{user1_id}_{user2_id}"
 
             # Get existing pair stats or create new ones
-            pair_doc = await self.firebase.get_document(
-                "player_pairs", pair_key
-            )
+            pair_doc = await self.firebase.get_document("player_pairs", pair_key)
 
             if pair_doc:
                 stats = pair_doc
@@ -655,17 +597,14 @@ class GameStatsService:
             # Calculate success rate
             if stats["total_challenges_between"] > 0:
                 stats["success_rate"] = (
-                    stats["matches_between"]
-                    / stats["total_challenges_between"]
+                    stats["matches_between"] / stats["total_challenges_between"]
                 )
 
             # Update last challenge
             stats["last_challenge"] = challenge_result.completed_at
 
             # Save updated stats
-            await self.firebase.update_document(
-                "player_pairs", pair_key, stats
-            )
+            await self.firebase.update_document("player_pairs", pair_key, stats)
 
         except Exception as e:
             logger.error(f"Failed to update player pairs: {e}")
@@ -684,9 +623,7 @@ class GameStatsService:
                 return []
 
             # Sort by total interactions (descending)
-            players.sort(
-                key=lambda x: x.get("total_interactions", 0), reverse=True
-            )
+            players.sort(key=lambda x: x.get("total_interactions", 0), reverse=True)
 
             # Return top N results
             return [PlayerInteraction(**player) for player in players[:limit]]
@@ -695,9 +632,7 @@ class GameStatsService:
             logger.error(f"Failed to get most challenged players: {e}")
             return []
 
-    async def get_most_active_player_pairs(
-        self, limit: int = 10
-    ) -> List[PlayerPair]:
+    async def get_most_active_player_pairs(self, limit: int = 10) -> List[PlayerPair]:
         """Get most active player pairs."""
         try:
             # Query player_pairs collection
@@ -748,9 +683,7 @@ class GameStatsService:
             return [PlayerPair(**pair) for pair in pairs[:limit]]
 
         except Exception as e:
-            logger.error(
-                f"Failed to get user friends activity for {user_id}: {e}"
-            )
+            logger.error(f"Failed to get user friends activity for {user_id}: {e}")
             return []
 
     async def get_user_challenge_recipients(
@@ -806,7 +739,5 @@ class GameStatsService:
             return recipients[:limit]
 
         except Exception as e:
-            logger.error(
-                f"Failed to get user challenge recipients for {user_id}: {e}"
-            )
+            logger.error(f"Failed to get user challenge recipients for {user_id}: {e}")
             return []

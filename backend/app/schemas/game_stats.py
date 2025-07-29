@@ -13,6 +13,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
+
 # TODO: Add validator when validation is implemented
 
 
@@ -21,12 +22,8 @@ class NumberSelection(BaseModel):
 
     user_id: str = Field(..., description="User ID who selected the number")
     number: int = Field(..., ge=1, le=100, description="Selected number")
-    selected_at: datetime = Field(
-        ..., description="When the number was selected"
-    )
-    challenge_id: str = Field(
-        ..., description="Challenge ID this selection belongs to"
-    )
+    selected_at: datetime = Field(..., description="When the number was selected")
+    challenge_id: str = Field(..., description="Challenge ID this selection belongs to")
 
 
 class ChallengeResult(BaseModel):
@@ -38,12 +35,8 @@ class ChallengeResult(BaseModel):
     description: str = Field(..., description="Challenge description")
 
     # Number range
-    range_min: int = Field(
-        ..., ge=1, le=100, description="Minimum number in range"
-    )
-    range_max: int = Field(
-        ..., ge=1, le=100, description="Maximum number in range"
-    )
+    range_min: int = Field(..., ge=1, le=100, description="Minimum number in range")
+    range_max: int = Field(..., ge=1, le=100, description="Maximum number in range")
 
     # Number selections
     from_user_number: int = Field(
@@ -57,17 +50,11 @@ class ChallengeResult(BaseModel):
     result: str = Field(
         ..., pattern="^(match|no_match)$", description="Challenge result"
     )
-    winner: Optional[str] = Field(
-        None, description="User ID of winner (if match)"
-    )
+    winner: Optional[str] = Field(None, description="User ID of winner (if match)")
 
     # Timestamps
-    created_at: datetime = Field(
-        ..., description="Challenge creation timestamp"
-    )
-    completed_at: datetime = Field(
-        ..., description="Challenge completion timestamp"
-    )
+    created_at: datetime = Field(..., description="Challenge creation timestamp")
+    completed_at: datetime = Field(..., description="Challenge completion timestamp")
 
     # Statistics
     response_time_from_user: Optional[float] = Field(
@@ -101,9 +88,7 @@ class RangeStats(BaseModel):
 
     range_min: int = Field(..., ge=1, le=100, description="Range minimum")
     range_max: int = Field(..., ge=1, le=100, description="Range maximum")
-    times_used: int = Field(
-        ..., ge=0, description="How many times this range was used"
-    )
+    times_used: int = Field(..., ge=0, description="How many times this range was used")
     success_rate: float = Field(
         ..., ge=0.0, le=1.0, description="Success rate with this range"
     )
@@ -121,9 +106,7 @@ class UserGameStats(BaseModel):
     total_challenges: int = Field(
         ..., ge=0, description="Total challenges participated in"
     )
-    challenges_created: int = Field(
-        ..., ge=0, description="Challenges created by user"
-    )
+    challenges_created: int = Field(..., ge=0, description="Challenges created by user")
     challenges_received: int = Field(
         ..., ge=0, description="Challenges received by user"
     )
@@ -131,9 +114,7 @@ class UserGameStats(BaseModel):
     # Results
     matches_won: int = Field(..., ge=0, description="Number of matches won")
     matches_lost: int = Field(..., ge=0, description="Number of matches lost")
-    win_rate: float = Field(
-        ..., ge=0.0, le=1.0, description="Win rate percentage"
-    )
+    win_rate: float = Field(..., ge=0.0, le=1.0, description="Win rate percentage")
 
     # Performance
     average_response_time: Optional[float] = Field(
@@ -185,13 +166,9 @@ class PlayerPair(BaseModel):
     """Schema for player pair interaction statistics."""
 
     user1_id: str = Field(..., description="First user ID")
-    user1_username: Optional[str] = Field(
-        None, description="First user's username"
-    )
+    user1_username: Optional[str] = Field(None, description="First user's username")
     user2_id: str = Field(..., description="Second user ID")
-    user2_username: Optional[str] = Field(
-        None, description="Second user's username"
-    )
+    user2_username: Optional[str] = Field(None, description="Second user's username")
     total_challenges_between: int = Field(
         ..., ge=0, description="Total challenges between these two users"
     )
@@ -219,12 +196,8 @@ class GlobalGameStats(BaseModel):
     total_challenges: int = Field(
         ..., ge=0, description="Total challenges ever created"
     )
-    total_matches: int = Field(
-        ..., ge=0, description="Total successful matches"
-    )
-    total_participants: int = Field(
-        ..., ge=0, description="Total unique participants"
-    )
+    total_matches: int = Field(..., ge=0, description="Total successful matches")
+    total_participants: int = Field(..., ge=0, description="Total unique participants")
 
     # Most popular numbers
     most_used_numbers: List[NumberStats] = Field(
@@ -256,9 +229,7 @@ class GlobalGameStats(BaseModel):
     )
 
     # Time-based statistics
-    challenges_today: int = Field(
-        ..., ge=0, description="Challenges created today"
-    )
+    challenges_today: int = Field(..., ge=0, description="Challenges created today")
     challenges_this_week: int = Field(
         ..., ge=0, description="Challenges created this week"
     )
@@ -267,9 +238,7 @@ class GlobalGameStats(BaseModel):
     )
 
     # Timestamps
-    last_updated: datetime = Field(
-        ..., description="Last statistics update timestamp"
-    )
+    last_updated: datetime = Field(..., description="Last statistics update timestamp")
 
 
 class GameStatsCreate(BaseModel):
@@ -289,9 +258,7 @@ class GameStatsCreate(BaseModel):
 class GameStatsUpdate(BaseModel):
     """Schema for updating game statistics."""
 
-    user_id: Optional[str] = Field(
-        None, description="User ID to update stats for"
-    )
+    user_id: Optional[str] = Field(None, description="User ID to update stats for")
     stats_type: str = Field(
         ...,
         pattern="^(user|global|number|range)$",
@@ -303,9 +270,7 @@ class GameStatsUpdate(BaseModel):
 class GameStatsQuery(BaseModel):
     """Schema for querying game statistics."""
 
-    user_id: Optional[str] = Field(
-        None, description="User ID to get stats for"
-    )
+    user_id: Optional[str] = Field(None, description="User ID to get stats for")
     stats_type: str = Field(
         ...,
         pattern="^(user|global|number|range|challenge)$",
@@ -324,9 +289,7 @@ class GameStatsQuery(BaseModel):
 class GameStatsResponse(BaseModel):
     """Schema for game statistics API response."""
 
-    success: bool = Field(
-        ..., description="Whether the operation was successful"
-    )
+    success: bool = Field(..., description="Whether the operation was successful")
     data: Optional[Dict[str, Any]] = Field(None, description="Statistics data")
     message: Optional[str] = Field(None, description="Response message")
     timestamp: datetime = Field(..., description="Response timestamp")

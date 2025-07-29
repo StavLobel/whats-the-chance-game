@@ -79,9 +79,7 @@ async def fast_test_challenges():
                     }
                 )
             except Exception as e:
-                logger.warning(
-                    f"Failed to parse challenge {challenge.get('id')}: {e}"
-                )
+                logger.warning(f"Failed to parse challenge {challenge.get('id')}: {e}")
                 continue
 
         logger.info(
@@ -120,9 +118,7 @@ async def test_challenges(
     start_time = time.time()
 
     try:
-        logger.info(
-            f"🔥 Backend: test_challenges called with user_id: {user_id}"
-        )
+        logger.info(f"🔥 Backend: test_challenges called with user_id: {user_id}")
         logger.info(f"🔥 Backend: starting Firebase request at {start_time}")
 
         challenges = await firebase_service.get_collection("challenges")
@@ -131,9 +127,7 @@ async def test_challenges(
         )
 
         if challenges:
-            logger.info(
-                f"🔍 Backend: first challenge from Firebase: {challenges[0]}"
-            )
+            logger.info(f"🔍 Backend: first challenge from Firebase: {challenges[0]}")
 
         # Get unique user IDs to minimize lookups
         unique_users = set()
@@ -162,9 +156,7 @@ async def test_challenges(
                     elif user_info.get("display_name"):
                         user_cache[uid] = user_info.get("display_name")
                     elif user_info.get("email"):
-                        user_cache[uid] = user_info.get("email", "").split(
-                            "@"
-                        )[0]
+                        user_cache[uid] = user_info.get("email", "").split("@")[0]
                     else:
                         user_cache[uid] = uid[:8] + "..."
                 else:
@@ -204,9 +196,7 @@ async def test_challenges(
                     )
                 )
             except Exception as e:
-                logger.warning(
-                    f"Failed to parse challenge {challenge.get('id')}: {e}"
-                )
+                logger.warning(f"Failed to parse challenge {challenge.get('id')}: {e}")
                 continue
 
         logger.info(
@@ -214,9 +204,7 @@ async def test_challenges(
         )
         logger.info(f"📊 Backend: returning {len(result)} challenges")
         if result:
-            logger.info(
-                f"📦 Backend: first challenge being returned: {result[0]}"
-            )
+            logger.info(f"📦 Backend: first challenge being returned: {result[0]}")
         return result
 
     except Exception as e:
@@ -271,9 +259,7 @@ async def get_challenges(
 
         # Apply basic filtering
         if status_filter:
-            challenges = [
-                c for c in challenges if c.get("status") == status_filter
-            ]
+            challenges = [c for c in challenges if c.get("status") == status_filter]
 
         # Apply pagination
         start_idx = (page - 1) * per_page
@@ -298,9 +284,7 @@ async def get_challenges(
                     )
                 )
             except Exception as e:
-                logger.warning(
-                    f"Failed to parse challenge {challenge.get('id')}: {e}"
-                )
+                logger.warning(f"Failed to parse challenge {challenge.get('id')}: {e}")
                 continue
 
         return result
@@ -313,9 +297,7 @@ async def get_challenges(
         )
 
 
-@router.post(
-    "/", response_model=Challenge, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=Challenge, status_code=status.HTTP_201_CREATED)
 async def create_challenge(
     challenge_data: ChallengeCreate,
     current_user: dict = CurrentUser,
@@ -357,9 +339,7 @@ async def create_challenge(
         )
 
         # Get the created challenge
-        challenge = await firebase_service.get_document(
-            "challenges", challenge_id
-        )
+        challenge = await firebase_service.get_document("challenges", challenge_id)
 
         if not challenge:
             raise HTTPException(
@@ -412,9 +392,7 @@ async def get_challenge(
     """
     try:
         # Get challenge from Firestore
-        challenge = await firebase_service.get_document(
-            "challenges", challenge_id
-        )
+        challenge = await firebase_service.get_document("challenges", challenge_id)
 
         if not challenge:
             raise HTTPException(
@@ -479,9 +457,7 @@ async def respond_to_challenge(
     """
     try:
         # Get challenge from Firestore
-        challenge = await firebase_service.get_document(
-            "challenges", challenge_id
-        )
+        challenge = await firebase_service.get_document("challenges", challenge_id)
 
         if not challenge:
             raise HTTPException(
@@ -646,9 +622,7 @@ async def resolve_challenge(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Error resolving challenge {resolve_data.challenge_id}: {e}"
-        )
+        logger.error(f"Error resolving challenge {resolve_data.challenge_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to resolve challenge",
@@ -701,10 +675,7 @@ async def get_user_challenges(
                 challenge.get("from_user") == user_id
                 or challenge.get("to_user") == user_id
             ):
-                if (
-                    not status_filter
-                    or challenge.get("status") == status_filter
-                ):
+                if not status_filter or challenge.get("status") == status_filter:
                     challenges.append(challenge)
 
         # Apply pagination
@@ -781,21 +752,13 @@ async def get_user_challenge_stats(
 
         # Calculate statistics
         total_challenges = len(challenges)
-        pending_challenges = len(
-            [c for c in challenges if c["status"] == "pending"]
-        )
-        active_challenges = len(
-            [c for c in challenges if c["status"] == "active"]
-        )
+        pending_challenges = len([c for c in challenges if c["status"] == "pending"])
+        active_challenges = len([c for c in challenges if c["status"] == "active"])
         completed_challenges = len(
             [c for c in challenges if c["status"] == "completed"]
         )
-        matches_won = len(
-            [c for c in challenges if c.get("result") == "match"]
-        )
-        matches_lost = len(
-            [c for c in challenges if c.get("result") == "no_match"]
-        )
+        matches_won = len([c for c in challenges if c.get("result") == "match"])
+        matches_lost = len([c for c in challenges if c.get("result") == "no_match"])
 
         return ChallengeStats(
             total_challenges=total_challenges,
