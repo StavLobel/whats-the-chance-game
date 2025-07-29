@@ -25,7 +25,8 @@ export function useGame() {
     const loadChallenges = async () => {
       try {
         // Fetch challenges from the backend API
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        // Use localhost for browser requests since browser runs on host machine
+        const apiUrl = 'http://localhost:8000';
         const response = await fetch(`${apiUrl}/api/challenges/test?user_id=${user.uid}`);
         
         if (!response.ok) {
