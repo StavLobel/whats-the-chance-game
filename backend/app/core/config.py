@@ -6,7 +6,7 @@ This module contains all configuration settings for the FastAPI backend,
 including environment variables, Firebase settings, and security configurations.
 """
 
-import os
+# import os  # TODO: Remove if not needed for environment variables
 from typing import List, Optional
 
 from pydantic import Field, field_validator
@@ -48,8 +48,12 @@ class Settings(BaseSettings):
     firebase_private_key: Optional[str] = Field(default=None)
     firebase_client_email: Optional[str] = Field(default=None)
     firebase_client_id: Optional[str] = Field(default=None)
-    firebase_auth_uri: str = Field(default="https://accounts.google.com/o/oauth2/auth")
-    firebase_token_uri: str = Field(default="https://oauth2.googleapis.com/token")
+    firebase_auth_uri: str = Field(
+        default="https://accounts.google.com/o/oauth2/auth"
+    )
+    firebase_token_uri: str = Field(
+        default="https://oauth2.googleapis.com/token"
+    )
     firebase_auth_provider_x509_cert_url: str = Field(
         default="https://www.googleapis.com/oauth2/v1/certs"
     )

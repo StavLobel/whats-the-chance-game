@@ -142,7 +142,9 @@ async def require_email_verification(
     return current_user
 
 
-async def require_active_user(current_user: dict = Depends(get_current_user)) -> dict:
+async def require_active_user(
+    current_user: dict = Depends(get_current_user),
+) -> dict:
     """
     Require active user account for protected endpoints.
 
@@ -177,7 +179,9 @@ def get_user_uid(current_user: dict = Depends(get_current_user)) -> str:
     return current_user["uid"]
 
 
-def get_user_email(current_user: dict = Depends(get_current_user)) -> Optional[str]:
+def get_user_email(
+    current_user: dict = Depends(get_current_user),
+) -> Optional[str]:
     """
     Extract user email from current user.
 

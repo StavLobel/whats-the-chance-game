@@ -196,7 +196,10 @@ class TestGameStatsService:
 
     @pytest.mark.unit
     async def test_create_challenge_result_success(
-        self, game_stats_service, sample_challenge_result, mock_firebase_service
+        self,
+        game_stats_service,
+        sample_challenge_result,
+        mock_firebase_service,
     ):
         """Test successful challenge result creation."""
         # Mock successful operations
@@ -217,11 +220,16 @@ class TestGameStatsService:
 
     @pytest.mark.unit
     async def test_create_challenge_result_failure(
-        self, game_stats_service, sample_challenge_result, mock_firebase_service
+        self,
+        game_stats_service,
+        sample_challenge_result,
+        mock_firebase_service,
     ):
         """Test challenge result creation failure."""
         # Mock failure
-        mock_firebase_service.create_document.side_effect = Exception("Database error")
+        mock_firebase_service.create_document.side_effect = Exception(
+            "Database error"
+        )
 
         result = await game_stats_service.create_challenge_result(
             sample_challenge_result
@@ -323,7 +331,9 @@ class TestGameStatsService:
         ]
         mock_firebase_service.query_documents.return_value = mock_numbers
 
-        result = await game_stats_service.get_top_numbers(limit=5, by_usage=True)
+        result = await game_stats_service.get_top_numbers(
+            limit=5, by_usage=True
+        )
 
         assert len(result) == 2
         assert result[0].number == 7
@@ -399,9 +409,13 @@ class TestGameStatsService:
                 "completed_at": datetime.utcnow(),
             },
         ]
-        mock_firebase_service.query_documents_multiple.return_value = mock_challenges
+        mock_firebase_service.query_documents_multiple.return_value = (
+            mock_challenges
+        )
 
-        result = await game_stats_service.get_challenge_history("user1", limit=10)
+        result = await game_stats_service.get_challenge_history(
+            "user1", limit=10
+        )
 
         assert len(result) == 2
         assert result[0].challenge_id == "challenge1"
@@ -642,9 +656,13 @@ class TestSocialStatistics:
                 "last_challenge": datetime.utcnow(),
             },
         ]
-        mock_firebase_service.query_documents_multiple.return_value = mock_pairs
+        mock_firebase_service.query_documents_multiple.return_value = (
+            mock_pairs
+        )
 
-        result = await game_stats_service.get_user_friends_activity("user1", limit=5)
+        result = await game_stats_service.get_user_friends_activity(
+            "user1", limit=5
+        )
 
         assert len(result) == 1
         assert result[0].user1_id == "user1"

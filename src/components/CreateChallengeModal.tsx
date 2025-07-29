@@ -13,8 +13,11 @@ interface CreateChallengeModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModalProps) {
-  // open is used in the Dialog component below
+export function CreateChallengeModal({ 
+  open, 
+  onOpenChange 
+}: CreateChallengeModalProps) {
+  // ESLint false positive: open is used in Dialog component below
   const [task, setTask] = useState('');
   const [targetUser, setTargetUser] = useState('');
   const [tags, setTags] = useState<string[]>([]);

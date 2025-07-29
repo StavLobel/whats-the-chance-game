@@ -111,7 +111,7 @@ test.describe('Home Page E2E Tests', () => {
     });
   });
 
-  test('should maintain state across page interactions', async ({ page }) => {
+  test('should maintain state across page interactions', async () => {
     await test.step('Interact with page elements', async () => {
       // Scroll down to see how it works section
       await homePage.howItWorksSection.scrollIntoViewIfNeeded();
@@ -125,7 +125,7 @@ test.describe('Home Page E2E Tests', () => {
     });
   });
 
-  test('should work with disabled JavaScript (graceful degradation)', async ({ page, browser }) => {
+  test('should work with disabled JavaScript (graceful degradation)', async ({ browser }) => {
     // Create new context with JavaScript disabled
     const context = await browser.newContext({ javaScriptEnabled: false });
     const noJsPage = await context.newPage();

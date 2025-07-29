@@ -8,15 +8,17 @@ This module provides Firebase Admin SDK integration for:
 - Firebase Cloud Messaging (FCM) for push notifications
 """
 
-import json
+# TODO: Add json when JSON processing is needed
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
+# TODO: Add Union when union types are needed
 
 import firebase_admin
 from firebase_admin import auth, credentials, firestore, messaging
 from firebase_admin.exceptions import FirebaseError
-from google.cloud.firestore_v1.base_document import DocumentSnapshot
-from google.cloud.firestore_v1.base_query import FieldFilter
+# TODO: Add when advanced firestore queries are implemented
+# from google.cloud.firestore_v1.base_document import DocumentSnapshot
+# from google.cloud.firestore_v1.base_query import FieldFilter
 
 from app.core.config import settings
 
@@ -62,11 +64,15 @@ class FirebaseService:
 
                 cred = credentials.Certificate(cred_dict)
                 firebase_admin.initialize_app(cred)
-                logger.info("Firebase Admin SDK initialized with service account")
+                logger.info(
+                    "Firebase Admin SDK initialized with service account"
+                )
             else:
                 # Use default credentials (for development)
                 firebase_admin.initialize_app()
-                logger.info("Firebase Admin SDK initialized with default credentials")
+                logger.info(
+                    "Firebase Admin SDK initialized with default credentials"
+                )
 
     # Authentication Methods
     async def verify_id_token(self, id_token: str) -> Dict[str, Any]:
@@ -123,7 +129,9 @@ class FirebaseService:
                 if user_doc and user_doc.get("username"):
                     result["username"] = user_doc.get("username")
             except Exception as e:
-                logger.debug(f"Could not fetch username from Firestore for {uid}: {e}")
+                logger.debug(
+                    f"Could not fetch username from Firestore for {uid}: {e}"
+                )
 
             return result
         except FirebaseError as e:
@@ -163,7 +171,9 @@ class FirebaseService:
                 doc_ref = collection.add(data)[1]
                 return doc_ref.id
         except Exception as e:
-            logger.error(f"Failed to create document in {collection_name}: {e}")
+            logger.error(
+                f"Failed to create document in {collection_name}: {e}"
+            )
             raise
 
     async def get_document(
@@ -180,7 +190,9 @@ class FirebaseService:
             Document data or None if not found
         """
         try:
-            doc_ref = self._get_collection(collection_name).document(document_id)
+            doc_ref = self._get_collection(collection_name).document(
+                document_id
+            )
             doc = doc_ref.get()
 
             if doc.exists:
@@ -207,7 +219,9 @@ class FirebaseService:
             True if successful, False otherwise
         """
         try:
-            doc_ref = self._get_collection(collection_name).document(document_id)
+            doc_ref = self._get_collection(collection_name).document(
+                document_id
+            )
             doc_ref.update(data)
             return True
         except Exception as e:
@@ -216,7 +230,9 @@ class FirebaseService:
             )
             return False
 
-    async def delete_document(self, collection_name: str, document_id: str) -> bool:
+    async def delete_document(
+        self, collection_name: str, document_id: str
+    ) -> bool:
         """
         Delete a document from Firestore.
 
@@ -228,7 +244,9 @@ class FirebaseService:
             True if successful, False otherwise
         """
         try:
-            doc_ref = self._get_collection(collection_name).document(document_id)
+            doc_ref = self._get_collection(collection_name).document(
+                document_id
+            )
             doc_ref.delete()
             return True
         except Exception as e:
@@ -237,7 +255,9 @@ class FirebaseService:
             )
             return False
 
-    async def get_collection(self, collection_name: str) -> List[Dict[str, Any]]:
+    async def get_collection(
+        self, collection_name: str
+    ) -> List[Dict[str, Any]]:
         """
         Get all documents from a Firestore collection.
 
@@ -280,7 +300,9 @@ class FirebaseService:
 
             return [{"id": doc.id, **doc.to_dict()} for doc in docs]
         except Exception as e:
-            logger.error(f"Failed to query documents in {collection_name}: {e}")
+            logger.error(
+                f"Failed to query documents in {collection_name}: {e}"
+            )
             raise
 
     async def query_documents_multiple(
@@ -316,7 +338,11 @@ class FirebaseService:
 
     # Firebase Cloud Messaging (FCM) Methods
     async def send_notification(
-        self, token: str, title: str, body: str, data: Optional[Dict[str, str]] = None
+        self,
+        token: str,
+        title: str,
+        body: str,
+        data: Optional[Dict[str, str]] = None,
     ) -> bool:
         """
         Send push notification to a specific device.
@@ -345,7 +371,11 @@ class FirebaseService:
             return False
 
     async def send_notification_to_topic(
-        self, topic: str, title: str, body: str, data: Optional[Dict[str, str]] = None
+        self,
+        topic: str,
+        title: str,
+        body: str,
+        data: Optional[Dict[str, str]] = None,
     ) -> bool:
         """
         Send push notification to a topic.
@@ -367,7 +397,9 @@ class FirebaseService:
             )
 
             response = messaging.send(message)
-            logger.info(f"Successfully sent notification to topic {topic}: {response}")
+            logger.info(
+                f"Successfully sent notification to topic {topic}: {response}"
+            )
             return True
         except Exception as e:
             logger.error(f"Failed to send notification to topic {topic}: {e}")
@@ -385,7 +417,7 @@ class FirebaseService:
             True if successful, False otherwise
         """
         try:
-            response = messaging.subscribe_to_topic(tokens, topic)
+            messaging.subscribe_to_topic(tokens, topic)
             logger.info(
                 f"Successfully subscribed {len(tokens)} devices to topic {topic}"
             )
@@ -394,7 +426,9 @@ class FirebaseService:
             logger.error(f"Failed to subscribe devices to topic {topic}: {e}")
             return False
 
-    async def unsubscribe_from_topic(self, tokens: List[str], topic: str) -> bool:
+    async def unsubscribe_from_topic(
+        self, tokens: List[str], topic: str
+    ) -> bool:
         """
         Unsubscribe devices from a topic.
 
@@ -406,13 +440,15 @@ class FirebaseService:
             True if successful, False otherwise
         """
         try:
-            response = messaging.unsubscribe_from_topic(tokens, topic)
+            messaging.unsubscribe_from_topic(tokens, topic)
             logger.info(
                 f"Successfully unsubscribed {len(tokens)} devices from topic {topic}"
             )
             return True
         except Exception as e:
-            logger.error(f"Failed to unsubscribe devices from topic {topic}: {e}")
+            logger.error(
+                f"Failed to unsubscribe devices from topic {topic}: {e}"
+            )
             return False
 
 

@@ -50,8 +50,12 @@ class TestFirebaseService:
         mock_settings.firebase_project_id = "test-project"
         mock_settings.firebase_private_key_id = "test_key_id"
         mock_settings.firebase_client_id = "test_client_id"
-        mock_settings.firebase_auth_uri = "https://accounts.google.com/o/oauth2/auth"
-        mock_settings.firebase_token_uri = "https://oauth2.googleapis.com/token"
+        mock_settings.firebase_auth_uri = (
+            "https://accounts.google.com/o/oauth2/auth"
+        )
+        mock_settings.firebase_token_uri = (
+            "https://oauth2.googleapis.com/token"
+        )
         mock_settings.firebase_auth_provider_x509_cert_url = (
             "https://www.googleapis.com/oauth2/v1/certs"
         )
@@ -60,7 +64,9 @@ class TestFirebaseService:
         )
 
         # Mock Firebase Admin
-        mock_firebase_admin.get_app.side_effect = ValueError("No app initialized")
+        mock_firebase_admin.get_app.side_effect = ValueError(
+            "No app initialized"
+        )
         mock_cred = Mock()
         mock_firebase_admin.credentials.Certificate.return_value = mock_cred
         mock_firebase_admin.initialize_app.return_value = Mock()
@@ -84,7 +90,9 @@ class TestFirebaseService:
         mock_settings.firebase_project_id = "test-project"
 
         # Mock Firebase Admin
-        mock_firebase_admin.get_app.side_effect = ValueError("No app initialized")
+        mock_firebase_admin.get_app.side_effect = ValueError(
+            "No app initialized"
+        )
         mock_firebase_admin.initialize_app.return_value = Mock()
 
         # Create service
@@ -145,7 +153,9 @@ class TestFirebaseServiceAuthentication:
         with patch("app.services.firebase_service.auth") as mock_auth:
             from firebase_admin.exceptions import FirebaseError
 
-            mock_auth.verify_id_token.side_effect = FirebaseError("Invalid token")
+            mock_auth.verify_id_token.side_effect = FirebaseError(
+                "Invalid token"
+            )
 
             # Test
             with pytest.raises(FirebaseError):
@@ -247,7 +257,9 @@ class TestFirebaseServiceFirestore:
         firebase_service.db.collection.return_value = mock_collection
 
         # Test
-        result = await firebase_service.get_document("test_collection", "test_doc_id")
+        result = await firebase_service.get_document(
+            "test_collection", "test_doc_id"
+        )
 
         # Assertions
         assert result["id"] == "test_doc_id"
@@ -341,7 +353,9 @@ class TestFirebaseServiceFCM:
     async def test_send_notification_success(self, firebase_service):
         """Test successful notification sending."""
         # Mock Firebase Messaging
-        with patch("app.services.firebase_service.messaging") as mock_messaging:
+        with patch(
+            "app.services.firebase_service.messaging"
+        ) as mock_messaging:
             mock_messaging.Message.return_value = Mock()
             mock_messaging.send.return_value = "message_id"
 
@@ -358,7 +372,9 @@ class TestFirebaseServiceFCM:
     async def test_send_notification_to_topic_success(self, firebase_service):
         """Test successful topic notification sending."""
         # Mock Firebase Messaging
-        with patch("app.services.firebase_service.messaging") as mock_messaging:
+        with patch(
+            "app.services.firebase_service.messaging"
+        ) as mock_messaging:
             mock_messaging.Message.return_value = Mock()
             mock_messaging.send.return_value = "message_id"
 
@@ -375,7 +391,9 @@ class TestFirebaseServiceFCM:
     async def test_subscribe_to_topic_success(self, firebase_service):
         """Test successful topic subscription."""
         # Mock Firebase Messaging
-        with patch("app.services.firebase_service.messaging") as mock_messaging:
+        with patch(
+            "app.services.firebase_service.messaging"
+        ) as mock_messaging:
             mock_messaging.subscribe_to_topic.return_value = Mock()
 
             # Test
@@ -393,7 +411,9 @@ class TestFirebaseServiceFCM:
     async def test_unsubscribe_from_topic_success(self, firebase_service):
         """Test successful topic unsubscription."""
         # Mock Firebase Messaging
-        with patch("app.services.firebase_service.messaging") as mock_messaging:
+        with patch(
+            "app.services.firebase_service.messaging"
+        ) as mock_messaging:
             mock_messaging.unsubscribe_from_topic.return_value = Mock()
 
             # Test

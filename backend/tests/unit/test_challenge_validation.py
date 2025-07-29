@@ -10,7 +10,11 @@ from datetime import datetime, timedelta
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.challenge import ChallengeCreate, ChallengeResponse, ChallengeUpdate
+from app.schemas.challenge import (
+    ChallengeCreate,
+    ChallengeResponse,
+    ChallengeUpdate,
+)
 
 
 class TestChallengeValidation:

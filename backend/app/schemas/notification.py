@@ -95,8 +95,12 @@ class NotificationTemplate(BaseModel):
     """Schema for notification templates."""
 
     template_id: str = Field(..., description="Template identifier")
-    title_template: str = Field(..., description="Title template with placeholders")
-    body_template: str = Field(..., description="Body template with placeholders")
+    title_template: str = Field(
+        ..., description="Title template with placeholders"
+    )
+    body_template: str = Field(
+        ..., description="Body template with placeholders"
+    )
     notification_type: str = Field(..., description="Type of notification")
 
     @validator("template_id")
@@ -120,8 +124,12 @@ class NotificationPreferences(BaseModel):
     general_notifications: bool = Field(
         default=True, description="Enable general notifications"
     )
-    push_enabled: bool = Field(default=True, description="Enable push notifications")
-    email_enabled: bool = Field(default=False, description="Enable email notifications")
+    push_enabled: bool = Field(
+        default=True, description="Enable push notifications"
+    )
+    email_enabled: bool = Field(
+        default=False, description="Enable email notifications"
+    )
     quiet_hours_start: Optional[str] = Field(
         None,
         pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
@@ -139,7 +147,9 @@ class NotificationPreferences(BaseModel):
         if "quiet_hours_start" in values and values["quiet_hours_start"] and v:
             # Simple validation - could be enhanced with time comparison
             if values["quiet_hours_start"] == v:
-                raise ValueError("Quiet hours start and end times cannot be the same")
+                raise ValueError(
+                    "Quiet hours start and end times cannot be the same"
+                )
         return v
 
 
@@ -158,7 +168,9 @@ class NotificationHistory(BaseModel):
     delivered: bool = Field(
         default=False, description="Whether notification was delivered"
     )
-    read: bool = Field(default=False, description="Whether notification was read")
+    read: bool = Field(
+        default=False, description="Whether notification was read"
+    )
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat()}
@@ -179,13 +191,19 @@ class NotificationStats(BaseModel):
     """Schema for notification statistics."""
 
     total_sent: int = Field(..., description="Total notifications sent")
-    total_delivered: int = Field(..., description="Total notifications delivered")
+    total_delivered: int = Field(
+        ..., description="Total notifications delivered"
+    )
     total_read: int = Field(..., description="Total notifications read")
     delivery_rate: float = Field(
         ..., ge=0.0, le=1.0, description="Delivery rate percentage"
     )
-    read_rate: float = Field(..., ge=0.0, le=1.0, description="Read rate percentage")
-    by_type: Dict[str, int] = Field(..., description="Notifications sent by type")
+    read_rate: float = Field(
+        ..., ge=0.0, le=1.0, description="Read rate percentage"
+    )
+    by_type: Dict[str, int] = Field(
+        ..., description="Notifications sent by type"
+    )
 
 
 class FCMToken(BaseModel):
@@ -193,16 +211,22 @@ class FCMToken(BaseModel):
 
     user_id: str = Field(..., description="User ID")
     token: str = Field(..., description="FCM device token")
-    device_type: str = Field(..., description="Device type (ios, android, web)")
+    device_type: str = Field(
+        ..., description="Device type (ios, android, web)"
+    )
     created_at: datetime = Field(..., description="Token creation timestamp")
-    last_used: Optional[datetime] = Field(None, description="Last time token was used")
+    last_used: Optional[datetime] = Field(
+        None, description="Last time token was used"
+    )
 
     @validator("device_type")
     def validate_device_type(cls, v):
         """Validate device type."""
         valid_types = ["ios", "android", "web"]
         if v not in valid_types:
-            raise ValueError(f"Invalid device type. Must be one of: {valid_types}")
+            raise ValueError(
+                f"Invalid device type. Must be one of: {valid_types}"
+            )
         return v
 
     class Config:

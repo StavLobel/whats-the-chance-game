@@ -11,18 +11,20 @@ This module provides API endpoints for:
 
 import logging
 from datetime import datetime
-from typing import List, Optional
+from typing import List
+# TODO: Add Optional when optional parameters are implemented
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import JSONResponse
+# TODO: Add JSONResponse when custom response formatting is needed
 
 from app.core.auth import get_current_user
 from app.schemas.game_stats import (
     ChallengeResult,
-    GameStatsCreate,
-    GameStatsQuery,
+    # TODO: Add when CRUD operations are implemented
+    # GameStatsCreate,
+    # GameStatsQuery,
     GameStatsResponse,
-    GameStatsUpdate,
+    # GameStatsUpdate,
     GlobalGameStats,
     NumberStats,
     PlayerInteraction,
@@ -69,12 +71,15 @@ async def get_user_game_stats(
         if current_user["uid"] != user_id:
             # TODO: Add admin permission check here
             raise HTTPException(
-                status_code=403, detail="Not authorized to view other user's stats"
+                status_code=403,
+                detail="Not authorized to view other user's stats",
             )
 
         stats = await game_stats_service.get_user_stats(user_id)
         if not stats:
-            raise HTTPException(status_code=404, detail="User statistics not found")
+            raise HTTPException(
+                status_code=404, detail="User statistics not found"
+            )
 
         return stats
 
@@ -104,7 +109,9 @@ async def get_global_game_stats(
     try:
         stats = await game_stats_service.get_global_stats()
         if not stats:
-            raise HTTPException(status_code=404, detail="Global statistics not found")
+            raise HTTPException(
+                status_code=404, detail="Global statistics not found"
+            )
 
         return stats
 
@@ -141,7 +148,9 @@ async def get_number_stats(
 
         stats = await game_stats_service.get_number_stats(number)
         if not stats:
-            raise HTTPException(status_code=404, detail="Number statistics not found")
+            raise HTTPException(
+                status_code=404, detail="Number statistics not found"
+            )
 
         return stats
 
@@ -180,25 +189,32 @@ async def get_range_stats(
 
         if range_min >= range_max:
             raise HTTPException(
-                status_code=400, detail="Range minimum must be less than maximum"
+                status_code=400,
+                detail="Range minimum must be less than maximum",
             )
 
         stats = await game_stats_service.get_range_stats(range_min, range_max)
         if not stats:
-            raise HTTPException(status_code=404, detail="Range statistics not found")
+            raise HTTPException(
+                status_code=404, detail="Range statistics not found"
+            )
 
         return stats
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get range stats for {range_min}-{range_max}: {e}")
+        logger.error(
+            f"Failed to get range stats for {range_min}-{range_max}: {e}"
+        )
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/numbers/top", response_model=List[NumberStats])
 async def get_top_numbers(
-    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Number of results to return"
+    ),
     by_usage: bool = Query(
         True, description="Sort by usage (True) or success rate (False)"
     ),
@@ -229,7 +245,9 @@ async def get_top_numbers(
 
 @router.get("/ranges/top", response_model=List[RangeStats])
 async def get_top_ranges(
-    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Number of results to return"
+    ),
     game_stats_service: GameStatsService = Depends(get_game_stats_service),
 ):
     """
@@ -257,7 +275,9 @@ async def get_top_ranges(
 @router.get("/user/{user_id}/history", response_model=List[ChallengeResult])
 async def get_user_challenge_history(
     user_id: str,
-    limit: int = Query(50, ge=1, le=200, description="Number of results to return"),
+    limit: int = Query(
+        50, ge=1, le=200, description="Number of results to return"
+    ),
     current_user: dict = Depends(get_current_user),
     game_stats_service: GameStatsService = Depends(get_game_stats_service),
 ):
@@ -281,10 +301,13 @@ async def get_user_challenge_history(
         if current_user["uid"] != user_id:
             # TODO: Add admin permission check here
             raise HTTPException(
-                status_code=403, detail="Not authorized to view other user's history"
+                status_code=403,
+                detail="Not authorized to view other user's history",
             )
 
-        history = await game_stats_service.get_challenge_history(user_id, limit)
+        history = await game_stats_service.get_challenge_history(
+            user_id, limit
+        )
         return history
 
     except HTTPException:
@@ -321,10 +344,13 @@ async def create_challenge_result(
             challenge_result.to_user,
         ]:
             raise HTTPException(
-                status_code=403, detail="Not authorized to create this challenge result"
+                status_code=403,
+                detail="Not authorized to create this challenge result",
             )
 
-        success = await game_stats_service.create_challenge_result(challenge_result)
+        success = await game_stats_service.create_challenge_result(
+            challenge_result
+        )
 
         if success:
             return GameStatsResponse(
@@ -365,14 +391,18 @@ async def get_analytics_summary(
         global_stats = await game_stats_service.get_global_stats()
 
         # Get top numbers and ranges
-        top_numbers = await game_stats_service.get_top_numbers(5, by_usage=True)
+        top_numbers = await game_stats_service.get_top_numbers(
+            5, by_usage=True
+        )
         top_ranges = await game_stats_service.get_top_ranges(5)
 
         # Get social statistics
-        most_challenged_players = await game_stats_service.get_most_challenged_players(
-            5
+        most_challenged_players = (
+            await game_stats_service.get_most_challenged_players(5)
         )
-        most_active_pairs = await game_stats_service.get_most_active_player_pairs(5)
+        most_active_pairs = (
+            await game_stats_service.get_most_active_player_pairs(5)
+        )
 
         summary = {
             "global_stats": global_stats.dict() if global_stats else None,
@@ -382,7 +412,9 @@ async def get_analytics_summary(
                 "most_challenged_players": [
                     player.dict() for player in most_challenged_players
                 ],
-                "most_active_pairs": [pair.dict() for pair in most_active_pairs],
+                "most_active_pairs": [
+                    pair.dict() for pair in most_active_pairs
+                ],
             },
             "timestamp": datetime.utcnow().isoformat(),
         }
@@ -396,7 +428,9 @@ async def get_analytics_summary(
 
 @router.get("/social/most-challenged", response_model=List[PlayerInteraction])
 async def get_most_challenged_players(
-    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Number of results to return"
+    ),
     game_stats_service: GameStatsService = Depends(get_game_stats_service),
 ):
     """
@@ -423,7 +457,9 @@ async def get_most_challenged_players(
 
 @router.get("/social/most-active-pairs", response_model=List[PlayerPair])
 async def get_most_active_player_pairs(
-    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Number of results to return"
+    ),
     game_stats_service: GameStatsService = Depends(get_game_stats_service),
 ):
     """
@@ -448,10 +484,14 @@ async def get_most_active_player_pairs(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/social/user/{user_id}/friends-activity", response_model=List[PlayerPair])
+@router.get(
+    "/social/user/{user_id}/friends-activity", response_model=List[PlayerPair]
+)
 async def get_user_friends_activity(
     user_id: str,
-    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Number of results to return"
+    ),
     current_user: dict = Depends(get_current_user),
     game_stats_service: GameStatsService = Depends(get_game_stats_service),
 ):
@@ -479,7 +519,9 @@ async def get_user_friends_activity(
                 detail="Not authorized to view other user's friends activity",
             )
 
-        pairs = await game_stats_service.get_user_friends_activity(user_id, limit)
+        pairs = await game_stats_service.get_user_friends_activity(
+            user_id, limit
+        )
         return pairs
 
     except HTTPException:
@@ -495,7 +537,9 @@ async def get_user_friends_activity(
 )
 async def get_user_challenge_recipients(
     user_id: str,
-    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Number of results to return"
+    ),
     current_user: dict = Depends(get_current_user),
     game_stats_service: GameStatsService = Depends(get_game_stats_service),
 ):
@@ -531,5 +575,7 @@ async def get_user_challenge_recipients(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get user challenge recipients for {user_id}: {e}")
+        logger.error(
+            f"Failed to get user challenge recipients for {user_id}: {e}"
+        )
         raise HTTPException(status_code=500, detail="Internal server error")

@@ -6,7 +6,7 @@ This is the main entry point for the FastAPI application.
 Follows the project structure outlined in the SRD.
 """
 
-import os
+# import os  # TODO: Add when environment variables are used
 
 import uvicorn
 from dotenv import load_dotenv
@@ -76,7 +76,9 @@ async def root():
 
 
 # Include routers
-app.include_router(challenges.router, prefix="/api/challenges", tags=["challenges"])
+app.include_router(
+    challenges.router, prefix="/api/challenges", tags=["challenges"]
+)
 app.include_router(
     notifications.router, prefix="/api/notifications", tags=["notifications"]
 )

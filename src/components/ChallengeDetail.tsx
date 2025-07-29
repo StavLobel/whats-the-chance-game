@@ -8,8 +8,9 @@ import { ArrowLeft, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from 'lucide-reac
 import { Challenge } from '@/types/challenge';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
-import { LoadingState } from '@/components/LoadingState';
-import { ErrorState } from '@/components/ErrorState';
+// TODO: Implement LoadingState and ErrorState components when needed
+// import { LoadingState } from '@/components/LoadingState';
+// import { ErrorState } from '@/components/ErrorState';
 
 interface ChallengeDetailProps {
   challenge: Challenge;

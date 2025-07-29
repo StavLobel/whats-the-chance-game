@@ -52,32 +52,46 @@ class ChallengeRange(BaseModel):
     def validate_max_greater_than_min(cls, v, values):
         """Validate that max is greater than min."""
         if "min" in values and v <= values["min"]:
-            raise ValueError("Maximum number must be greater than minimum number")
+            raise ValueError(
+                "Maximum number must be greater than minimum number"
+            )
         return v
 
 
 class ChallengeNumbers(BaseModel):
     """Schema for challenge number submissions."""
 
-    from_user: int = Field(..., ge=1, description="Number chosen by challenge creator")
-    to_user: int = Field(..., ge=1, description="Number chosen by challenge recipient")
+    from_user: int = Field(
+        ..., ge=1, description="Number chosen by challenge creator"
+    )
+    to_user: int = Field(
+        ..., ge=1, description="Number chosen by challenge recipient"
+    )
 
 
 class ChallengeResponse(BaseModel):
     """Schema for responding to a challenge."""
 
-    range: ChallengeRange = Field(..., description="Number range for the challenge")
-    accepted: bool = Field(..., description="Whether the challenge is accepted")
+    range: ChallengeRange = Field(
+        ..., description="Number range for the challenge"
+    )
+    accepted: bool = Field(
+        ..., description="Whether the challenge is accepted"
+    )
 
 
 class ChallengeUpdate(BaseModel):
     """Schema for updating challenge status."""
 
-    status: str = Field(..., pattern="^(pending|accepted|rejected|active|completed)$")
+    status: str = Field(
+        ..., pattern="^(pending|accepted|rejected|active|completed)$"
+    )
     range: Optional[ChallengeRange] = Field(
         None, description="Number range (if accepted)"
     )
-    numbers: Optional[ChallengeNumbers] = Field(None, description="Submitted numbers")
+    numbers: Optional[ChallengeNumbers] = Field(
+        None, description="Submitted numbers"
+    )
     result: Optional[str] = Field(
         None, pattern="^(match|no_match)$", description="Challenge result"
     )
@@ -92,11 +106,17 @@ class Challenge(BaseModel):
     to_user: str = Field(..., description="User ID of the challenge recipient")
     status: str = Field(..., description="Challenge status")
     range: Optional[ChallengeRange] = Field(None, description="Number range")
-    numbers: Optional[ChallengeNumbers] = Field(None, description="Submitted numbers")
+    numbers: Optional[ChallengeNumbers] = Field(
+        None, description="Submitted numbers"
+    )
     result: Optional[str] = Field(None, description="Challenge result")
-    created_at: datetime = Field(..., description="Challenge creation timestamp")
+    created_at: datetime = Field(
+        ..., description="Challenge creation timestamp"
+    )
     updated_at: datetime = Field(..., description="Last update timestamp")
-    completed_at: Optional[datetime] = Field(None, description="Completion timestamp")
+    completed_at: Optional[datetime] = Field(
+        None, description="Completion timestamp"
+    )
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat()}
@@ -114,10 +134,18 @@ class ChallengeList(BaseModel):
 class ChallengeStats(BaseModel):
     """Schema for challenge statistics."""
 
-    total_challenges: int = Field(..., description="Total number of challenges")
-    pending_challenges: int = Field(..., description="Number of pending challenges")
-    active_challenges: int = Field(..., description="Number of active challenges")
-    completed_challenges: int = Field(..., description="Number of completed challenges")
+    total_challenges: int = Field(
+        ..., description="Total number of challenges"
+    )
+    pending_challenges: int = Field(
+        ..., description="Number of pending challenges"
+    )
+    active_challenges: int = Field(
+        ..., description="Number of active challenges"
+    )
+    completed_challenges: int = Field(
+        ..., description="Number of completed challenges"
+    )
     matches_won: int = Field(..., description="Number of matches won")
     matches_lost: int = Field(..., description="Number of matches lost")
 
@@ -126,7 +154,9 @@ class ChallengeResolveRequest(BaseModel):
     """Schema for resolving a challenge (backend processing)."""
 
     challenge_id: str = Field(..., description="Challenge ID to resolve")
-    numbers: Dict[str, int] = Field(..., description="Numbers submitted by each user")
+    numbers: Dict[str, int] = Field(
+        ..., description="Numbers submitted by each user"
+    )
 
     @validator("numbers")
     def validate_numbers(cls, v):
@@ -144,7 +174,9 @@ class ChallengeResolveResponse(BaseModel):
 
     challenge_id: str = Field(..., description="Challenge ID")
     result: str = Field(..., description="Challenge result (match/no_match)")
-    numbers: Dict[str, int] = Field(..., description="Numbers submitted by each user")
+    numbers: Dict[str, int] = Field(
+        ..., description="Numbers submitted by each user"
+    )
     resolved_at: datetime = Field(..., description="Resolution timestamp")
 
     class Config:

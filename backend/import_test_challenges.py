@@ -34,7 +34,9 @@ def load_test_challenges() -> List[Dict[str, Any]]:
             return json.load(f)
     except FileNotFoundError:
         print("❌ test_challenges_data.json not found!")
-        print("   Run create_test_challenges_api.py first to generate the data.")
+        print(
+            "   Run create_test_challenges_api.py first to generate the data."
+        )
         return []
     except json.JSONDecodeError as e:
         print(f"❌ Error parsing JSON file: {e}")
@@ -46,11 +48,15 @@ def generate_challenge_id() -> str:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     import random
 
-    random_suffix = "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6))
+    random_suffix = "".join(
+        random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6)
+    )
     return f"challenge_{timestamp}_{random_suffix}"
 
 
-def prepare_challenge_for_import(challenge_data: Dict[str, Any]) -> Dict[str, Any]:
+def prepare_challenge_for_import(
+    challenge_data: Dict[str, Any]
+) -> Dict[str, Any]:
     """Prepare challenge data for import into Firestore."""
 
     # Generate a unique ID
@@ -116,7 +122,9 @@ async def import_challenges_to_firestore(challenges: List[Dict[str, Any]]):
             successful_imports += 1
 
         except Exception as e:
-            print(f"❌ [{i:2d}/{len(challenges)}] Failed to import challenge: {e}")
+            print(
+                f"❌ [{i:2d}/{len(challenges)}] Failed to import challenge: {e}"
+            )
             failed_imports += 1
 
     print(f"\n📊 Import Summary:")
@@ -158,7 +166,9 @@ def print_import_summary(challenges: List[Dict[str, Any]]):
 
         # Count ranges
         if "range" in challenge:
-            range_key = f"{challenge['range']['min']}-{challenge['range']['max']}"
+            range_key = (
+                f"{challenge['range']['min']}-{challenge['range']['max']}"
+            )
             range_counts[range_key] = range_counts.get(range_key, 0) + 1
 
     print(f"\n📈 Status Distribution:")

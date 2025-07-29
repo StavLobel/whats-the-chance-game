@@ -10,7 +10,6 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-  setDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Challenge, GameSession } from '@/types/challenge';
@@ -206,7 +205,6 @@ export class GameService {
    * Listen to real-time updates for a specific challenge
    */
   subscribeToChallenge(challengeId: string, callback: (challenge: Challenge | null) => void) {
-    // eslint-disable-next-line no-unused-vars
     const challengeRef = doc(this.challengesCollection, challengeId);
 
     return onSnapshot(challengeRef, doc => {

@@ -3,4 +3,5 @@ Routers Package
 API route definitions for the FastAPI application.
 """
 
-from . import challenges, game_stats, notifications
+# TODO: Uncomment imports when routers are properly initialized
+# from . import challenges, game_stats, notifications

@@ -28,14 +28,16 @@ export default function Game() {
     error,
     getIncomingChallenges,
     getOutgoingChallenges,
-    getActiveChallenges,
-    getCompletedChallenges,
+    // TODO: Uncomment when implementing active/completed challenges display
+    // getActiveChallenges,
+    // getCompletedChallenges,
   } = useGame();
 
   const incomingChallenges = getIncomingChallenges();
   const myChallenges = getOutgoingChallenges();
-  const activeChallenges = getActiveChallenges();
-  const completedChallenges = getCompletedChallenges();
+  // TODO: Implement active and completed challenges display
+  // const activeChallenges = getActiveChallenges();
+  // const completedChallenges = getCompletedChallenges();
   const notificationCount = incomingChallenges.length;
 
   const handleAcceptChallenge = (id: string) => {

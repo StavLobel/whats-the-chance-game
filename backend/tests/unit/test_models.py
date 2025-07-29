@@ -74,7 +74,12 @@ class TestUserModel:
     def test_username_validation(self):
         """Test username validation rules."""
         with allure.step("Test valid username"):
-            valid_usernames = ["john_doe", "jane123", "user-name", "test_user_123"]
+            valid_usernames = [
+                "john_doe",
+                "jane123",
+                "user-name",
+                "test_user_123",
+            ]
             for username in valid_usernames:
                 assert len(username) >= 3
                 assert len(username) <= 30

@@ -198,7 +198,6 @@ export function useGame() {
   }, []);
 
   // Subscribe to real-time updates for a challenge
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const subscribeToChallenge = useCallback(
     (challengeId: string, callback: (challenge: Challenge | null) => void) => {
       return gameService.subscribeToChallenge(challengeId, callback);
