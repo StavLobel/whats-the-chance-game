@@ -10,7 +10,7 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-  Timestamp,
+  setDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Challenge, GameSession } from '@/types/challenge';
@@ -26,16 +26,15 @@ export class GameService {
    * Create a new challenge
    */
   async createChallenge(fromUser: string, toUser: string, description: string): Promise<string> {
-    const challengeData = {
-      fromUser,
-      toUser,
+    const challengeRef = await addDoc(this.challengesCollection, {
+      from_user: fromUser,
+      to_user: toUser,
       description,
-      status: 'pending' as const,
-      createdAt: serverTimestamp(),
-    };
-
-    const docRef = await addDoc(this.challengesCollection, challengeData);
-    return docRef.id;
+      status: 'pending',
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp(),
+    });
+    return challengeRef.id;
   }
 
   /**
@@ -51,10 +50,10 @@ export class GameService {
     // Create a game session
     const challengeDoc = await getDoc(challengeRef);
     const challengeData = challengeDoc.data() as Challenge;
-    
+
     await addDoc(this.sessionsCollection, {
       challengeId,
-      players: [challengeData.fromUser, challengeData.toUser],
+      players: [challengeData.from_user, challengeData.to_user],
       status: 'waiting',
       numbers: {},
       createdAt: serverTimestamp(),
@@ -97,10 +96,11 @@ export class GameService {
   /**
    * Calculate the result of a challenge
    */
-  private async calculateResult(challengeId: string, numbers: Record<string, number>): Promise<void> {
+  private async calculateResult(
+    challengeId: string,
+    numbers: Record<string, number>
+  ): Promise<void> {
     const challengeRef = doc(this.challengesCollection, challengeId);
-    const challengeDoc = await getDoc(challengeRef);
-    const challengeData = challengeDoc.data() as Challenge;
 
     const numberValues = Object.values(numbers);
     const isMatch = numberValues[0] === numberValues[1];
@@ -112,10 +112,7 @@ export class GameService {
     });
 
     // Update game session
-    const sessionQuery = query(
-      this.sessionsCollection,
-      where('challengeId', '==', challengeId)
-    );
+    const sessionQuery = query(this.sessionsCollection, where('challengeId', '==', challengeId));
     const sessionDocs = await getDocs(sessionQuery);
     if (!sessionDocs.empty && sessionDocs.docs[0]) {
       const sessionRef = doc(this.sessionsCollection, sessionDocs.docs[0].id);
@@ -132,45 +129,46 @@ export class GameService {
    */
   getChallengesForUser(userId: string, type: 'incoming' | 'outgoing' | 'all' = 'all') {
     let q;
-    
+
     switch (type) {
       case 'incoming':
         q = query(
           this.challengesCollection,
-          where('toUser', '==', userId),
-          orderBy('createdAt', 'desc')
+          where('to_user', '==', userId),
+          orderBy('created_at', 'desc')
         );
         break;
       case 'outgoing':
         q = query(
           this.challengesCollection,
-          where('fromUser', '==', userId),
-          orderBy('createdAt', 'desc')
+          where('from_user', '==', userId),
+          orderBy('created_at', 'desc')
         );
         break;
       default:
         q = query(
           this.challengesCollection,
-          where('toUser', '==', userId),
-          orderBy('createdAt', 'desc')
+          where('to_user', '==', userId),
+          orderBy('created_at', 'desc')
         );
     }
 
-    return onSnapshot(q, (snapshot) => {
+    return onSnapshot(q, snapshot => {
       const challenges: Challenge[] = [];
-      snapshot.forEach((doc) => {
+      snapshot.forEach(doc => {
         const data = doc.data();
         challenges.push({
           id: doc.id,
-          fromUser: data.fromUser,
-          toUser: data.toUser,
+          from_user: data.from_user,
+          to_user: data.to_user,
           description: data.description,
           status: data.status,
           range: data.range,
           numbers: data.numbers,
           result: data.result,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          completedAt: data.completedAt?.toDate(),
+          created_at: data.created_at?.toDate() || new Date(),
+          updated_at: data.updated_at?.toDate() || new Date(),
+          completed_at: data.completed_at?.toDate(),
         });
       });
       return challenges;
@@ -183,7 +181,7 @@ export class GameService {
   async getChallenge(challengeId: string): Promise<Challenge | null> {
     const challengeRef = doc(this.challengesCollection, challengeId);
     const challengeDoc = await getDoc(challengeRef);
-    
+
     if (!challengeDoc.exists()) {
       return null;
     }
@@ -191,15 +189,16 @@ export class GameService {
     const data = challengeDoc.data();
     return {
       id: challengeDoc.id,
-      fromUser: data.fromUser,
-      toUser: data.toUser,
+      from_user: data.from_user,
+      to_user: data.to_user,
       description: data.description,
       status: data.status,
       range: data.range,
       numbers: data.numbers,
       result: data.result,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      completedAt: data.completedAt?.toDate(),
+      created_at: data.created_at?.toDate() || new Date(),
+      updated_at: data.updated_at?.toDate() || new Date(),
+      completed_at: data.completed_at?.toDate(),
     };
   }
 
@@ -207,9 +206,10 @@ export class GameService {
    * Listen to real-time updates for a specific challenge
    */
   subscribeToChallenge(challengeId: string, callback: (challenge: Challenge | null) => void) {
+    // eslint-disable-next-line no-unused-vars
     const challengeRef = doc(this.challengesCollection, challengeId);
-    
-    return onSnapshot(challengeRef, (doc) => {
+
+    return onSnapshot(challengeRef, doc => {
       if (!doc.exists()) {
         callback(null);
         return;
@@ -218,17 +218,18 @@ export class GameService {
       const data = doc.data();
       const challenge: Challenge = {
         id: doc.id,
-        fromUser: data.fromUser,
-        toUser: data.toUser,
+        from_user: data.from_user,
+        to_user: data.to_user,
         description: data.description,
         status: data.status,
         range: data.range,
         numbers: data.numbers,
         result: data.result,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        completedAt: data.completedAt?.toDate(),
+        created_at: data.created_at?.toDate() || new Date(),
+        updated_at: data.updated_at?.toDate() || new Date(),
+        completed_at: data.completed_at?.toDate(),
       };
-      
+
       callback(challenge);
     });
   }
@@ -237,21 +238,18 @@ export class GameService {
    * Get game session for a challenge
    */
   async getGameSession(challengeId: string): Promise<GameSession | null> {
-    const sessionQuery = query(
-      this.sessionsCollection,
-      where('challengeId', '==', challengeId)
-    );
+    const sessionQuery = query(this.sessionsCollection, where('challengeId', '==', challengeId));
     const sessionDocs = await getDocs(sessionQuery);
-    
+
     if (sessionDocs.empty) {
       return null;
     }
 
     const doc = sessionDocs.docs[0];
     if (!doc) return null;
-    
+
     const data = doc.data();
-    
+
     return {
       id: doc.id,
       challengeId: data.challengeId,
@@ -264,4 +262,4 @@ export class GameService {
 }
 
 // Export singleton instance
-export const gameService = new GameService(); 
+export const gameService = new GameService();

@@ -1,0 +1,72 @@
+---
+description: Conversation logging rule to track all AI agent interactions
+globs: ["conversation-log.txt", "chat-transcript.txt"]
+alwaysApply: true
+---
+
+# Conversation Logging Rule
+
+## Purpose
+Track all conversations and interactions with the AI agent for project development history and reference.
+
+## Log Files
+- **conversation-log.txt**: Development progress and technical implementation details
+- **chat-transcript.txt**: Raw conversation messages with timestamps
+
+## Requirements
+- Update conversation-log.txt after each significant interaction
+- Include user requests, challenges faced, solutions implemented, and outcomes
+- Maintain chronological order with clear session boundaries
+- Add timestamps and session markers
+- Include technical details and file modifications
+- Track key decisions and their rationale
+
+## Format Guidelines
+- Use clear section headers with emojis for visual organization
+- Include user's exact request in quotes
+- Document challenges and how they were resolved
+- List all files modified or created
+- Include technical implementation details
+- Add status indicators (✅ COMPLETED, 🔄 IN PROGRESS, ❌ FAILED)
+- Maintain consistent formatting throughout the log
+
+## Update Triggers
+- **On new chat initialization**: Read existing chat logs for context and continuity
+- After each user request is completed
+- When new files are created or modified
+- When technical challenges are resolved
+- When significant decisions are made
+- At the end of each development session
+
+## Update Process
+- **Background Updates**: All log updates should be performed in the background without interrupting the main conversation flow
+- **Non-blocking**: Log updates should not delay or interfere with user interactions
+- **Automatic**: Updates should happen automatically without requiring explicit user acknowledgment
+- **Seamless**: The logging process should be invisible to the user experience
+
+## Content Structure
+1. Session overview with date and focus
+2. Key interactions in chronological order
+3. Technical achievements and challenges
+4. Files modified and created
+5. Next steps and future considerations
+
+## Chat Initialization Process
+- **Read conversation-log.txt**: Review previous development progress and decisions
+- **Read chat-transcript.txt**: Review recent conversation context and user preferences
+- **Identify ongoing tasks**: Note any incomplete work or pending decisions
+- **Maintain continuity**: Reference previous solutions and technical decisions
+- **Update session markers**: Add new session start markers with current date/time
+
+## Security Note
+- Do not log sensitive information like API keys or passwords
+- Focus on technical implementation and user interactions
+- Keep the log focused on development progress and decisions
+
+## Benefits of Reading Logs on Initialization
+- **Context Continuity**: Understand previous decisions and technical approaches
+- **User Preferences**: Remember user's preferred workflows and communication style
+- **Ongoing Tasks**: Identify incomplete work that needs attention
+- **Technical Decisions**: Reference previous solutions to maintain consistency
+- **Development History**: Build on previous work without repeating mistakes
+- **Session Efficiency**: Reduce time spent re-explaining previous work

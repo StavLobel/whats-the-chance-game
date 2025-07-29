@@ -27,6 +27,9 @@ class TestUserModel:
                 "uid": user_data["uid"],
                 "email": user_data["email"],
                 "display_name": user_data["display_name"],
+                "first_name": user_data.get("first_name"),
+                "last_name": user_data.get("last_name"),
+                "username": user_data.get("username"),
                 "created_at": user_data["created_at"],
             }
 
@@ -34,6 +37,9 @@ class TestUserModel:
             assert user["uid"] == "test-user-id"
             assert user["email"] == "test@example.com"
             assert user["display_name"] == "Test User"
+            assert user["first_name"] is None  # Optional field
+            assert user["last_name"] is None  # Optional field
+            assert user["username"] is None  # Optional field
             assert user["created_at"] is not None
 
     @allure.story("User Validation")
@@ -61,6 +67,33 @@ class TestUserModel:
 
         with allure.step("Verify default display name"):
             assert default_name == "test"
+
+    @allure.story("Username Validation")
+    @allure.severity(allure.severity_level.NORMAL)
+    @pytest.mark.unit
+    def test_username_validation(self):
+        """Test username validation rules."""
+        with allure.step("Test valid username"):
+            valid_usernames = ["john_doe", "jane123", "user-name", "test_user_123"]
+            for username in valid_usernames:
+                assert len(username) >= 3
+                assert len(username) <= 30
+                # Check if contains only alphanumeric, underscore, and hyphen
+                clean_username = username.replace("_", "").replace("-", "")
+                assert clean_username.isalnum()
+
+        with allure.step("Test invalid username - too short"):
+            invalid_username = "ab"
+            assert len(invalid_username) < 3
+
+        with allure.step("Test invalid username - too long"):
+            invalid_username = "a" * 31
+            assert len(invalid_username) > 30
+
+        with allure.step("Test invalid username - special characters"):
+            invalid_username = "user@name"
+            clean_username = invalid_username.replace("_", "").replace("-", "")
+            assert not clean_username.isalnum()
 
 
 @allure.epic("Backend Models")

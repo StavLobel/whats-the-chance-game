@@ -18,8 +18,6 @@ import {
   sendEmailVerification,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   onAuthStateChanged,
   User as FirebaseUser,
   UserCredential,
@@ -287,6 +285,7 @@ export const getCurrentUser = (): FirebaseUser | null => {
 export const waitForAuthInit = (): Promise<FirebaseUser | null> => {
   return new Promise(resolve => {
     const unsubscribe = onAuthStateChanged(auth, user => {
+      // user is used in resolve(user)
       unsubscribe();
       resolve(user);
     });

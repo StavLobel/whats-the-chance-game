@@ -31,14 +31,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
 
   // Authentication actions
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>; // eslint-disable-line no-unused-vars
+  signUp: (email: string, password: string, displayName: string) => Promise<void>; // eslint-disable-line no-unused-vars
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  sendPasswordReset: (email: string) => Promise<void>;
+  sendPasswordReset: (email: string) => Promise<void>; // eslint-disable-line no-unused-vars
 
   // State management
-  setLoading: (loading: boolean) => void;
+  setLoading: (loading: boolean) => void; // eslint-disable-line no-unused-vars
   refreshUserDoc: () => Promise<void>;
 }
 
@@ -68,10 +68,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Authentication Actions
   // =============================================================================
 
-  const signIn = async (email: string, password: string): Promise<void> => {
+  const signIn = async (_email: string, _password: string): Promise<void> => {
     setIsLoading(true);
     try {
-      await signInWithEmail(email, password);
+      await signInWithEmail(_email, _password);
       // User state will be updated via the auth state listener
     } catch (error: unknown) {
       setIsLoading(false);
@@ -79,10 +79,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, displayName: string): Promise<void> => {
+  const signUp = async (_email: string, _password: string, _displayName: string): Promise<void> => {
     setIsLoading(true);
     try {
-      await signUpWithEmail(email, password, displayName);
+      await signUpWithEmail(_email, _password, _displayName);
       // User state will be updated via the auth state listener
     } catch (error: unknown) {
       setIsLoading(false);
@@ -112,8 +112,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const sendPasswordReset = async (email: string): Promise<void> => {
-    await resetPassword(email);
+  const sendPasswordReset = async (_email: string): Promise<void> => {
+    await resetPassword(_email);
   };
 
   const refreshUserDoc = async (): Promise<void> => {

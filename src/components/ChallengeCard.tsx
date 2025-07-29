@@ -5,12 +5,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Clock, Zap } from 'lucide-react';
 import { Challenge } from '@/types/challenge';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ChallengeCardProps {
   challenge: Challenge;
-  onAccept?: (id: string) => void;
-  onReject?: (id: string) => void;
-  onClick?: (id: string) => void;
+  onAccept?: (id: string) => void; // eslint-disable-line no-unused-vars
+  onReject?: (id: string) => void; // eslint-disable-line no-unused-vars
+  onClick?: (id: string) => void; // eslint-disable-line no-unused-vars
 }
 
 export function ChallengeCard({ challenge, onAccept, onReject, onClick }: ChallengeCardProps) {
@@ -20,10 +19,10 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
         return 'bg-warning text-warning-foreground';
       case 'accepted':
         return 'bg-primary text-primary-foreground';
+      case 'active':
+        return 'bg-blue-500 text-white';
       case 'completed':
         return 'bg-success text-success-foreground';
-      case 'rejected':
-        return 'bg-destructive text-destructive-foreground';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -35,10 +34,10 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
         return <Clock className='h-3 w-3' />;
       case 'accepted':
         return <Zap className='h-3 w-3' />;
+      case 'active':
+        return <Zap className='h-3 w-3' />;
       case 'completed':
         return <span className='text-xs'>✓</span>;
-      case 'rejected':
-        return <span className='text-xs'>✗</span>;
       default:
         return null;
     }
@@ -50,10 +49,10 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
         return 'Pending';
       case 'accepted':
         return 'Accepted';
+      case 'active':
+        return 'Active';
       case 'completed':
         return 'Completed';
-      case 'rejected':
-        return 'Rejected';
       default:
         return 'Unknown';
     }
@@ -69,7 +68,7 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
           <div className='flex items-center gap-3'>
             <Avatar className='h-10 w-10'>
               <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-                {challenge.from_user.charAt(0).toUpperCase()}
+                {challenge.from_user?.charAt(0).toUpperCase() || '?'}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -91,7 +90,7 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
         {challenge.range && (
           <div className='mt-3 flex items-center gap-2 text-sm text-muted-foreground'>
             <span className='w-2 h-2 bg-primary rounded-full'></span>
-            Range: 1-{challenge.range}
+            Range: {challenge.range.min}-{challenge.range.max}
           </div>
         )}
       </CardContent>

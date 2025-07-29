@@ -166,6 +166,28 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
    - Backend API: http://localhost:8000
    - API Docs: http://localhost:8000/docs
 
+## 👥 Test Users
+
+For development and testing purposes, the following dummy users are available in the Firebase database:
+
+### User 1: John Doe
+
+- **Email**: testuser1@example.com
+- **Password**: TestPassword123!
+- **Username**: johndoe
+- **Full Name**: John Doe
+- **UID**: 6Op1SrQJdyVpHAo419YyUwT9NOo2
+
+### User 2: Jane Smith
+
+- **Email**: testuser2@example.com
+- **Password**: TestPassword123!
+- **Username**: janesmith
+- **Full Name**: Jane Smith
+- **UID**: ZYWaZCihaeXcId5EW0ht2HAHTCq1
+
+> **Note**: These are test users created specifically for development. They have full profiles with statistics and can be used to test all game features including challenge creation, acceptance, and number submission. For more details, see [TEST_USERS.md](./backend/TEST_USERS.md).
+
 ### Docker Development
 
 ```bash

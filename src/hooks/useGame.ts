@@ -22,16 +22,48 @@ export function useGame() {
     setLoading(true);
     setError(null);
 
-    const unsubscribe = gameService.getChallengesForUser(user.uid, 'all');
-    
-    // Note: The current implementation returns a function, but we need to handle the snapshot
-    // For now, we'll use a different approach to get challenges
     const loadChallenges = async () => {
       try {
-        // This is a temporary implementation - we'll need to modify the service
-        // to properly return challenges from the snapshot
+        console.log('🚀 Frontend: Starting to load challenges...');
+        // Fetch challenges from the backend API with timeout
+        const apiUrl = 'http://localhost:8000';
+        // Use test endpoint with user lookup and timeout protection
+        const url = `${apiUrl}/api/challenges/test`;
+        console.log('🌐 Frontend: Making API call to:', url);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          console.log('⏰ Frontend: Request timeout after 10 seconds');
+          controller.abort();
+        }, 10000); // 10 second timeout
+        
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        clearTimeout(timeoutId);
+        console.log('📨 Frontend: Response received, status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const challengesData = await response.json();
+        console.log('📦 Frontend: Challenges data received:', challengesData);
+        console.log('📊 Frontend: Number of challenges:', challengesData?.length || 0);
+        if (challengesData?.length > 0) {
+          console.log('🔍 Frontend: First challenge structure:', challengesData[0]);
+        }
+        
+        // Ensure we always set an array
+        const challenges = Array.isArray(challengesData) ? challengesData : [];
+        setChallenges(challenges);
         setLoading(false);
       } catch (err) {
+        console.error('Failed to load challenges:', err);
         setError(err instanceof Error ? err.message : 'Failed to load challenges');
         setLoading(false);
       }
@@ -39,8 +71,11 @@ export function useGame() {
 
     loadChallenges();
 
+    // Set up periodic refresh every 30 seconds
+    const interval = setInterval(loadChallenges, 30000);
+
     return () => {
-      // Cleanup subscription when component unmounts
+      clearInterval(interval);
     };
   }, [user?.uid]);
 
@@ -151,6 +186,7 @@ export function useGame() {
   }, []);
 
   // Subscribe to real-time updates for a challenge
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const subscribeToChallenge = useCallback((challengeId: string, callback: (challenge: Challenge | null) => void) => {
     return gameService.subscribeToChallenge(challengeId, callback);
   }, []);
@@ -168,14 +204,14 @@ export function useGame() {
 
   // Filter challenges by type
   const getIncomingChallenges = useCallback(() => {
-    return challenges.filter(challenge => 
-      challenge.toUser === user?.uid && challenge.status === 'pending'
+    return challenges.filter(c => 
+      c.to_user === user?.uid && c.status === 'pending'
     );
   }, [challenges, user?.uid]);
 
   const getOutgoingChallenges = useCallback(() => {
-    return challenges.filter(challenge => 
-      challenge.fromUser === user?.uid
+    return challenges.filter(c => 
+      c.from_user === user?.uid
     );
   }, [challenges, user?.uid]);
 

@@ -8,6 +8,8 @@ import { ArrowLeft, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from 'lucide-reac
 import { Challenge } from '@/types/challenge';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
+import { LoadingState } from '@/components/LoadingState';
+import { ErrorState } from '@/components/ErrorState';
 
 interface ChallengeDetailProps {
   challenge: Challenge;
@@ -20,10 +22,9 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
   const [phase, setPhase] = useState<GamePhase>('initial');
   const [range, setRange] = useState([10]);
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenge);
-  const { acceptChallenge, rejectChallenge, submitNumber, subscribeToChallenge } = useGame();
   const { user } = useAuth();
+  const { acceptChallenge, rejectChallenge, submitNumber, subscribeToChallenge } = useGame();
 
   // Subscribe to real-time updates
   useEffect(() => {
@@ -38,17 +39,12 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
           setPhase('waiting');
         } else if (updatedChallenge.status === 'completed') {
           setPhase('reveal');
-          setShowResult(true);
         }
       }
     });
 
     return () => unsubscribe();
   }, [challenge.id, subscribeToChallenge]);
-
-  // Determine if current user is the challenger or challengee
-  const isChallenger = user?.uid === currentChallenge.fromUser;
-  const isChallengee = user?.uid === currentChallenge.toUser;
 
   const handleAccept = async () => {
     try {
@@ -209,12 +205,12 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
               <Card className='text-center'>
                 <CardHeader className='pb-2'>
                   <CardTitle className='text-sm text-muted-foreground'>
-                    @{currentChallenge.fromUser}
+                    @{currentChallenge.from_user}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='text-3xl font-bold text-primary animate-number-reveal'>
-                    {(currentChallenge.numbers as Record<string, number>)?.[currentChallenge.fromUser] || '?'}
+                    {(currentChallenge.numbers as Record<string, number>)?.[currentChallenge.from_user] || '?'}
                   </div>
                 </CardContent>
               </Card>
@@ -260,11 +256,11 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
         <div className='flex items-center gap-3 flex-1'>
           <Avatar className='h-10 w-10'>
             <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-                              {challenge.fromUser.charAt(0).toUpperCase()}
+                              {challenge.from_user.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-                          <p className='font-medium'>@{challenge.fromUser}</p>
+                          <p className='font-medium'>@{challenge.from_user}</p>
             <Badge variant='secondary' className='text-xs'>
               {challenge.status}
             </Badge>

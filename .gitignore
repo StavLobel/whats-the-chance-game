@@ -153,6 +153,9 @@ backend/coverage.xml
 backend/htmlcov/
 backend/.coverage
 backend/bandit-report.json
+backend/service-account-key.json
+backend/app/**/__pycache__/
+backend/tests/**/__pycache__/
 
 # Firebase
 firebase-debug.log
@@ -199,6 +202,8 @@ build/
 # Logs
 logs/
 *.log
+conversation-log.txt
+chat-transcript.txt
 
 # Database
 *.db

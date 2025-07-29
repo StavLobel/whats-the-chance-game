@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GameService } from '@/lib/gameService';
 import { addDoc, updateDoc, getDoc, getDocs } from 'firebase/firestore';
 
+// Mock Firebase functions
+const mockAddDoc = vi.mocked(addDoc);
+const mockUpdateDoc = vi.mocked(updateDoc);
+const mockGetDoc = vi.mocked(getDoc);
+const mockGetDocs = vi.mocked(getDocs);
+
 // Mock Firebase
 vi.mock('@/lib/firebase', () => ({
   db: {},
