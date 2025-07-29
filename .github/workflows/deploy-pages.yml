@@ -1,0 +1,347 @@
+name: Deploy Test Reports to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Download workflow artifacts
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+
+            for (const artifact of artifacts.data.artifacts) {
+              if (artifact.name === 'allure-report') {
+                const download = await github.rest.actions.downloadArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                  archive_format: 'zip',
+                });
+                
+                const fs = require('fs');
+                fs.writeFileSync('allure-report.zip', Buffer.from(download.data));
+              }
+              
+              if (artifact.name === 'frontend-coverage') {
+                const download = await github.rest.actions.downloadArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                  archive_format: 'zip',
+                });
+                
+                const fs = require('fs');
+                fs.writeFileSync('frontend-coverage.zip', Buffer.from(download.data));
+              }
+              
+              if (artifact.name === 'backend-coverage') {
+                const download = await github.rest.actions.downloadArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                  archive_format: 'zip',
+                });
+                
+                const fs = require('fs');
+                fs.writeFileSync('backend-coverage.zip', Buffer.from(download.data));
+              }
+            }
+
+      - name: Extract artifacts
+        run: |
+          mkdir -p ./public
+          
+          # Extract Allure reports
+          if [ -f "allure-report.zip" ]; then
+            unzip -q allure-report.zip -d ./public/
+            echo "Allure reports extracted"
+          else
+            echo "No Allure reports found, creating placeholder"
+            mkdir -p ./public
+            cat > ./public/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Test Reports - What's the Chance?</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      margin: 0;
+                      padding: 2rem;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      min-height: 100vh;
+                  }
+                  .container {
+                      max-width: 800px;
+                      margin: 0 auto;
+                      text-align: center;
+                  }
+                  .card {
+                      background: rgba(255, 255, 255, 0.1);
+                      backdrop-filter: blur(10px);
+                      border-radius: 20px;
+                      padding: 2rem;
+                      margin: 1rem 0;
+                      border: 1px solid rgba(255, 255, 255, 0.2);
+                  }
+                  h1 {
+                      font-size: 2.5rem;
+                      margin-bottom: 1rem;
+                  }
+                  .badge {
+                      display: inline-block;
+                      padding: 0.5rem 1rem;
+                      background: rgba(34, 197, 94, 0.2);
+                      border: 1px solid rgba(34, 197, 94, 0.3);
+                      border-radius: 10px;
+                      margin: 0.5rem;
+                      font-weight: 600;
+                  }
+                  .links {
+                      display: grid;
+                      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                      gap: 1rem;
+                      margin-top: 2rem;
+                  }
+                  .link-card {
+                      background: rgba(255, 255, 255, 0.05);
+                      border-radius: 15px;
+                      padding: 1.5rem;
+                      text-decoration: none;
+                      color: white;
+                      transition: transform 0.2s, background 0.2s;
+                  }
+                  .link-card:hover {
+                      transform: translateY(-5px);
+                      background: rgba(255, 255, 255, 0.1);
+                  }
+                  .coming-soon {
+                      opacity: 0.6;
+                      font-style: italic;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="card">
+                      <h1>🧪 Test Reports</h1>
+                      <p>What's the Chance? - Comprehensive Testing Dashboard</p>
+                      
+                      <div>
+                          <span class="badge">✅ TDD Approach</span>
+                          <span class="badge">🎯 90%+ Coverage Target</span>
+                          <span class="badge">🚀 CI/CD Automated</span>
+                      </div>
+                  </div>
+                  
+                  <div class="links">
+                      <div class="link-card coming-soon">
+                          <h3>📊 Allure Test Reports</h3>
+                          <p>Comprehensive test execution reports</p>
+                          <small>Available after test runs</small>
+                      </div>
+                      
+                      <div class="link-card coming-soon">
+                          <h3>📈 Frontend Coverage</h3>
+                          <p>React/TypeScript test coverage</p>
+                          <small>Available after test runs</small>
+                      </div>
+                      
+                      <div class="link-card coming-soon">
+                          <h3>🐍 Backend Coverage</h3>
+                          <p>FastAPI/Python test coverage</p>
+                          <small>Available after test runs</small>
+                      </div>
+                      
+                      <a href="https://github.com/StavLobel/whats-the-chance-game" class="link-card">
+                          <h3>📋 Project Repository</h3>
+                          <p>Source code and documentation</p>
+                          <small>github.com/StavLobel/whats-the-chance-game</small>
+                      </a>
+                  </div>
+                  
+                  <div class="card" style="margin-top: 2rem;">
+                      <h3>🔄 Test Status</h3>
+                      <p>Tests will run automatically on every commit to main branch.</p>
+                      <p>Reports will be updated here after successful CI pipeline execution.</p>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+          fi
+          
+          # Extract coverage reports
+          if [ -f "frontend-coverage.zip" ]; then
+            mkdir -p ./public/coverage/frontend
+            unzip -q frontend-coverage.zip -d ./public/coverage/frontend/
+            echo "Frontend coverage extracted"
+          fi
+          
+          if [ -f "backend-coverage.zip" ]; then
+            mkdir -p ./public/coverage/backend
+            unzip -q backend-coverage.zip -d ./public/coverage/backend/
+            echo "Backend coverage extracted"
+          fi
+          
+          # Create index file if allure reports exist
+          if [ -d "./public/allure-report" ]; then
+            cat > ./public/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Test Reports - What's the Chance?</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      margin: 0;
+                      padding: 2rem;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      min-height: 100vh;
+                  }
+                  .container {
+                      max-width: 800px;
+                      margin: 0 auto;
+                      text-align: center;
+                  }
+                  .card {
+                      background: rgba(255, 255, 255, 0.1);
+                      backdrop-filter: blur(10px);
+                      border-radius: 20px;
+                      padding: 2rem;
+                      margin: 1rem 0;
+                      border: 1px solid rgba(255, 255, 255, 0.2);
+                  }
+                  h1 {
+                      font-size: 2.5rem;
+                      margin-bottom: 1rem;
+                  }
+                  .badge {
+                      display: inline-block;
+                      padding: 0.5rem 1rem;
+                      background: rgba(34, 197, 94, 0.2);
+                      border: 1px solid rgba(34, 197, 94, 0.3);
+                      border-radius: 10px;
+                      margin: 0.5rem;
+                      font-weight: 600;
+                  }
+                  .links {
+                      display: grid;
+                      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                      gap: 1rem;
+                      margin-top: 2rem;
+                  }
+                  .link-card {
+                      background: rgba(255, 255, 255, 0.05);
+                      border-radius: 15px;
+                      padding: 1.5rem;
+                      text-decoration: none;
+                      color: white;
+                      transition: transform 0.2s, background 0.2s;
+                  }
+                  .link-card:hover {
+                      transform: translateY(-5px);
+                      background: rgba(255, 255, 255, 0.1);
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="card">
+                      <h1>🧪 Test Reports</h1>
+                      <p>What's the Chance? - Comprehensive Testing Dashboard</p>
+                      
+                      <div>
+                          <span class="badge">✅ TDD Approach</span>
+                          <span class="badge">🎯 90%+ Coverage Target</span>
+                          <span class="badge">🚀 CI/CD Automated</span>
+                      </div>
+                  </div>
+                  
+                  <div class="links">
+                      <a href="./allure-report/" class="link-card">
+                          <h3>📊 Allure Test Reports</h3>
+                          <p>Comprehensive test execution reports</p>
+                          <small>Latest test results with detailed analytics</small>
+                      </a>
+                      
+                      <a href="./coverage/frontend/" class="link-card">
+                          <h3>📈 Frontend Coverage</h3>
+                          <p>React/TypeScript test coverage</p>
+                          <small>Vitest coverage reports</small>
+                      </a>
+                      
+                      <a href="./coverage/backend/" class="link-card">
+                          <h3>🐍 Backend Coverage</h3>
+                          <p>FastAPI/Python test coverage</p>
+                          <small>Pytest coverage reports</small>
+                      </a>
+                      
+                      <a href="https://github.com/StavLobel/whats-the-chance-game" class="link-card">
+                          <h3>📋 Project Repository</h3>
+                          <p>Source code and documentation</p>
+                          <small>github.com/StavLobel/whats-the-chance-game</small>
+                      </a>
+                  </div>
+                  
+                  <div class="card" style="margin-top: 2rem;">
+                      <h3>📊 Latest Test Summary</h3>
+                      <p>Reports updated automatically on every commit to main branch.</p>
+                      <p>Last updated: <strong id="timestamp"></strong></p>
+                  </div>
+              </div>
+              
+              <script>
+                  document.getElementById('timestamp').textContent = new Date().toLocaleString();
+              </script>
+          </body>
+          </html>
+          EOF
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: './public'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2 
