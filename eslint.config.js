@@ -38,6 +38,7 @@ export default [
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'no-unused-vars': 'off', // Disable base rule as it can report incorrect errors
       '@typescript-eslint/no-unused-vars': 'warn',
     },
   },
