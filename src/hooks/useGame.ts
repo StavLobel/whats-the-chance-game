@@ -22,16 +22,20 @@ export function useGame() {
     setLoading(true);
     setError(null);
 
-    const unsubscribe = gameService.getChallengesForUser(user.uid, 'all');
-    
-    // Note: The current implementation returns a function, but we need to handle the snapshot
-    // For now, we'll use a different approach to get challenges
     const loadChallenges = async () => {
       try {
-        // This is a temporary implementation - we'll need to modify the service
-        // to properly return challenges from the snapshot
+        // Fetch challenges from the backend API
+        const response = await fetch(`http://localhost:8000/api/challenges/test?user_id=${user.uid}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const challengesData = await response.json();
+        setChallenges(challengesData);
         setLoading(false);
       } catch (err) {
+        console.error('Failed to load challenges:', err);
         setError(err instanceof Error ? err.message : 'Failed to load challenges');
         setLoading(false);
       }
@@ -39,8 +43,11 @@ export function useGame() {
 
     loadChallenges();
 
+    // Set up periodic refresh every 30 seconds
+    const interval = setInterval(loadChallenges, 30000);
+
     return () => {
-      // Cleanup subscription when component unmounts
+      clearInterval(interval);
     };
   }, [user?.uid]);
 
@@ -151,6 +158,7 @@ export function useGame() {
   }, []);
 
   // Subscribe to real-time updates for a challenge
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const subscribeToChallenge = useCallback((challengeId: string, callback: (challenge: Challenge | null) => void) => {
     return gameService.subscribeToChallenge(challengeId, callback);
   }, []);

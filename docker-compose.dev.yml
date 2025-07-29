@@ -11,6 +11,7 @@ services:
       - /app/__pycache__
     environment:
       - ENV=development
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/firebase-service-account.json
     env_file:
       - ./backend/.env
     restart: unless-stopped
