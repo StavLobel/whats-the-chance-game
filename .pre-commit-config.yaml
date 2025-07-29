@@ -1,0 +1,106 @@
+# Pre-commit hooks configuration for whats-the-chance-game
+# Ensures code quality and linting before commits reach CI pipeline
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-case-conflict
+
+  # Frontend (TypeScript/JavaScript) checks
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: npm run lint
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+        exclude: ^(node_modules/|dist/|build/)
+        pass_filenames: false
+
+      - id: prettier
+        name: Prettier
+        entry: npm run format:check
+        language: system
+        files: \.(ts|tsx|js|jsx|json|css|md)$
+        exclude: ^(node_modules/|dist/|build/|package-lock\.json)
+        pass_filenames: false
+
+      - id: typescript
+        name: TypeScript Check
+        entry: npm run type-check
+        language: system
+        files: \.(ts|tsx)$
+        exclude: ^(node_modules/|dist/|build/)
+        pass_filenames: false
+
+  # Backend (Python) checks
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        name: Black (Python formatter)
+        files: ^backend/.*\.py$
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        name: Flake8 (Python linter)
+        files: ^backend/.*\.py$
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort (Python import sorter)
+        files: ^backend/.*\.py$
+        args: [--profile=black]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: Bandit (Python security checker)
+        files: ^backend/.*\.py$
+        exclude: ^backend/tests/
+        args: [-ll]
+
+  # Python type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.4.1
+    hooks:
+      - id: mypy
+        name: MyPy (Python type checker)
+        files: ^backend/.*\.py$
+        exclude: ^backend/tests/
+        additional_dependencies: [types-requests, pydantic]
+
+  # Commit message validation
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v2.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--strict]
+
+# Configuration for specific hooks
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false 

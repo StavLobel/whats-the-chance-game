@@ -1,3 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
-npm run pre-commit
+
+# Run pre-commit hooks on staged files (fast and comprehensive)
+python3 -m pre_commit run

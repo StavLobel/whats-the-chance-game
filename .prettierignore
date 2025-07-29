@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Cache directories
+.cache/
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Test results
+allure-results/
+allure-report/
+reports/
+
+# Lock files
+package-lock.json
+yarn.lock
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+
+# Docker
+.dockerignore
+
+# Backup files
+*.bak
+*.tmp
+*.temp
+
+# Documentation that should maintain specific formatting
+CHANGELOG.md 
