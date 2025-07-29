@@ -22,6 +22,8 @@ from app.schemas.game_stats import (
     GameStatsUpdate,
     GlobalGameStats,
     NumberStats,
+    PlayerInteraction,
+    PlayerPair,
     RangeStats,
     UserGameStats,
 )
@@ -494,3 +496,184 @@ class TestGameStatsValidation:
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
             )
+
+
+class TestSocialStatistics:
+    """Test social statistics functionality."""
+
+    @pytest.mark.unit
+    def test_player_interaction_valid(self):
+        """Test valid player interaction creation."""
+        player_interaction = PlayerInteraction(
+            user_id="user123",
+            username="testuser",
+            first_name="Test",
+            last_name="User",
+            total_challenges_received=25,
+            total_challenges_sent=15,
+            total_interactions=40,
+            last_interaction=datetime.utcnow(),
+        )
+
+        assert player_interaction.user_id == "user123"
+        assert player_interaction.username == "testuser"
+        assert player_interaction.total_interactions == 40
+        assert player_interaction.total_challenges_received == 25
+        assert player_interaction.total_challenges_sent == 15
+
+    @pytest.mark.unit
+    def test_player_pair_valid(self):
+        """Test valid player pair creation."""
+        player_pair = PlayerPair(
+            user1_id="user1",
+            user1_username="user1name",
+            user2_id="user2",
+            user2_username="user2name",
+            total_challenges_between=10,
+            challenges_from_user1=6,
+            challenges_from_user2=4,
+            matches_between=3,
+            success_rate=0.3,
+            last_challenge=datetime.utcnow(),
+        )
+
+        assert player_pair.user1_id == "user1"
+        assert player_pair.user2_id == "user2"
+        assert player_pair.total_challenges_between == 10
+        assert player_pair.matches_between == 3
+        assert player_pair.success_rate == 0.3
+
+    @pytest.mark.unit
+    async def test_get_most_challenged_players_success(
+        self, game_stats_service, mock_firebase_service
+    ):
+        """Test successful most challenged players retrieval."""
+        mock_players = [
+            {
+                "user_id": "user1",
+                "username": "user1name",
+                "first_name": "User",
+                "last_name": "One",
+                "total_challenges_received": 30,
+                "total_challenges_sent": 20,
+                "total_interactions": 50,
+                "last_interaction": datetime.utcnow(),
+            },
+            {
+                "user_id": "user2",
+                "username": "user2name",
+                "first_name": "User",
+                "last_name": "Two",
+                "total_challenges_received": 25,
+                "total_challenges_sent": 15,
+                "total_interactions": 40,
+                "last_interaction": datetime.utcnow(),
+            },
+        ]
+        mock_firebase_service.query_documents.return_value = mock_players
+
+        result = await game_stats_service.get_most_challenged_players(limit=5)
+
+        assert len(result) == 2
+        assert result[0].user_id == "user1"
+        assert result[0].total_interactions == 50
+        assert result[1].user_id == "user2"
+        assert result[1].total_interactions == 40
+
+    @pytest.mark.unit
+    async def test_get_most_active_player_pairs_success(
+        self, game_stats_service, mock_firebase_service
+    ):
+        """Test successful most active player pairs retrieval."""
+        mock_pairs = [
+            {
+                "user1_id": "user1",
+                "user1_username": "user1name",
+                "user2_id": "user2",
+                "user2_username": "user2name",
+                "total_challenges_between": 15,
+                "challenges_from_user1": 8,
+                "challenges_from_user2": 7,
+                "matches_between": 5,
+                "success_rate": 0.33,
+                "last_challenge": datetime.utcnow(),
+            },
+            {
+                "user1_id": "user3",
+                "user1_username": "user3name",
+                "user2_id": "user4",
+                "user2_username": "user4name",
+                "total_challenges_between": 12,
+                "challenges_from_user1": 6,
+                "challenges_from_user2": 6,
+                "matches_between": 4,
+                "success_rate": 0.33,
+                "last_challenge": datetime.utcnow(),
+            },
+        ]
+        mock_firebase_service.query_documents.return_value = mock_pairs
+
+        result = await game_stats_service.get_most_active_player_pairs(limit=5)
+
+        assert len(result) == 2
+        assert result[0].user1_id == "user1"
+        assert result[0].user2_id == "user2"
+        assert result[0].total_challenges_between == 15
+        assert result[1].user1_id == "user3"
+        assert result[1].user2_id == "user4"
+        assert result[1].total_challenges_between == 12
+
+    @pytest.mark.unit
+    async def test_get_user_friends_activity_success(
+        self, game_stats_service, mock_firebase_service
+    ):
+        """Test successful user friends activity retrieval."""
+        mock_pairs = [
+            {
+                "user1_id": "user1",
+                "user1_username": "user1name",
+                "user2_id": "user2",
+                "user2_username": "user2name",
+                "total_challenges_between": 10,
+                "challenges_from_user1": 6,
+                "challenges_from_user2": 4,
+                "matches_between": 3,
+                "success_rate": 0.3,
+                "last_challenge": datetime.utcnow(),
+            },
+        ]
+        mock_firebase_service.query_documents_multiple.return_value = mock_pairs
+
+        result = await game_stats_service.get_user_friends_activity("user1", limit=5)
+
+        assert len(result) == 1
+        assert result[0].user1_id == "user1"
+        assert result[0].user2_id == "user2"
+        assert result[0].total_challenges_between == 10
+
+    @pytest.mark.unit
+    async def test_get_user_challenge_recipients_success(
+        self, game_stats_service, mock_firebase_service
+    ):
+        """Test successful user challenge recipients retrieval."""
+        mock_challenges = [
+            {"from_user": "user1", "to_user": "user2"},
+            {"from_user": "user1", "to_user": "user2"},
+            {"from_user": "user1", "to_user": "user3"},
+        ]
+        mock_firebase_service.query_documents.return_value = mock_challenges
+        mock_firebase_service.get_document.return_value = {
+            "user_id": "user2",
+            "username": "user2name",
+            "total_challenges_received": 2,
+            "total_challenges_sent": 0,
+            "total_interactions": 2,
+        }
+
+        result = await game_stats_service.get_user_challenge_recipients(
+            "user1", limit=5
+        )
+
+        assert len(result) == 2  # user2 (2 challenges) and user3 (1 challenge)
+        assert result[0].user_id == "user2"
+        assert result[0].total_challenges_received == 2

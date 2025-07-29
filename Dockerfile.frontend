@@ -1,0 +1,18 @@
+# Development Dockerfile for React Frontend
+FROM node:20-alpine
+
+# Set work directory
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy project files
+COPY . .
+
+# Expose port
+EXPOSE 8080
+
+# Run development server with hot reload
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"] 

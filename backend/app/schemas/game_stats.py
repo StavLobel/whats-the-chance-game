@@ -45,7 +45,9 @@ class ChallengeResult(BaseModel):
     )
 
     # Results
-    result: str = Field(..., regex="^(match|no_match)$", description="Challenge result")
+    result: str = Field(
+        ..., pattern="^(match|no_match)$", description="Challenge result"
+    )
     winner: Optional[str] = Field(None, description="User ID of winner (if match)")
 
     # Timestamps
@@ -134,6 +136,54 @@ class UserGameStats(BaseModel):
     updated_at: datetime = Field(..., description="Last update timestamp")
 
 
+class PlayerInteraction(BaseModel):
+    """Schema for player interaction statistics."""
+
+    user_id: str = Field(..., description="User ID")
+    username: Optional[str] = Field(None, description="User's username")
+    first_name: Optional[str] = Field(None, description="User's first name")
+    last_name: Optional[str] = Field(None, description="User's last name")
+    total_challenges_received: int = Field(
+        ..., ge=0, description="Total challenges received from others"
+    )
+    total_challenges_sent: int = Field(
+        ..., ge=0, description="Total challenges sent to others"
+    )
+    total_interactions: int = Field(
+        ..., ge=0, description="Total interactions (sent + received)"
+    )
+    last_interaction: Optional[datetime] = Field(
+        None, description="Last interaction timestamp"
+    )
+
+
+class PlayerPair(BaseModel):
+    """Schema for player pair interaction statistics."""
+
+    user1_id: str = Field(..., description="First user ID")
+    user1_username: Optional[str] = Field(None, description="First user's username")
+    user2_id: str = Field(..., description="Second user ID")
+    user2_username: Optional[str] = Field(None, description="Second user's username")
+    total_challenges_between: int = Field(
+        ..., ge=0, description="Total challenges between these two users"
+    )
+    challenges_from_user1: int = Field(
+        ..., ge=0, description="Challenges sent from user1 to user2"
+    )
+    challenges_from_user2: int = Field(
+        ..., ge=0, description="Challenges sent from user2 to user1"
+    )
+    matches_between: int = Field(
+        ..., ge=0, description="Total matches between these users"
+    )
+    success_rate: float = Field(
+        ..., ge=0.0, le=1.0, description="Success rate between these users"
+    )
+    last_challenge: Optional[datetime] = Field(
+        None, description="Last challenge between these users"
+    )
+
+
 class GlobalGameStats(BaseModel):
     """Schema for global game statistics and analytics."""
 
@@ -155,6 +205,14 @@ class GlobalGameStats(BaseModel):
     # Most popular ranges
     most_used_ranges: List[RangeStats] = Field(
         ..., description="Top 10 most used ranges"
+    )
+
+    # Social statistics
+    most_challenged_players: List[PlayerInteraction] = Field(
+        ..., description="Top 10 most challenged players"
+    )
+    most_active_player_pairs: List[PlayerPair] = Field(
+        ..., description="Top 10 most active player pairs"
     )
 
     # Success rates
@@ -197,7 +255,9 @@ class GameStatsUpdate(BaseModel):
 
     user_id: Optional[str] = Field(None, description="User ID to update stats for")
     stats_type: str = Field(
-        ..., regex="^(user|global|number|range)$", description="Type of stats to update"
+        ...,
+        pattern="^(user|global|number|range)$",
+        description="Type of stats to update",
     )
     data: Dict[str, Any] = Field(..., description="Statistics data to update")
 
@@ -208,12 +268,12 @@ class GameStatsQuery(BaseModel):
     user_id: Optional[str] = Field(None, description="User ID to get stats for")
     stats_type: str = Field(
         ...,
-        regex="^(user|global|number|range|challenge)$",
+        pattern="^(user|global|number|range|challenge)$",
         description="Type of stats to query",
     )
     time_range: Optional[str] = Field(
         None,
-        regex="^(today|week|month|year|all)$",
+        pattern="^(today|week|month|year|all)$",
         description="Time range for statistics",
     )
     limit: Optional[int] = Field(

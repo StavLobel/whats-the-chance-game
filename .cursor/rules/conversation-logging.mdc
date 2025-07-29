@@ -38,6 +38,12 @@ Track all conversations and interactions with the AI agent for project developme
 - When significant decisions are made
 - At the end of each development session
 
+## Update Process
+- **Background Updates**: All log updates should be performed in the background without interrupting the main conversation flow
+- **Non-blocking**: Log updates should not delay or interfere with user interactions
+- **Automatic**: Updates should happen automatically without requiring explicit user acknowledgment
+- **Seamless**: The logging process should be invisible to the user experience
+
 ## Content Structure
 1. Session overview with date and focus
 2. Key interactions in chronological order

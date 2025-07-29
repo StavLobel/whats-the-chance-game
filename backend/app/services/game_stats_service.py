@@ -20,6 +20,8 @@ from app.schemas.game_stats import (
     GameStatsUpdate,
     GlobalGameStats,
     NumberStats,
+    PlayerInteraction,
+    PlayerPair,
     RangeStats,
     UserGameStats,
 )
@@ -269,6 +271,10 @@ class GameStatsService:
             await self._update_number_stats(challenge_result)
             await self._update_range_stats(challenge_result)
 
+            # Update social statistics
+            await self._update_player_interactions(challenge_result)
+            await self._update_player_pairs(challenge_result)
+
         except Exception as e:
             logger.error(f"Failed to update global stats: {e}")
 
@@ -479,4 +485,249 @@ class GameStatsService:
 
         except Exception as e:
             logger.error(f"Failed to get challenge history for {user_id}: {e}")
+            return []
+
+    async def _update_player_interactions(
+        self, challenge_result: ChallengeResult
+    ) -> None:
+        """Update player interaction statistics."""
+        try:
+            # Update from_user interactions
+            await self._update_single_player_interaction(
+                challenge_result.from_user, challenge_result, is_sender=True
+            )
+
+            # Update to_user interactions
+            await self._update_single_player_interaction(
+                challenge_result.to_user, challenge_result, is_sender=False
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to update player interactions: {e}")
+
+    async def _update_single_player_interaction(
+        self, user_id: str, challenge_result: ChallengeResult, is_sender: bool
+    ) -> None:
+        """Update interaction statistics for a single player."""
+        try:
+            # Get existing player interaction stats or create new ones
+            interaction_doc = await self.firebase.get_document(
+                "player_interactions", user_id
+            )
+
+            if interaction_doc:
+                stats = interaction_doc
+            else:
+                # Create new player interaction stats
+                stats = {
+                    "user_id": user_id,
+                    "username": None,
+                    "first_name": None,
+                    "last_name": None,
+                    "total_challenges_received": 0,
+                    "total_challenges_sent": 0,
+                    "total_interactions": 0,
+                    "last_interaction": None,
+                }
+
+            # Update stats based on whether user is sender or receiver
+            if is_sender:
+                stats["total_challenges_sent"] += 1
+            else:
+                stats["total_challenges_received"] += 1
+
+            # Update total interactions
+            stats["total_interactions"] = (
+                stats["total_challenges_sent"] + stats["total_challenges_received"]
+            )
+
+            # Update last interaction
+            stats["last_interaction"] = challenge_result.completed_at
+
+            # Save updated stats
+            await self.firebase.update_document("player_interactions", user_id, stats)
+
+        except Exception as e:
+            logger.error(f"Failed to update player interaction for {user_id}: {e}")
+
+    async def _update_player_pairs(self, challenge_result: ChallengeResult) -> None:
+        """Update player pair interaction statistics."""
+        try:
+            # Create a consistent pair key (alphabetical order)
+            user1_id = min(challenge_result.from_user, challenge_result.to_user)
+            user2_id = max(challenge_result.from_user, challenge_result.to_user)
+            pair_key = f"{user1_id}_{user2_id}"
+
+            # Get existing pair stats or create new ones
+            pair_doc = await self.firebase.get_document("player_pairs", pair_key)
+
+            if pair_doc:
+                stats = pair_doc
+            else:
+                # Create new player pair stats
+                stats = {
+                    "user1_id": user1_id,
+                    "user1_username": None,
+                    "user2_id": user2_id,
+                    "user2_username": None,
+                    "total_challenges_between": 0,
+                    "challenges_from_user1": 0,
+                    "challenges_from_user2": 0,
+                    "matches_between": 0,
+                    "success_rate": 0.0,
+                    "last_challenge": None,
+                }
+
+            # Update challenge counts
+            stats["total_challenges_between"] += 1
+
+            if challenge_result.from_user == user1_id:
+                stats["challenges_from_user1"] += 1
+            else:
+                stats["challenges_from_user2"] += 1
+
+            # Update match count
+            if challenge_result.result == "match":
+                stats["matches_between"] += 1
+
+            # Calculate success rate
+            if stats["total_challenges_between"] > 0:
+                stats["success_rate"] = (
+                    stats["matches_between"] / stats["total_challenges_between"]
+                )
+
+            # Update last challenge
+            stats["last_challenge"] = challenge_result.completed_at
+
+            # Save updated stats
+            await self.firebase.update_document("player_pairs", pair_key, stats)
+
+        except Exception as e:
+            logger.error(f"Failed to update player pairs: {e}")
+
+    async def get_most_challenged_players(
+        self, limit: int = 10
+    ) -> List[PlayerInteraction]:
+        """Get most challenged players (most interactions)."""
+        try:
+            # Query player_interactions collection
+            players = await self.firebase.query_documents(
+                "player_interactions", "total_interactions", ">", 0
+            )
+
+            if not players:
+                return []
+
+            # Sort by total interactions (descending)
+            players.sort(key=lambda x: x.get("total_interactions", 0), reverse=True)
+
+            # Return top N results
+            return [PlayerInteraction(**player) for player in players[:limit]]
+
+        except Exception as e:
+            logger.error(f"Failed to get most challenged players: {e}")
+            return []
+
+    async def get_most_active_player_pairs(self, limit: int = 10) -> List[PlayerPair]:
+        """Get most active player pairs."""
+        try:
+            # Query player_pairs collection
+            pairs = await self.firebase.query_documents(
+                "player_pairs", "total_challenges_between", ">", 0
+            )
+
+            if not pairs:
+                return []
+
+            # Sort by total challenges between players (descending)
+            pairs.sort(key=lambda x: x.get("total_challenges_between", 0), reverse=True)
+
+            # Return top N results
+            return [PlayerPair(**pair) for pair in pairs[:limit]]
+
+        except Exception as e:
+            logger.error(f"Failed to get most active player pairs: {e}")
+            return []
+
+    async def get_user_friends_activity(
+        self, user_id: str, limit: int = 10
+    ) -> List[PlayerPair]:
+        """Get activity between a user and their friends."""
+        try:
+            # Query player_pairs where user is involved
+            pairs = await self.firebase.query_documents_multiple(
+                "player_pairs",
+                [
+                    {"field": "user1_id", "operator": "==", "value": user_id},
+                    {"field": "user2_id", "operator": "==", "value": user_id},
+                ],
+            )
+
+            if not pairs:
+                return []
+
+            # Sort by total challenges between players (descending)
+            pairs.sort(key=lambda x: x.get("total_challenges_between", 0), reverse=True)
+
+            # Return limited results
+            return [PlayerPair(**pair) for pair in pairs[:limit]]
+
+        except Exception as e:
+            logger.error(f"Failed to get user friends activity for {user_id}: {e}")
+            return []
+
+    async def get_user_challenge_recipients(
+        self, user_id: str, limit: int = 10
+    ) -> List[PlayerInteraction]:
+        """Get users that a specific user challenges most often."""
+        try:
+            # Query challenge_results to find recipients
+            challenges = await self.firebase.query_documents(
+                "challenge_results", "from_user", "==", user_id
+            )
+
+            if not challenges:
+                return []
+
+            # Count challenges to each recipient
+            recipient_counts = {}
+            for challenge in challenges:
+                recipient_id = challenge.get("to_user")
+                if recipient_id:
+                    recipient_counts[recipient_id] = (
+                        recipient_counts.get(recipient_id, 0) + 1
+                    )
+
+            # Get recipient details and create PlayerInteraction objects
+            recipients = []
+            for recipient_id, count in sorted(
+                recipient_counts.items(), key=lambda x: x[1], reverse=True
+            ):
+                # Get recipient interaction stats
+                recipient_stats = await self.firebase.get_document(
+                    "player_interactions", recipient_id
+                )
+
+                if recipient_stats:
+                    recipient_stats["total_challenges_received"] = count
+                    recipient_stats["total_interactions"] = count
+                    recipients.append(PlayerInteraction(**recipient_stats))
+                else:
+                    # Create basic stats if not found
+                    basic_stats = {
+                        "user_id": recipient_id,
+                        "username": None,
+                        "first_name": None,
+                        "last_name": None,
+                        "total_challenges_received": count,
+                        "total_challenges_sent": 0,
+                        "total_interactions": count,
+                        "last_interaction": None,
+                    }
+                    recipients.append(PlayerInteraction(**basic_stats))
+
+            return recipients[:limit]
+
+        except Exception as e:
+            logger.error(f"Failed to get user challenge recipients for {user_id}: {e}")
             return []

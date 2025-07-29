@@ -8,8 +8,8 @@
  */
 
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 import { getMessaging, isSupported } from 'firebase/messaging';
 
 // Firebase configuration
@@ -43,17 +43,17 @@ if (typeof window !== 'undefined') {
 
 export { messaging };
 
-// Connect to emulators in development
-if (import.meta.env.DEV) {
-  try {
-    // Connect to Auth emulator
-    connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+// Connect to emulators in development (disabled for now)
+// if (import.meta.env.DEV) {
+//   try {
+//     // Connect to Auth emulator
+//     connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
 
-    // Connect to Firestore emulator
-    connectFirestoreEmulator(db, 'localhost', 8080);
-  } catch (error) {
-    console.log('Firebase emulators not available, using production services');
-  }
-}
+//     // Connect to Firestore emulator
+//     connectFirestoreEmulator(db, 'localhost', 8080);
+//   } catch (error) {
+//     console.log('Firebase emulators not available, using production services');
+//   }
+// }
 
 export default app;

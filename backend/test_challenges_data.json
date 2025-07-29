@@ -1,0 +1,339 @@
+[
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Who's got better luck? Let's test it!",
+    "status": "pending",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "משחק ניחוש מספרים פשוט!",
+    "status": "pending",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Let's try our luck with numbers!",
+    "status": "pending",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "אני מתערב שאתה לא יכול לנחש את המספר שלי!",
+    "status": "pending",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Who's got better luck? Let's test it!",
+    "status": "pending",
+    "language": "english"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "A friendly number guessing challenge!",
+    "status": "accepted",
+    "range": {
+      "min": 10,
+      "max": 20,
+      "name": "Tight (10-20)"
+    },
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "אני מאתגר אותך למשחק ניחוש מספרים!",
+    "status": "accepted",
+    "range": {
+      "min": 1,
+      "max": 100,
+      "name": "Hard (1-100)"
+    },
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Think you can match my number? Let's find out!",
+    "status": "accepted",
+    "range": {
+      "min": 1,
+      "max": 50,
+      "name": "Medium-Hard (1-50)"
+    },
+    "language": "english"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Can you guess what number I'm thinking?",
+    "status": "active",
+    "range": {
+      "min": 1,
+      "max": 25,
+      "name": "Medium (1-25)"
+    },
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "אני מתערב שאתה לא יכול לנחש את המספר שלי!",
+    "status": "active",
+    "range": {
+      "min": 10,
+      "max": 20,
+      "name": "Tight (10-20)"
+    },
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Who's got better luck? Let's test it!",
+    "status": "active",
+    "range": {
+      "min": 1,
+      "max": 50,
+      "name": "Medium-Hard (1-50)"
+    },
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "בואו ננסה את המזל שלנו עם מספרים!",
+    "status": "active",
+    "range": {
+      "min": 1,
+      "max": 100,
+      "name": "Hard (1-100)"
+    },
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "I challenge you to a number guessing game!",
+    "status": "completed",
+    "range": {
+      "min": 5,
+      "max": 15,
+      "name": "Narrow (5-15)"
+    },
+    "numbers": {
+      "from_user": 15,
+      "to_user": 15
+    },
+    "result": "match",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "בואו נראה מי יכול לנחש את המספר המזל!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 10,
+      "name": "Easy (1-10)"
+    },
+    "numbers": {
+      "from_user": 10,
+      "to_user": 10
+    },
+    "result": "match",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Let's try our luck with numbers!",
+    "status": "completed",
+    "range": {
+      "min": 10,
+      "max": 20,
+      "name": "Tight (10-20)"
+    },
+    "numbers": {
+      "from_user": 20,
+      "to_user": 20
+    },
+    "result": "match",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "אתה יכול לנחש איזה מספר אני חושב?",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 50,
+      "name": "Medium-Hard (1-50)"
+    },
+    "numbers": {
+      "from_user": 8,
+      "to_user": 8
+    },
+    "result": "match",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Who's got better luck? Let's test it!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 10,
+      "name": "Easy (1-10)"
+    },
+    "numbers": {
+      "from_user": 8,
+      "to_user": 8
+    },
+    "result": "match",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "בואו נראה מי יותר אינטואיטיבי!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 25,
+      "name": "Medium (1-25)"
+    },
+    "numbers": {
+      "from_user": 13,
+      "to_user": 13
+    },
+    "result": "match",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "A simple number guessing game!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 100,
+      "name": "Hard (1-100)"
+    },
+    "numbers": {
+      "from_user": 3,
+      "to_user": 13
+    },
+    "result": "no_match",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "למי יש יותר מזל? בואו נבדוק!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 10,
+      "name": "Easy (1-10)"
+    },
+    "numbers": {
+      "from_user": 1,
+      "to_user": 6
+    },
+    "result": "no_match",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "I challenge you to a number guessing game!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 10,
+      "name": "Easy (1-10)"
+    },
+    "numbers": {
+      "from_user": 1,
+      "to_user": 9
+    },
+    "result": "no_match",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "אני מתערב שאתה לא יכול לנחש את המספר שלי!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 50,
+      "name": "Medium-Hard (1-50)"
+    },
+    "numbers": {
+      "from_user": 16,
+      "to_user": 37
+    },
+    "result": "no_match",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "I challenge you to a number guessing game!",
+    "status": "completed",
+    "range": {
+      "min": 1,
+      "max": 10,
+      "name": "Easy (1-10)"
+    },
+    "numbers": {
+      "from_user": 2,
+      "to_user": 9
+    },
+    "result": "no_match",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "למי יש יותר מזל? בואו נבדוק!",
+    "status": "completed",
+    "range": {
+      "min": 10,
+      "max": 20,
+      "name": "Tight (10-20)"
+    },
+    "numbers": {
+      "from_user": 11,
+      "to_user": 19
+    },
+    "result": "no_match",
+    "language": "hebrew"
+  },
+  {
+    "from_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "to_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "description": "Let's try our luck with numbers!",
+    "status": "rejected",
+    "language": "english"
+  },
+  {
+    "from_user": "ZYWaZCihaeXcId5EW0ht2HAHTCq1",
+    "to_user": "6Op1SrQJdyVpHAo419YyUwT9NOo2",
+    "description": "מוכן לבדוק את המזל שלך?",
+    "status": "rejected",
+    "language": "hebrew"
+  }
+]

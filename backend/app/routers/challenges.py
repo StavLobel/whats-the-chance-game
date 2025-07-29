@@ -33,6 +33,248 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/fast-test")
+async def fast_test_challenges():
+    """
+    Fast test endpoint that returns challenges without user lookups.
+    """
+    import time
+
+    start_time = time.time()
+
+    try:
+        logger.info("fast_test_challenges called")
+        logger.info(f"fast_test_challenges - starting at {start_time}")
+
+        challenges = await firebase_service.get_collection("challenges")
+        logger.info(
+            f"fast_test_challenges - got challenges from firebase at {time.time() - start_time:.2f}s"
+        )
+
+        result = []
+        for i, challenge in enumerate(challenges):
+            try:
+                logger.info(
+                    f"fast_test_challenges - processing challenge {i+1}/{len(challenges)} at {time.time() - start_time:.2f}s"
+                )
+
+                # Use shortened UIDs directly without user lookups
+                from_user_display = challenge["from_user"][:8] + "..."
+                to_user_display = challenge["to_user"][:8] + "..."
+
+                result.append(
+                    {
+                        "id": challenge["id"],
+                        "description": challenge["description"],
+                        "from_user": from_user_display,
+                        "to_user": to_user_display,
+                        "status": challenge["status"],
+                        "created_at": challenge["created_at"],
+                        "updated_at": challenge["updated_at"],
+                        "result": challenge.get("result"),
+                        "resolved_at": challenge.get("resolved_at"),
+                    }
+                )
+            except Exception as e:
+                logger.warning(f"Failed to parse challenge {challenge.get('id')}: {e}")
+                continue
+
+        logger.info(
+            f"fast_test_challenges - finished processing at {time.time() - start_time:.2f}s"
+        )
+        logger.info(f"fast_test_challenges returning {len(result)} challenges")
+        return result
+
+    except Exception as e:
+        logger.error(f"Error getting fast test challenges: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve fast test challenges",
+        )
+
+
+@router.get("/simple-test")
+async def simple_test():
+    """
+    Simple test endpoint that returns minimal data.
+    """
+    return {"message": "Hello from backend", "timestamp": "2025-01-27"}
+
+
+@router.get("/test", response_model=List[Challenge])
+async def test_challenges(
+    user_id: Optional[str] = Query(None, description="Filter by user ID")
+):
+    """
+    Test endpoint to get all challenges without authentication.
+    This is for debugging purposes only.
+    """
+    import time
+
+    start_time = time.time()
+
+    try:
+        logger.info(f"test_challenges called with user_id: {user_id}")
+        logger.info(f"test_challenges - starting at {start_time}")
+
+        challenges = await firebase_service.get_collection("challenges")
+        logger.info(
+            f"test_challenges - got challenges from firebase at {time.time() - start_time:.2f}s"
+        )
+
+        result = []
+        for i, challenge in enumerate(challenges):
+            try:
+                logger.info(
+                    f"test_challenges - processing challenge {i+1}/{len(challenges)} at {time.time() - start_time:.2f}s"
+                )
+
+                # Get user information for display names (with timeout)
+                from_user_display = challenge["from_user"][:8] + "..."
+                to_user_display = challenge["to_user"][:8] + "..."
+
+                # Try to get user info but don't block if it fails
+                try:
+                    from_user_info = await firebase_service.get_user_by_uid(
+                        challenge["from_user"]
+                    )
+                    if from_user_info and from_user_info.get("display_name"):
+                        from_user_display = from_user_info.get("display_name")
+                    elif from_user_info and from_user_info.get("email"):
+                        from_user_display = from_user_info.get("email", "").split("@")[
+                            0
+                        ]
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to get from_user info for {challenge['from_user']}: {e}"
+                    )
+
+                try:
+                    to_user_info = await firebase_service.get_user_by_uid(
+                        challenge["to_user"]
+                    )
+                    if to_user_info and to_user_info.get("display_name"):
+                        to_user_display = to_user_info.get("display_name")
+                    elif to_user_info and to_user_info.get("email"):
+                        to_user_display = to_user_info.get("email", "").split("@")[0]
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to get to_user info for {challenge['to_user']}: {e}"
+                    )
+
+                result.append(
+                    Challenge(
+                        id=challenge["id"],
+                        description=challenge["description"],
+                        from_user=from_user_display,  # Use display name instead of UID
+                        to_user=to_user_display,  # Use display name instead of UID
+                        status=challenge["status"],
+                        created_at=challenge["created_at"],
+                        updated_at=challenge["updated_at"],
+                        result=challenge.get("result"),
+                        resolved_at=challenge.get("resolved_at"),
+                    )
+                )
+            except Exception as e:
+                logger.warning(f"Failed to parse challenge {challenge.get('id')}: {e}")
+                continue
+
+        logger.info(
+            f"test_challenges - finished processing at {time.time() - start_time:.2f}s"
+        )
+        logger.info(f"test_challenges returning {len(result)} challenges")
+        return result
+
+    except Exception as e:
+        logger.error(f"Error getting test challenges: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve test challenges",
+        )
+
+
+@router.get("/", response_model=List[Challenge])
+async def get_challenges(
+    user_id: Optional[str] = Query(None, description="Filter by user ID"),
+    type: Optional[str] = Query(
+        None, description="Filter by type (incoming/outgoing/all)"
+    ),
+    status_filter: Optional[str] = Query(
+        None, description="Filter by challenge status"
+    ),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    current_user: dict = CurrentUser,
+):
+    """
+    Get challenges with optional filtering.
+
+    Args:
+        user_id: Optional user ID to filter challenges
+        type: Type of challenges to return (incoming/outgoing/all)
+        status_filter: Optional status filter
+        page: Page number for pagination
+        per_page: Items per page
+        current_user: Current authenticated user
+
+    Returns:
+        List of challenges matching the criteria
+    """
+    try:
+        # If user_id is provided, use the existing user-specific endpoint logic
+        if user_id:
+            return await get_user_challenges(
+                user_id=user_id,
+                status_filter=status_filter,
+                page=page,
+                per_page=per_page,
+                current_user=current_user,
+            )
+
+        # Otherwise, get all challenges (for admin or general listing)
+        # This is a simplified version - in production you might want more restrictions
+        challenges = await firebase_service.get_collection("challenges")
+
+        # Apply basic filtering
+        if status_filter:
+            challenges = [c for c in challenges if c.get("status") == status_filter]
+
+        # Apply pagination
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        challenges = challenges[start_idx:end_idx]
+
+        # Convert to Challenge schema
+        result = []
+        for challenge in challenges:
+            try:
+                result.append(
+                    Challenge(
+                        id=challenge["id"],
+                        description=challenge["description"],
+                        from_user=challenge["from_user"],
+                        to_user=challenge["to_user"],
+                        status=challenge["status"],
+                        created_at=challenge["created_at"],
+                        updated_at=challenge["updated_at"],
+                        result=challenge.get("result"),
+                        resolved_at=challenge.get("resolved_at"),
+                    )
+                )
+            except Exception as e:
+                logger.warning(f"Failed to parse challenge {challenge.get('id')}: {e}")
+                continue
+
+        return result
+
+    except Exception as e:
+        logger.error(f"Error getting challenges: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve challenges",
+        )
+
+
 @router.post("/", response_model=Challenge, status_code=status.HTTP_201_CREATED)
 async def create_challenge(
     challenge_data: ChallengeCreate,
@@ -401,21 +643,18 @@ async def get_user_challenges(
                 detail="Access denied to other users' challenges",
             )
 
-        # Build query filters
-        filters = [
-            {"field": "from_user", "operator": "==", "value": user_id},
-        ]
+        # Get all challenges and filter in Python (simpler approach)
+        all_challenges = await firebase_service.get_collection("challenges")
 
-        # Add status filter if provided
-        if status_filter:
-            filters.append(
-                {"field": "status", "operator": "==", "value": status_filter}
-            )
-
-        # Query challenges from Firestore
-        challenges = await firebase_service.query_documents_multiple(
-            "challenges", filters
-        )
+        # Filter challenges for this user (both as from_user and to_user)
+        challenges = []
+        for challenge in all_challenges:
+            if (
+                challenge.get("from_user") == user_id
+                or challenge.get("to_user") == user_id
+            ):
+                if not status_filter or challenge.get("status") == status_filter:
+                    challenges.append(challenge)
 
         # Apply pagination
         start_idx = (page - 1) * per_page

@@ -226,6 +226,27 @@ class FirebaseService:
             )
             return False
 
+    async def get_collection(self, collection_name: str) -> List[Dict[str, Any]]:
+        """
+        Get all documents from a Firestore collection.
+
+        Args:
+            collection_name: Name of the collection
+
+        Returns:
+            List of documents with their IDs
+        """
+        try:
+            collection = self._get_collection(collection_name)
+            docs = collection.stream()
+            result = []
+            for doc in docs:
+                result.append({"id": doc.id, **doc.to_dict()})
+            return result
+        except Exception as e:
+            logger.error(f"Failed to get collection {collection_name}: {e}")
+            return []
+
     async def query_documents(
         self, collection_name: str, field: str, operator: str, value: Any
     ) -> List[Dict[str, Any]]:
@@ -384,4 +405,5 @@ class FirebaseService:
             return False
 
 
-# Firebase service will be initialized when needed
+# Global Firebase service instance
+firebase_service = FirebaseService()

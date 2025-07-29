@@ -73,13 +73,13 @@ class ChallengeResponse(BaseModel):
 class ChallengeUpdate(BaseModel):
     """Schema for updating challenge status."""
 
-    status: str = Field(..., regex="^(pending|accepted|rejected|active|completed)$")
+    status: str = Field(..., pattern="^(pending|accepted|rejected|active|completed)$")
     range: Optional[ChallengeRange] = Field(
         None, description="Number range (if accepted)"
     )
     numbers: Optional[ChallengeNumbers] = Field(None, description="Submitted numbers")
     result: Optional[str] = Field(
-        None, regex="^(match|no_match)$", description="Challenge result"
+        None, pattern="^(match|no_match)$", description="Challenge result"
     )
 
 

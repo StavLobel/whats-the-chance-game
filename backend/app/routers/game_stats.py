@@ -25,6 +25,8 @@ from app.schemas.game_stats import (
     GameStatsUpdate,
     GlobalGameStats,
     NumberStats,
+    PlayerInteraction,
+    PlayerPair,
     RangeStats,
     UserGameStats,
 )
@@ -366,10 +368,22 @@ async def get_analytics_summary(
         top_numbers = await game_stats_service.get_top_numbers(5, by_usage=True)
         top_ranges = await game_stats_service.get_top_ranges(5)
 
+        # Get social statistics
+        most_challenged_players = await game_stats_service.get_most_challenged_players(
+            5
+        )
+        most_active_pairs = await game_stats_service.get_most_active_player_pairs(5)
+
         summary = {
             "global_stats": global_stats.dict() if global_stats else None,
             "top_numbers": [num.dict() for num in top_numbers],
             "top_ranges": [range_data.dict() for range_data in top_ranges],
+            "social_stats": {
+                "most_challenged_players": [
+                    player.dict() for player in most_challenged_players
+                ],
+                "most_active_pairs": [pair.dict() for pair in most_active_pairs],
+            },
             "timestamp": datetime.utcnow().isoformat(),
         }
 
@@ -377,4 +391,145 @@ async def get_analytics_summary(
 
     except Exception as e:
         logger.error(f"Failed to get analytics summary: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/social/most-challenged", response_model=List[PlayerInteraction])
+async def get_most_challenged_players(
+    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    game_stats_service: GameStatsService = Depends(get_game_stats_service),
+):
+    """
+    Get most challenged players (most interactions).
+
+    Args:
+        limit: Number of results to return (1-100)
+        game_stats_service: Game statistics service
+
+    Returns:
+        List[PlayerInteraction]: Most challenged players
+
+    Raises:
+        HTTPException: If error occurs
+    """
+    try:
+        players = await game_stats_service.get_most_challenged_players(limit)
+        return players
+
+    except Exception as e:
+        logger.error(f"Failed to get most challenged players: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/social/most-active-pairs", response_model=List[PlayerPair])
+async def get_most_active_player_pairs(
+    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    game_stats_service: GameStatsService = Depends(get_game_stats_service),
+):
+    """
+    Get most active player pairs (users who challenge each other most).
+
+    Args:
+        limit: Number of results to return (1-100)
+        game_stats_service: Game statistics service
+
+    Returns:
+        List[PlayerPair]: Most active player pairs
+
+    Raises:
+        HTTPException: If error occurs
+    """
+    try:
+        pairs = await game_stats_service.get_most_active_player_pairs(limit)
+        return pairs
+
+    except Exception as e:
+        logger.error(f"Failed to get most active player pairs: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/social/user/{user_id}/friends-activity", response_model=List[PlayerPair])
+async def get_user_friends_activity(
+    user_id: str,
+    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    current_user: dict = Depends(get_current_user),
+    game_stats_service: GameStatsService = Depends(get_game_stats_service),
+):
+    """
+    Get activity between a user and their friends.
+
+    Args:
+        user_id: User ID to get friends activity for
+        limit: Number of results to return (1-100)
+        current_user: Currently authenticated user
+        game_stats_service: Game statistics service
+
+    Returns:
+        List[PlayerPair]: User's friends activity
+
+    Raises:
+        HTTPException: If unauthorized or error occurs
+    """
+    try:
+        # Check if user is requesting their own data or has permission
+        if current_user["uid"] != user_id:
+            # TODO: Add admin permission check here
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to view other user's friends activity",
+            )
+
+        pairs = await game_stats_service.get_user_friends_activity(user_id, limit)
+        return pairs
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get user friends activity for {user_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get(
+    "/social/user/{user_id}/challenge-recipients",
+    response_model=List[PlayerInteraction],
+)
+async def get_user_challenge_recipients(
+    user_id: str,
+    limit: int = Query(10, ge=1, le=100, description="Number of results to return"),
+    current_user: dict = Depends(get_current_user),
+    game_stats_service: GameStatsService = Depends(get_game_stats_service),
+):
+    """
+    Get users that a specific user challenges most often.
+
+    Args:
+        user_id: User ID to get challenge recipients for
+        limit: Number of results to return (1-100)
+        current_user: Currently authenticated user
+        game_stats_service: Game statistics service
+
+    Returns:
+        List[PlayerInteraction]: Users challenged most often
+
+    Raises:
+        HTTPException: If unauthorized or error occurs
+    """
+    try:
+        # Check if user is requesting their own data or has permission
+        if current_user["uid"] != user_id:
+            # TODO: Add admin permission check here
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to view other user's challenge recipients",
+            )
+
+        recipients = await game_stats_service.get_user_challenge_recipients(
+            user_id, limit
+        )
+        return recipients
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get user challenge recipients for {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
