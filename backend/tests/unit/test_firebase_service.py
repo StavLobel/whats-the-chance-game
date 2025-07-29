@@ -40,11 +40,13 @@ class TestFirebaseService:
     """Test cases for FirebaseService class."""
 
     @patch("app.services.firebase_service.settings")
+    @patch("app.services.firebase_service.os.path.exists")
     def test_initialization_with_service_account(
-        self, mock_settings, mock_firebase_admin, mock_firestore
+        self, mock_exists, mock_settings, mock_firebase_admin, mock_firestore
     ):
         """Test Firebase initialization with service account credentials."""
         # Mock settings
+        mock_settings.firebase_service_account_path = "firebase-service-account.json"
         mock_settings.firebase_private_key = "test_private_key"
         mock_settings.firebase_client_email = "test@example.com"
         mock_settings.firebase_project_id = "test-project"
@@ -58,6 +60,9 @@ class TestFirebaseService:
         mock_settings.firebase_client_x509_cert_url = (
             "https://www.googleapis.com/robot/v1/metadata/x509/test"
         )
+
+        # Mock file existence
+        mock_exists.return_value = False  # Service account file doesn't exist
 
         # Mock Firebase Admin
         mock_firebase_admin.get_app.side_effect = ValueError("No app initialized")
@@ -74,14 +79,19 @@ class TestFirebaseService:
         assert service.db is not None
 
     @patch("app.services.firebase_service.settings")
+    @patch("app.services.firebase_service.os.path.exists")
     def test_initialization_with_default_credentials(
-        self, mock_settings, mock_firebase_admin, mock_firestore
+        self, mock_exists, mock_settings, mock_firebase_admin, mock_firestore
     ):
         """Test Firebase initialization with default credentials."""
         # Mock settings without service account
+        mock_settings.firebase_service_account_path = "firebase-service-account.json"
         mock_settings.firebase_private_key = None
         mock_settings.firebase_client_email = None
         mock_settings.firebase_project_id = "test-project"
+
+        # Mock file existence
+        mock_exists.return_value = False  # Service account file doesn't exist
 
         # Mock Firebase Admin
         mock_firebase_admin.get_app.side_effect = ValueError("No app initialized")
@@ -95,8 +105,9 @@ class TestFirebaseService:
         assert service.db is not None
 
     @patch("app.services.firebase_service.settings")
+    @patch("app.services.firebase_service.os.path.exists")
     def test_initialization_already_initialized(
-        self, mock_settings, mock_firebase_admin, mock_firestore
+        self, mock_exists, mock_settings, mock_firebase_admin, mock_firestore
     ):
         """Test Firebase initialization when already initialized."""
         # Mock settings
@@ -145,7 +156,7 @@ class TestFirebaseServiceAuthentication:
         with patch("app.services.firebase_service.auth") as mock_auth:
             from firebase_admin.exceptions import FirebaseError
 
-            mock_auth.verify_id_token.side_effect = FirebaseError("Invalid token")
+            mock_auth.verify_id_token.side_effect = FirebaseError("Invalid token", "AUTH_ERROR")
 
             # Test
             with pytest.raises(FirebaseError):
@@ -182,7 +193,7 @@ class TestFirebaseServiceAuthentication:
         with patch("app.services.firebase_service.auth") as mock_auth:
             from firebase_admin.exceptions import FirebaseError
 
-            mock_auth.get_user.side_effect = FirebaseError("User not found")
+            mock_auth.get_user.side_effect = FirebaseError("User not found", "USER_NOT_FOUND")
 
             # Test
             result = await firebase_service.get_user_by_uid("nonexistent_uid")

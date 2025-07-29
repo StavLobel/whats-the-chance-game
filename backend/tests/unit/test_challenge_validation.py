@@ -25,70 +25,19 @@ class TestChallengeValidation:
         valid_data = {
             "from_user": "user123",
             "to_user": "user456",
-            "title": "Test Challenge",
             "description": "What's the chance you'll do this test?",
-            "category": "funny",
-            "difficulty": "easy",
-            "tags": ["test", "fun"],
-            "isPublic": True,
-            "targetUserId": None,
-            "expiresAt": datetime.now() + timedelta(hours=24),
         }
 
         challenge = ChallengeCreate(**valid_data)
-        assert challenge.title == "Test Challenge"
-        assert challenge.category == "funny"
-        assert challenge.difficulty == "easy"
-        assert challenge.isPublic is True
-
-    def test_title_validation_required(self):
-        """Test that title is required for challenge creation."""
-        invalid_data = {
-            "description": "What's the chance you'll do this test?",
-            "category": "funny",
-            "difficulty": "easy",
-            "tags": ["test"],
-            "isPublic": True,
-        }
-
-        with pytest.raises(ValidationError) as exc_info:
-            ChallengeCreate(**invalid_data)
-
-        errors = exc_info.value.errors()
-        assert any(error["loc"] == ("title",) for error in errors)
-
-    def test_title_validation_length(self):
-        """Test that title has appropriate length constraints."""
-        # Test too short title
-        with pytest.raises(ValidationError):
-            ChallengeCreate(
-                title="",
-                description="Test description",
-                category="funny",
-                difficulty="easy",
-                tags=["test"],
-                isPublic=True,
-            )
-
-        # Test too long title
-        with pytest.raises(ValidationError):
-            ChallengeCreate(
-                title="x" * 201,  # Assuming 200 char limit
-                description="Test description",
-                category="funny",
-                difficulty="easy",
-                tags=["test"],
-                isPublic=True,
-            )
+        assert challenge.description == "What's the chance you'll do this test?"
+        assert challenge.from_user == "user123"
+        assert challenge.to_user == "user456"
 
     def test_description_validation_required(self):
         """Test that description is required for challenge creation."""
         invalid_data = {
-            "title": "Test Challenge",
-            "category": "funny",
-            "difficulty": "easy",
-            "tags": ["test"],
-            "isPublic": True,
+            "from_user": "user123",
+            "to_user": "user456",
         }
 
         with pytest.raises(ValidationError) as exc_info:
@@ -97,104 +46,48 @@ class TestChallengeValidation:
         errors = exc_info.value.errors()
         assert any(error["loc"] == ("description",) for error in errors)
 
-    def test_category_validation(self):
-        """Test that only valid categories are accepted."""
-        valid_categories = [
-            "funny",
-            "dare",
-            "creative",
-            "physical",
-            "mental",
-            "social",
-            "other",
-        ]
-
-        for category in valid_categories:
-            challenge = ChallengeCreate(
-                title="Test Challenge",
-                description="Test description",
-                category=category,
-                difficulty="easy",
-                tags=["test"],
-                isPublic=True,
-            )
-            assert challenge.category == category
-
-        # Test invalid category
+    def test_description_validation_length(self):
+        """Test that description has appropriate length constraints."""
+        # Test too short description
         with pytest.raises(ValidationError):
             ChallengeCreate(
-                title="Test Challenge",
-                description="Test description",
-                category="invalid_category",
-                difficulty="easy",
-                tags=["test"],
-                isPublic=True,
+                from_user="user123",
+                to_user="user456",
+                description="",
             )
 
-    def test_difficulty_validation(self):
-        """Test that only valid difficulties are accepted."""
-        valid_difficulties = ["easy", "medium", "hard", "extreme"]
-
-        for difficulty in valid_difficulties:
-            challenge = ChallengeCreate(
-                title="Test Challenge",
-                description="Test description",
-                category="funny",
-                difficulty=difficulty,
-                tags=["test"],
-                isPublic=True,
-            )
-            assert challenge.difficulty == difficulty
-
-        # Test invalid difficulty
+        # Test too long description
         with pytest.raises(ValidationError):
             ChallengeCreate(
-                title="Test Challenge",
-                description="Test description",
-                category="funny",
-                difficulty="invalid_difficulty",
-                tags=["test"],
-                isPublic=True,
+                from_user="user123",
+                to_user="user456",
+                description="x" * 501,  # Assuming 500 char limit
             )
 
-    def test_tags_validation(self):
-        """Test that tags are properly validated."""
-        # Test valid tags
-        challenge = ChallengeCreate(
-            title="Test Challenge",
-            description="Test description",
-            category="funny",
-            difficulty="easy",
-            tags=["test", "fun", "challenge"],
-            isPublic=True,
-        )
-        assert len(challenge.tags) == 3
+    def test_user_validation(self):
+        """Test that user IDs are properly validated."""
+        # Test empty user IDs
+        with pytest.raises(ValidationError):
+            ChallengeCreate(
+                from_user="",
+                to_user="user456",
+                description="Test description",
+            )
 
-        # Test empty tags (should be allowed)
-        challenge = ChallengeCreate(
-            title="Test Challenge",
-            description="Test description",
-            category="funny",
-            difficulty="easy",
-            tags=[],
-            isPublic=True,
-        )
-        assert challenge.tags == []
+        with pytest.raises(ValidationError):
+            ChallengeCreate(
+                from_user="user123",
+                to_user="",
+                description="Test description",
+            )
 
-    def test_expiration_date_validation(self):
-        """Test that expiration date is properly validated."""
-        # Test valid future date
-        future_date = datetime.now() + timedelta(hours=24)
-        challenge = ChallengeCreate(
-            title="Test Challenge",
-            description="Test description",
-            category="funny",
-            difficulty="easy",
-            tags=["test"],
-            isPublic=True,
-            expiresAt=future_date,
-        )
-        assert challenge.expiresAt == future_date
+        # Test same user IDs (should fail validation)
+        with pytest.raises(ValidationError):
+            ChallengeCreate(
+                from_user="user123",
+                to_user="user123",
+                description="Test description",
+            )
 
     @pytest.mark.skip(reason="Range validation not yet implemented")
     def test_number_range_validation(self):
