@@ -68,11 +68,11 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
           <div className='flex items-center gap-3'>
             <Avatar className='h-10 w-10'>
               <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-                {challenge.fromUser.charAt(0).toUpperCase()}
+                {challenge.from_user?.charAt(0).toUpperCase() || '?'}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className='font-medium text-foreground'>@{challenge.fromUser}</p>
+              <p className='font-medium text-foreground'>@{challenge.from_user}</p>
               <p className='text-sm text-muted-foreground'>challenged you</p>
             </div>
           </div>

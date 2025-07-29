@@ -26,8 +26,7 @@ export class GameService {
    * Create a new challenge
    */
   async createChallenge(fromUser: string, toUser: string, description: string): Promise<string> {
-    const challengeRef = doc(collection(db, 'challenges'));
-    await setDoc(challengeRef, {
+    const challengeRef = await addDoc(this.challengesCollection, {
       from_user: fromUser,
       to_user: toUser,
       description,
@@ -54,7 +53,7 @@ export class GameService {
 
     await addDoc(this.sessionsCollection, {
       challengeId,
-      players: [challengeData.fromUser, challengeData.toUser],
+      players: [challengeData.from_user, challengeData.to_user],
       status: 'waiting',
       numbers: {},
       createdAt: serverTimestamp(),
@@ -160,15 +159,16 @@ export class GameService {
         const data = doc.data();
         challenges.push({
           id: doc.id,
-          fromUser: data.from_user,
-          toUser: data.to_user,
+          from_user: data.from_user,
+          to_user: data.to_user,
           description: data.description,
           status: data.status,
           range: data.range,
           numbers: data.numbers,
           result: data.result,
-          createdAt: data.created_at?.toDate() || new Date(),
-          completedAt: data.completedAt?.toDate(),
+          created_at: data.created_at?.toDate() || new Date(),
+          updated_at: data.updated_at?.toDate() || new Date(),
+          completed_at: data.completed_at?.toDate(),
         });
       });
       return challenges;
@@ -189,15 +189,16 @@ export class GameService {
     const data = challengeDoc.data();
     return {
       id: challengeDoc.id,
-      fromUser: data.from_user,
-      toUser: data.to_user,
+      from_user: data.from_user,
+      to_user: data.to_user,
       description: data.description,
       status: data.status,
       range: data.range,
       numbers: data.numbers,
       result: data.result,
-      createdAt: data.created_at?.toDate() || new Date(),
-      completedAt: data.completedAt?.toDate(),
+      created_at: data.created_at?.toDate() || new Date(),
+      updated_at: data.updated_at?.toDate() || new Date(),
+      completed_at: data.completed_at?.toDate(),
     };
   }
 
@@ -205,7 +206,7 @@ export class GameService {
    * Listen to real-time updates for a specific challenge
    */
   subscribeToChallenge(challengeId: string, callback: (challenge: Challenge | null) => void) {
-    // eslint-disable-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
     const challengeRef = doc(this.challengesCollection, challengeId);
 
     return onSnapshot(challengeRef, doc => {
@@ -217,15 +218,16 @@ export class GameService {
       const data = doc.data();
       const challenge: Challenge = {
         id: doc.id,
-        fromUser: data.from_user,
-        toUser: data.to_user,
+        from_user: data.from_user,
+        to_user: data.to_user,
         description: data.description,
         status: data.status,
         range: data.range,
         numbers: data.numbers,
         result: data.result,
-        createdAt: data.created_at?.toDate() || new Date(),
-        completedAt: data.completedAt?.toDate(),
+        created_at: data.created_at?.toDate() || new Date(),
+        updated_at: data.updated_at?.toDate() || new Date(),
+        completed_at: data.completed_at?.toDate(),
       };
 
       callback(challenge);

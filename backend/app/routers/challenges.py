@@ -96,9 +96,10 @@ async def fast_test_challenges():
 @router.get("/simple-test")
 async def simple_test():
     """
-    Simple test endpoint that returns minimal data.
+    Ultra simple test endpoint without Firebase to verify routing.
     """
-    return {"message": "Hello from backend", "timestamp": "2025-01-27"}
+    logger.info("🎯 Backend: simple_test endpoint called!")
+    return {"message": "Backend is working!", "timestamp": "2025-01-29"}
 
 
 @router.get("/test", response_model=List[Challenge])
@@ -106,68 +107,84 @@ async def test_challenges(
     user_id: Optional[str] = Query(None, description="Filter by user ID")
 ):
     """
-    Test endpoint to get all challenges without authentication.
-    This is for debugging purposes only.
+    Test endpoint to get all challenges with optimized user lookups.
     """
     import time
+    import asyncio
 
     start_time = time.time()
 
     try:
-        logger.info(f"test_challenges called with user_id: {user_id}")
-        logger.info(f"test_challenges - starting at {start_time}")
+        logger.info(f"🔥 Backend: test_challenges called with user_id: {user_id}")
+        logger.info(f"🔥 Backend: starting Firebase request at {start_time}")
 
         challenges = await firebase_service.get_collection("challenges")
         logger.info(
-            f"test_challenges - got challenges from firebase at {time.time() - start_time:.2f}s"
+            f"✅ Backend: got {len(challenges)} challenges from firebase at {time.time() - start_time:.2f}s"
         )
+        
+        if challenges:
+            logger.info(f"🔍 Backend: first challenge from Firebase: {challenges[0]}")
+
+        # Get unique user IDs to minimize lookups
+        unique_users = set()
+        for challenge in challenges:
+            unique_users.add(challenge["from_user"])
+            unique_users.add(challenge["to_user"])
+        
+        logger.info(f"👥 Backend: found {len(unique_users)} unique users, limiting to 10 lookups for performance")
+        
+        # Limit to first 10 users to prevent timeout
+        limited_users = list(unique_users)[:10]
+        user_cache = {}
+        
+        # Batch user lookups with timeout
+        for uid in limited_users:
+            try:
+                user_info = await asyncio.wait_for(
+                    firebase_service.get_user_by_uid(uid),
+                    timeout=1.0  # 1 second per user
+                )
+                if user_info:
+                    if user_info.get("username"):
+                        user_cache[uid] = user_info.get("username")
+                    elif user_info.get("display_name"):
+                        user_cache[uid] = user_info.get("display_name")
+                    elif user_info.get("email"):
+                        user_cache[uid] = user_info.get("email", "").split("@")[0]
+                    else:
+                        user_cache[uid] = uid[:8] + "..."
+                else:
+                    user_cache[uid] = uid[:8] + "..."
+            except Exception as e:
+                logger.warning(f"Failed to get user info for {uid}: {e}")
+                user_cache[uid] = uid[:8] + "..."
+
+        logger.info(f"👤 Backend: cached {len(user_cache)} user display names")
 
         result = []
         for i, challenge in enumerate(challenges):
             try:
                 logger.info(
-                    f"test_challenges - processing challenge {i+1}/{len(challenges)} at {time.time() - start_time:.2f}s"
+                    f"🔄 Backend: processing challenge {i+1}/{len(challenges)} at {time.time() - start_time:.2f}s"
                 )
 
-                # Get user information for display names (with timeout)
-                from_user_display = challenge["from_user"][:8] + "..."
-                to_user_display = challenge["to_user"][:8] + "..."
-
-                # Try to get user info but don't block if it fails
-                try:
-                    from_user_info = await firebase_service.get_user_by_uid(
-                        challenge["from_user"]
-                    )
-                    if from_user_info and from_user_info.get("display_name"):
-                        from_user_display = from_user_info.get("display_name")
-                    elif from_user_info and from_user_info.get("email"):
-                        from_user_display = from_user_info.get("email", "").split("@")[
-                            0
-                        ]
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to get from_user info for {challenge['from_user']}: {e}"
-                    )
-
-                try:
-                    to_user_info = await firebase_service.get_user_by_uid(
-                        challenge["to_user"]
-                    )
-                    if to_user_info and to_user_info.get("display_name"):
-                        to_user_display = to_user_info.get("display_name")
-                    elif to_user_info and to_user_info.get("email"):
-                        to_user_display = to_user_info.get("email", "").split("@")[0]
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to get to_user info for {challenge['to_user']}: {e}"
-                    )
+                # Use cached user info or fallback to shortened UID
+                from_user_display = user_cache.get(
+                    challenge["from_user"], 
+                    challenge["from_user"][:8] + "..."
+                )
+                to_user_display = user_cache.get(
+                    challenge["to_user"], 
+                    challenge["to_user"][:8] + "..."
+                )
 
                 result.append(
                     Challenge(
                         id=challenge["id"],
                         description=challenge["description"],
-                        from_user=from_user_display,  # Use display name instead of UID
-                        to_user=to_user_display,  # Use display name instead of UID
+                        from_user=from_user_display,
+                        to_user=to_user_display,
                         status=challenge["status"],
                         created_at=challenge["created_at"],
                         updated_at=challenge["updated_at"],
@@ -180,9 +197,11 @@ async def test_challenges(
                 continue
 
         logger.info(
-            f"test_challenges - finished processing at {time.time() - start_time:.2f}s"
+            f"✅ Backend: finished processing at {time.time() - start_time:.2f}s"
         )
-        logger.info(f"test_challenges returning {len(result)} challenges")
+        logger.info(f"📊 Backend: returning {len(result)} challenges")
+        if result:
+            logger.info(f"📦 Backend: first challenge being returned: {result[0]}")
         return result
 
     except Exception as e:

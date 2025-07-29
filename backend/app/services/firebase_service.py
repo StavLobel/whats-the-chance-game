@@ -97,17 +97,18 @@ class FirebaseService:
 
     async def get_user_by_uid(self, uid: str) -> Optional[Dict[str, Any]]:
         """
-        Get user information by UID.
+        Get user information by UID from both Auth and Firestore.
 
         Args:
             uid: Firebase user UID
 
         Returns:
-            User information dict or None if not found
+            Combined user information dict or None if not found
         """
         try:
+            # Get basic auth info
             user_record = auth.get_user(uid)
-            return {
+            result = {
                 "uid": user_record.uid,
                 "email": user_record.email,
                 "email_verified": user_record.email_verified,
@@ -115,6 +116,16 @@ class FirebaseService:
                 "photo_url": user_record.photo_url,
                 "disabled": user_record.disabled,
             }
+            
+            # Also try to get username from Firestore users collection
+            try:
+                user_doc = await self.get_document("users", uid)
+                if user_doc and user_doc.get("username"):
+                    result["username"] = user_doc.get("username")
+            except Exception as e:
+                logger.debug(f"Could not fetch username from Firestore for {uid}: {e}")
+            
+            return result
         except FirebaseError as e:
             logger.error(f"Failed to get user by UID {uid}: {e}")
             return None

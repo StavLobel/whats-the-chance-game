@@ -24,17 +24,43 @@ export function useGame() {
 
     const loadChallenges = async () => {
       try {
-        // Fetch challenges from the backend API
-        // Use localhost for browser requests since browser runs on host machine
+        console.log('🚀 Frontend: Starting to load challenges...');
+        // Fetch challenges from the backend API with timeout
         const apiUrl = 'http://localhost:8000';
-        const response = await fetch(`${apiUrl}/api/challenges/test?user_id=${user.uid}`);
+        // Use test endpoint with user lookup and timeout protection
+        const url = `${apiUrl}/api/challenges/test`;
+        console.log('🌐 Frontend: Making API call to:', url);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          console.log('⏰ Frontend: Request timeout after 10 seconds');
+          controller.abort();
+        }, 10000); // 10 second timeout
+        
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        clearTimeout(timeoutId);
+        console.log('📨 Frontend: Response received, status:', response.status);
         
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const challengesData = await response.json();
-        setChallenges(challengesData);
+        console.log('📦 Frontend: Challenges data received:', challengesData);
+        console.log('📊 Frontend: Number of challenges:', challengesData?.length || 0);
+        if (challengesData?.length > 0) {
+          console.log('🔍 Frontend: First challenge structure:', challengesData[0]);
+        }
+        
+        // Ensure we always set an array
+        const challenges = Array.isArray(challengesData) ? challengesData : [];
+        setChallenges(challenges);
         setLoading(false);
       } catch (err) {
         console.error('Failed to load challenges:', err);
@@ -178,14 +204,14 @@ export function useGame() {
 
   // Filter challenges by type
   const getIncomingChallenges = useCallback(() => {
-    return challenges.filter(challenge => 
-      challenge.toUser === user?.uid && challenge.status === 'pending'
+    return challenges.filter(c => 
+      c.to_user === user?.uid && c.status === 'pending'
     );
   }, [challenges, user?.uid]);
 
   const getOutgoingChallenges = useCallback(() => {
-    return challenges.filter(challenge => 
-      challenge.fromUser === user?.uid
+    return challenges.filter(c => 
+      c.from_user === user?.uid
     );
   }, [challenges, user?.uid]);
 

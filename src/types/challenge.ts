@@ -5,15 +5,17 @@ export interface User {
 
 export interface Challenge {
   id: string;
-  fromUser: string;
-  toUser: string;
+  from_user: string;
+  to_user: string;
   description: string;
   status: 'pending' | 'accepted' | 'active' | 'completed';
   range?: { min: number; max: number };
-  numbers?: { fromUser: number; toUser: number };
+  numbers?: { from_user: number; to_user: number };
   result?: 'match' | 'no_match';
-  createdAt: Date;
-  completedAt?: Date;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+  resolved_at?: string;
 }
 
 export interface GameSession {
