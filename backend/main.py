@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.config import settings
-from app.routers import challenges, notifications
+from app.routers import challenges, game_stats, notifications
 
 # Load environment variables
 load_dotenv()
@@ -70,6 +70,7 @@ async def root():
         "endpoints": {
             "challenges": "/api/challenges",
             "notifications": "/api/notifications",
+            "game_stats": "/api/game-stats",
         },
     }
 
@@ -79,6 +80,7 @@ app.include_router(challenges.router, prefix="/api/challenges", tags=["challenge
 app.include_router(
     notifications.router, prefix="/api/notifications", tags=["notifications"]
 )
+app.include_router(game_stats.router)
 
 if __name__ == "__main__":
     # Development server
