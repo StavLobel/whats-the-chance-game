@@ -42,6 +42,7 @@ const Carousel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & CarouselProps
 >(({ orientation = 'horizontal', opts, setApi, plugins, className, children, ...props }, ref) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,

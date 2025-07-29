@@ -1,11 +1,25 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { X, Users } from 'lucide-react';
+import { X } from 'lucide-react';
+import { Challenge } from '@/types/challenge';
 import { useGame } from '@/hooks/useGame';
 
 interface CreateChallengeModalProps {
@@ -13,10 +27,7 @@ interface CreateChallengeModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateChallengeModal({ 
-  open, 
-  onOpenChange 
-}: CreateChallengeModalProps) {
+export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModalProps) {
   // ESLint false positive: open is used in Dialog component below
   const [task, setTask] = useState('');
   const [targetUser, setTargetUser] = useState('');
@@ -86,7 +97,6 @@ export function CreateChallengeModal({
           {/* Target User */}
           <div className='space-y-2'>
             <Label htmlFor='user' className='text-foreground font-medium flex items-center gap-2'>
-              <Users className='h-4 w-4' />
               Challenge someone
             </Label>
             <div className='flex gap-2'>

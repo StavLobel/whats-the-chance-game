@@ -23,6 +23,8 @@ class TestChallengeValidation:
     def test_valid_challenge_creation(self):
         """Test that valid challenge data passes validation."""
         valid_data = {
+            "from_user": "user123",
+            "to_user": "user456",
             "title": "Test Challenge",
             "description": "What's the chance you'll do this test?",
             "category": "funny",
