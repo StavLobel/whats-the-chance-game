@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: ['**'] # Run on all branches
+    branches: ['**']
   pull_request:
-    branches: [main]
+    branches: ['**']
 
 env:
   NODE_VERSION: '18'
