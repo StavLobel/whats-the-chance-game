@@ -116,7 +116,7 @@ class FirebaseService:
                 "photo_url": user_record.photo_url,
                 "disabled": user_record.disabled,
             }
-            
+
             # Also try to get username from Firestore users collection
             try:
                 user_doc = await self.get_document("users", uid)
@@ -124,7 +124,7 @@ class FirebaseService:
                     result["username"] = user_doc.get("username")
             except Exception as e:
                 logger.debug(f"Could not fetch username from Firestore for {uid}: {e}")
-            
+
             return result
         except FirebaseError as e:
             logger.error(f"Failed to get user by UID {uid}: {e}")

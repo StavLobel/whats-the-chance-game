@@ -122,7 +122,7 @@ async def test_challenges(
         logger.info(
             f"✅ Backend: got {len(challenges)} challenges from firebase at {time.time() - start_time:.2f}s"
         )
-        
+
         if challenges:
             logger.info(f"🔍 Backend: first challenge from Firebase: {challenges[0]}")
 
@@ -131,19 +131,21 @@ async def test_challenges(
         for challenge in challenges:
             unique_users.add(challenge["from_user"])
             unique_users.add(challenge["to_user"])
-        
-        logger.info(f"👥 Backend: found {len(unique_users)} unique users, limiting to 10 lookups for performance")
-        
+
+        logger.info(
+            f"👥 Backend: found {len(unique_users)} unique users, limiting to 10 lookups for performance"
+        )
+
         # Limit to first 10 users to prevent timeout
         limited_users = list(unique_users)[:10]
         user_cache = {}
-        
+
         # Batch user lookups with timeout
         for uid in limited_users:
             try:
                 user_info = await asyncio.wait_for(
                     firebase_service.get_user_by_uid(uid),
-                    timeout=1.0  # 1 second per user
+                    timeout=1.0,  # 1 second per user
                 )
                 if user_info:
                     if user_info.get("username"):
@@ -171,12 +173,10 @@ async def test_challenges(
 
                 # Use cached user info or fallback to shortened UID
                 from_user_display = user_cache.get(
-                    challenge["from_user"], 
-                    challenge["from_user"][:8] + "..."
+                    challenge["from_user"], challenge["from_user"][:8] + "..."
                 )
                 to_user_display = user_cache.get(
-                    challenge["to_user"], 
-                    challenge["to_user"][:8] + "..."
+                    challenge["to_user"], challenge["to_user"][:8] + "..."
                 )
 
                 result.append(

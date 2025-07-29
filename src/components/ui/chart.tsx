@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 const THEMES = { light: '', dark: '.dark' } as const;
 
 export type ChartConfig = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   [k in string]: {
     label?: React.ReactNode;
     icon?: React.ComponentType;
@@ -62,6 +63,7 @@ const ChartContainer = React.forwardRef<
 ChartContainer.displayName = 'Chart';
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
   if (!colorConfig.length) {
