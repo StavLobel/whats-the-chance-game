@@ -11,16 +11,20 @@ This module provides Firebase Admin SDK integration for:
 # TODO: Add json when JSON processing is needed
 import logging
 from typing import Any, Dict, List, Optional
-# TODO: Add Union when union types are needed
 
 import firebase_admin
 from firebase_admin import auth, credentials, firestore, messaging
 from firebase_admin.exceptions import FirebaseError
+
+from app.core.config import settings
+
+# TODO: Add Union when union types are needed
+
+
 # TODO: Add when advanced firestore queries are implemented
 # from google.cloud.firestore_v1.base_document import DocumentSnapshot
 # from google.cloud.firestore_v1.base_query import FieldFilter
 
-from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

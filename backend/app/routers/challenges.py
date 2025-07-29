@@ -13,12 +13,14 @@ from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, status
+
 # TODO: Add Depends when authentication endpoints are implemented
 from pydantic import ValidationError
 
 from app.core.auth import CurrentUser
+
 # TODO: Add UserUID when user-specific endpoints are implemented
-from app.schemas.challenge import (
+from app.schemas.challenge import (  # TODO: Add ChallengeUpdate when update endpoints are implemented
     Challenge,
     ChallengeCreate,
     ChallengeList,
@@ -26,7 +28,6 @@ from app.schemas.challenge import (
     ChallengeResolveResponse,
     ChallengeResponse,
     ChallengeStats,
-    # TODO: Add ChallengeUpdate when update endpoints are implemented
 )
 from app.services.firebase_service import firebase_service
 

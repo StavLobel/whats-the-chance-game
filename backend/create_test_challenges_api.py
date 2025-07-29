@@ -16,7 +16,7 @@ Features:
 import asyncio
 import json
 import random
-from datetime import datetime, timedelta
+# TODO: Add datetime when needed for time operations
 from typing import Any, Dict, List
 
 import aiohttp
@@ -353,15 +353,15 @@ def print_challenge_summary(challenges: List[Dict[str, Any]]):
             )
             range_counts[range_key] = range_counts.get(range_key, 0) + 1
 
-    print(f"\n📈 Status Distribution:")
+    print("\n📈 Status Distribution:")
     for status, count in status_counts.items():
         print(f"   • {status.capitalize()}: {count} challenges")
 
-    print(f"\n🌍 Language Distribution:")
+    print("\n🌍 Language Distribution:")
     for language, count in language_counts.items():
         print(f"   • {language.capitalize()}: {count} challenges")
 
-    print(f"\n🎯 Number Range Distribution:")
+    print("\n🎯 Number Range Distribution:")
     for range_key, count in range_counts.items():
         print(f"   • Range {range_key}: {count} challenges")
 

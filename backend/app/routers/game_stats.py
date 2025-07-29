@@ -12,19 +12,13 @@ This module provides API endpoints for:
 import logging
 from datetime import datetime
 from typing import List
-# TODO: Add Optional when optional parameters are implemented
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-# TODO: Add JSONResponse when custom response formatting is needed
 
 from app.core.auth import get_current_user
-from app.schemas.game_stats import (
+from app.schemas.game_stats import (  # TODO: Add when CRUD operations are implemented; GameStatsCreate,; GameStatsQuery,; GameStatsUpdate,
     ChallengeResult,
-    # TODO: Add when CRUD operations are implemented
-    # GameStatsCreate,
-    # GameStatsQuery,
     GameStatsResponse,
-    # GameStatsUpdate,
     GlobalGameStats,
     NumberStats,
     PlayerInteraction,
@@ -34,6 +28,12 @@ from app.schemas.game_stats import (
 )
 from app.services.firebase_service import FirebaseService
 from app.services.game_stats_service import GameStatsService
+
+# TODO: Add Optional when optional parameters are implemented
+
+
+# TODO: Add JSONResponse when custom response formatting is needed
+
 
 logger = logging.getLogger(__name__)
 

@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 # Add the app directory to the path so we can import settings
-sys.path.append(os.path.join(os.path.dirname(__file__), "app"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "app"))
 
 from app.services.firebase_service import FirebaseService
 
@@ -345,15 +345,15 @@ def print_challenge_summary(challenges: List[Dict[str, Any]]):
             )
             range_counts[range_key] = range_counts.get(range_key, 0) + 1
 
-    print(f"\n📈 Status Distribution:")
+    print("\n📈 Status Distribution:")
     for status, count in status_counts.items():
         print(f"   • {status.capitalize()}: {count} challenges")
 
-    print(f"\n🌍 Language Distribution:")
+    print("\n🌍 Language Distribution:")
     for language, count in language_counts.items():
         print(f"   • {language.capitalize()}: {count} challenges")
 
-    print(f"\n🎯 Number Range Distribution:")
+    print("\n🎯 Number Range Distribution:")
     for range_key, count in range_counts.items():
         print(f"   • Range {range_key}: {count} challenges")
 

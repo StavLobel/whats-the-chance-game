@@ -17,6 +17,7 @@ Prerequisites:
 import asyncio
 import json
 import os
+import random
 import sys
 from datetime import datetime
 from typing import Any, Dict, List
@@ -46,8 +47,6 @@ def load_test_challenges() -> List[Dict[str, Any]]:
 def generate_challenge_id() -> str:
     """Generate a unique challenge ID."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    import random
-
     random_suffix = "".join(
         random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=6)
     )
@@ -127,7 +126,7 @@ async def import_challenges_to_firestore(challenges: List[Dict[str, Any]]):
             )
             failed_imports += 1
 
-    print(f"\n📊 Import Summary:")
+    print("\n📊 Import Summary:")
     print(f"   ✅ Successful: {successful_imports}")
     print(f"   ❌ Failed: {failed_imports}")
     print(f"   📊 Total: {len(challenges)}")
@@ -171,15 +170,15 @@ def print_import_summary(challenges: List[Dict[str, Any]]):
             )
             range_counts[range_key] = range_counts.get(range_key, 0) + 1
 
-    print(f"\n📈 Status Distribution:")
+    print("\n📈 Status Distribution:")
     for status, count in status_counts.items():
         print(f"   • {status.capitalize()}: {count} challenges")
 
-    print(f"\n🌍 Language Distribution:")
+    print("\n🌍 Language Distribution:")
     for language, count in language_counts.items():
         print(f"   • {language.capitalize()}: {count} challenges")
 
-    print(f"\n🎯 Number Range Distribution:")
+    print("\n🎯 Number Range Distribution:")
     for range_key, count in range_counts.items():
         print(f"   • Range {range_key}: {count} challenges")
 

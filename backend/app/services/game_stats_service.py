@@ -12,15 +12,9 @@ This module provides services for:
 import logging
 from datetime import datetime, timedelta
 from typing import List, Optional
-# TODO: Add when advanced typing is needed
-# from typing import Any, Dict, Tuple
 
-from app.schemas.game_stats import (
+from app.schemas.game_stats import (  # TODO: Add when CRUD operations are implemented; GameStatsCreate,; GameStatsQuery,; GameStatsUpdate,
     ChallengeResult,
-    # TODO: Add when CRUD operations are implemented
-    # GameStatsCreate,
-    # GameStatsQuery,
-    # GameStatsUpdate,
     GlobalGameStats,
     NumberStats,
     PlayerInteraction,
@@ -29,6 +23,10 @@ from app.schemas.game_stats import (
     UserGameStats,
 )
 from app.services.firebase_service import FirebaseService
+
+# TODO: Add when advanced typing is needed
+# from typing import Any, Dict, Tuple
+
 
 logger = logging.getLogger(__name__)
 

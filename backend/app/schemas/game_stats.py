@@ -12,7 +12,8 @@ This module defines the data models for:
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+# TODO: Add validator when validation is implemented
 
 
 class NumberSelection(BaseModel):

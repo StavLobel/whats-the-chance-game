@@ -10,29 +10,31 @@ This module provides RESTful API endpoints for:
 
 import logging
 from datetime import datetime
-# TODO: Add when list/optional parameters are implemented
-# from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, status
-# TODO: Add when dependencies and validation are implemented
-# from fastapi import Depends
-# from pydantic import ValidationError
 
 from app.core.auth import CurrentUser
+
 # TODO: Add UserUID when user-specific endpoints are implemented
-from app.schemas.notification import (
+from app.schemas.notification import (  # TODO: Add when preferences and subscription endpoints are implemented; NotificationPreferences,; TopicSubscription,
     FCMToken,
     NotificationHistory,
     NotificationHistoryList,
-    # TODO: Add when preferences and subscription endpoints are implemented
-    # NotificationPreferences,
     NotificationSend,
     NotificationSendBatch,
     NotificationSendToTopic,
     NotificationStats,
-    # TopicSubscription,
 )
 from app.services.firebase_service import firebase_service
+
+# TODO: Add when list/optional parameters are implemented
+# from typing import List, Optional
+
+
+# TODO: Add when dependencies and validation are implemented
+# from fastapi import Depends
+# from pydantic import ValidationError
+
 
 logger = logging.getLogger(__name__)
 

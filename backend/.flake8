@@ -1,0 +1,25 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203,E501,W503
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    .env,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    .coverage,
+    htmlcov,
+    allure-results,
+    allure-report
+per-file-ignores =
+    __init__.py:F401
+    tests/*:F401,E501
+    */test_*.py:F401,E501
+    create_test_challenges.py:E402
+    create_test_challenges_api.py:E402
+    import_test_challenges.py:E402 
