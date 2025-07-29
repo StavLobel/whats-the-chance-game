@@ -25,7 +25,8 @@ export function useGame() {
     const loadChallenges = async () => {
       try {
         // Fetch challenges from the backend API
-        const response = await fetch(`http://localhost:8000/api/challenges/test?user_id=${user.uid}`);
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${apiUrl}/api/challenges/test?user_id=${user.uid}`);
         
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
