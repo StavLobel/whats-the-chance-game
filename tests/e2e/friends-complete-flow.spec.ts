@@ -58,7 +58,7 @@ test.describe('Complete Friends Flow', () => {
     await page.waitForTimeout(800);
     
     // User 2 should appear in results - try both full name and email
-    const user2Result = page.getByText(user2.fullName).or(page.getByText(user2.email));
+    const user2Result = page.getByText(user2.fullName).or(page.getByText(user2.email)).first();
     await expect(user2Result).toBeVisible({ timeout: 10000 });
     
     // Check if Add Friend button is available (users might already be friends)
