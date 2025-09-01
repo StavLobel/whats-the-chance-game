@@ -191,39 +191,71 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 #### Phase 4: Integration & Testing (Continued)
 
-8. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
+8. **👥 Friends Feature: Search, Add, and Remove Friends** [#34](https://github.com/StavLobel/whats-the-chance-game/issues/34)
    - **Status**: ⏳ **PENDING**
    - **Priority**: **MEDIUM** ⭐⭐⭐
-   - Connect existing ChallengeCard components to real data
-   - Enhance existing ChallengeDetail with real-time updates
-   - Improve existing CreateChallengeModal with validation
-   - Add real-time updates to existing number selection interface
+   - **Dependencies**: Authentication (#6), Backend (#9), Real-time (#10) - All completed
+   - **Blocks**: Challenge Management Enhancement (#8)
+   - User search and discovery functionality
+   - Friend request system (send, accept, reject)
+   - Friend list management with online status
+   - Privacy controls for friend interactions
+   - Friend activity feed and suggestions
 
-9. **🔧 Fix Persistent CI Pipeline Failures** [#29](https://github.com/StavLobel/whats-the-chance-game/issues/29)
+9. **👤 Profile Page: User Profile Management After Login** [#35](https://github.com/StavLobel/whats-the-chance-game/issues/35)
    - **Status**: ⏳ **PENDING**
-   - **Priority**: **HIGH** ⭐⭐⭐⭐
-   - Fix ESLint configuration conflicts between `.eslintrc.json` and `eslint.config.js`
-   - Resolve Pydantic V1 to V2 migration issues
-   - Fix Firebase service initialization issues in CI environment
-   - Ensure all frontend and backend unit tests pass in CI
+   - **Priority**: **MEDIUM** ⭐⭐⭐
+   - **Dependencies**: Authentication (#6), Backend (#9), Game Logic (#20) - All completed
+   - Profile information display and editing
+   - Game statistics and achievements system
+   - Game history and activity timeline
+   - Profile privacy settings
+   - Avatar upload and management
+
+10. **⚙️ Settings Page: User Settings and Preferences After Login** [#36](https://github.com/StavLobel/whats-the-chance-game/issues/36)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **MEDIUM** ⭐⭐⭐
+    - **Dependencies**: Authentication (#6), Backend (#9), Profile Page (#35)
+    - Account settings and security management
+    - App preferences (theme, language, accessibility)
+    - Privacy and security controls
+    - Notification settings and preferences
+    - Game-specific settings and preferences
+
+11. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **MEDIUM** ⭐⭐⭐
+    - **Dependencies**: Friends Feature (#34) - PENDING
+    - Connect existing ChallengeCard components to real data
+    - Enhance existing ChallengeDetail with real-time updates
+    - Improve existing CreateChallengeModal with validation
+    - Add real-time updates to existing number selection interface
+
+12. **🔧 Fix Persistent CI Pipeline Failures** [#29](https://github.com/StavLobel/whats-the-chance-game/issues/29)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **HIGH** ⭐⭐⭐⭐
+    - Fix ESLint configuration conflicts between `.eslintrc.json` and `eslint.config.js`
+    - Resolve Pydantic V1 to V2 migration issues
+    - Fix Firebase service initialization issues in CI environment
+    - Ensure all frontend and backend unit tests pass in CI
 
 #### Phase 5: Deployment & DevOps
 
-10. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
+13. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
     - Hostinger VPS setup with Traefik v3.0
     - Docker Compose configuration
     - Let's Encrypt HTTPS certificate automation
 
-11. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
+14. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Production deployment workflow
     - Versioning and release workflow
     - Advanced testing and monitoring
 
-12. **🔧 Admin Panel - User & Challenge Management System** [#27](https://github.com/StavLobel/whats-the-chance-game/issues/27)
+15. **🔧 Admin Panel - User & Challenge Management System** [#27](https://github.com/StavLobel/whats-the-chance-game/issues/27)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - User CRUD operations (create, read, update, delete)
@@ -233,7 +265,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 #### Phase 6: Advanced Features (Future)
 
-13. **🎯 Enhanced Game Features** [#15](https://github.com/StavLobel/whats-the-chance-game/issues/15)
+16. **🎯 Enhanced Game Features** [#15](https://github.com/StavLobel/whats-the-chance-game/issues/15)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Challenge history and statistics
@@ -242,7 +274,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
     - Social features (friends, leaderboards)
     - Group challenges
 
-14. **📱 Mobile Experience** [#16](https://github.com/StavLobel/whats-the-chance-game/issues/16)
+17. **📱 Mobile Experience** [#16](https://github.com/StavLobel/whats-the-chance-game/issues/16)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Progressive Web App (PWA) features
@@ -272,8 +304,11 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 ## 🎯 Next Immediate Tasks
 
 1. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
-2. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data
-3. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
+2. **👥 Friends Feature: Search, Add, and Remove Friends** (#34) - **MEDIUM** - Implement social foundation for challenges
+3. **👤 Profile Page: User Profile Management** (#35) - **MEDIUM** - Complete user profile experience
+4. **⚙️ Settings Page: User Settings and Preferences** (#36) - **MEDIUM** - Centralized settings management
+5. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data (after friends)
+6. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
 
 ## 🐛 Recent Bug Fixes
 
