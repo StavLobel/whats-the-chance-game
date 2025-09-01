@@ -31,6 +31,9 @@ from app.schemas.challenge import (  # TODO: Add ChallengeUpdate when update end
 )
 from app.services.firebase_service import firebase_service
 
+# Import WebSocket manager for real-time updates
+from app.routers.websocket import manager as ws_manager
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -348,7 +351,7 @@ async def create_challenge(
             )
 
         # Convert Firestore document to Challenge schema
-        return Challenge(
+        created_challenge = Challenge(
             id=challenge["id"],
             description=challenge["description"],
             from_user=challenge["from_user"],
@@ -357,6 +360,17 @@ async def create_challenge(
             created_at=challenge["created_at"],
             updated_at=challenge["updated_at"],
         )
+        
+        # Broadcast to WebSocket connections
+        await ws_manager.broadcast_to_users(
+            [challenge_data.from_user, challenge_data.to_user],
+            {
+                "type": "challenge_created",
+                "data": created_challenge.dict()
+            }
+        )
+        
+        return created_challenge
 
     except ValidationError as e:
         logger.error(f"Validation error creating challenge: {e}")
@@ -508,7 +522,7 @@ async def respond_to_challenge(
         )
 
         # Convert Firestore document to Challenge schema
-        return Challenge(
+        updated_challenge_model = Challenge(
             id=updated_challenge["id"],
             description=updated_challenge["description"],
             from_user=updated_challenge["from_user"],
@@ -521,6 +535,17 @@ async def respond_to_challenge(
             updated_at=updated_challenge["updated_at"],
             completed_at=updated_challenge.get("completed_at"),
         )
+        
+        # Broadcast to WebSocket connections
+        await ws_manager.broadcast_to_users(
+            [updated_challenge["from_user"], updated_challenge["to_user"]],
+            {
+                "type": "challenge_updated",
+                "data": updated_challenge_model.dict()
+            }
+        )
+        
+        return updated_challenge_model
 
     except HTTPException:
         raise
@@ -611,6 +636,23 @@ async def resolve_challenge(
                 detail="Failed to resolve challenge",
             )
 
+        # Get the updated challenge for WebSocket broadcast
+        updated_challenge = await firebase_service.get_document(
+            "challenges", resolve_data.challenge_id
+        )
+        
+        # Broadcast challenge completion to WebSocket connections
+        await ws_manager.broadcast_to_users(
+            [challenge["from_user"], challenge["to_user"]],
+            {
+                "type": "challenge_completed",
+                "data": {
+                    "challengeId": resolve_data.challenge_id,
+                    "result": "match" if is_match else "no_match"
+                }
+            }
+        )
+        
         # Return resolution result
         return ChallengeResolveResponse(
             challenge_id=resolve_data.challenge_id,

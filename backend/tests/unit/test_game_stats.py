@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from pydantic import ValidationError
 
 from app.schemas.game_stats import (
     ChallengeResult,
