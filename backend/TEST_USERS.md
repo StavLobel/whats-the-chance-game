@@ -137,7 +137,7 @@ The user profiles now include additional fields:
 ⚠️ **Important**: These are test users with simple passwords. They should only be used in development/testing environments.
 
 - Do not use these credentials in production
-- These users are created in the Firebase project: `whats-the-chance-game`
+- These users are created in the Firebase project: `your-project-id`
 - Users are created with email verification enabled for immediate use
 - Custom claims are set for firstName, lastName, and username fields
 - All Firestore documents are properly structured with timestamps
@@ -173,8 +173,8 @@ python3 update_test_users.py
 
 You can view these users in the Firebase Console:
 
-- **Authentication**: https://console.firebase.google.com/project/whats-the-chance-game/authentication/users
-- **Firestore**: https://console.firebase.google.com/project/whats-the-chance-game/firestore
+- **Authentication**: https://console.firebase.google.com/project/your-project-id/authentication/users
+- **Firestore**: https://console.firebase.google.com/project/your-project-id/firestore
 
 ## Backend Schema Updates
 
@@ -201,5 +201,5 @@ The new schema supports:
 **Created**: January 28, 2025
 **Updated**: January 28, 2025 (Added firstName, lastName, username fields)
 **Database Updated**: January 28, 2025 (Complete Firestore structure)
-**Project**: whats-the-chance-game
+**Project**: your-project-id
 **Environment**: Development/Testing

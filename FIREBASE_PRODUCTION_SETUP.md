@@ -36,7 +36,7 @@ firebase deploy --only firestore:indexes
 
 ### **Visit Firebase Console:**
 
-https://console.firebase.google.com/project/whats-the-chance-game/authentication
+https://console.firebase.google.com/project/your-project-id/authentication
 
 ### **Steps:**
 
@@ -48,7 +48,7 @@ https://console.firebase.google.com/project/whats-the-chance-game/authentication
 
 ### **Visit Service Accounts:**
 
-https://console.firebase.google.com/project/whats-the-chance-game/settings/serviceaccounts/adminsdk
+https://console.firebase.google.com/project/your-project-id/settings/serviceaccounts/adminsdk
 
 ### **Steps:**
 
@@ -59,15 +59,15 @@ https://console.firebase.google.com/project/whats-the-chance-game/settings/servi
 ### **Example backend/.env:**
 
 ```env
-FIREBASE_PROJECT_ID=whats-the-chance-game
+FIREBASE_PROJECT_ID=your-project-id
 FIREBASE_PRIVATE_KEY_ID=your-private-key-id
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour private key here\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@whats-the-chance-game.iam.gserviceaccount.com
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
 FIREBASE_CLIENT_ID=your-client-id
 FIREBASE_AUTH_URI=https://accounts.google.com/o/oauth2/auth
 FIREBASE_TOKEN_URI=https://oauth2.googleapis.com/token
 FIREBASE_AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
-FIREBASE_CLIENT_X509_CERT_URL=https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxxxx%40whats-the-chance-game.iam.gserviceaccount.com
+FIREBASE_CLIENT_X509_CERT_URL=https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxxxx%40your-project-id.iam.gserviceaccount.com
 ```
 
 ## 🔧 **Step 6: Test the Setup**
@@ -117,11 +117,11 @@ python -m pytest tests/unit/test_firebase_service.py -v
 
 ## 🔗 **Useful Links**
 
-- **Firebase Console**: https://console.firebase.google.com/project/whats-the-chance-game
-- **Firestore Console**: https://console.firebase.google.com/project/whats-the-chance-game/firestore
-- **Authentication Console**: https://console.firebase.google.com/project/whats-the-chance-game/authentication
-- **Project Settings**: https://console.firebase.google.com/project/whats-the-chance-game/settings
-- **Billing Setup**: https://console.developers.google.com/billing/enable?project=whats-the-chance-game
+- **Firebase Console**: https://console.firebase.google.com/project/your-project-id
+- **Firestore Console**: https://console.firebase.google.com/project/your-project-id/firestore
+- **Authentication Console**: https://console.firebase.google.com/project/your-project-id/authentication
+- **Project Settings**: https://console.firebase.google.com/project/your-project-id/settings
+- **Billing Setup**: https://console.developers.google.com/billing/enable?project=your-project-id
 
 ## 🎯 **Current Status**
 
