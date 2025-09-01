@@ -47,6 +47,12 @@ check-env: ## Check required environment variables and tools
 	@test -f .env || { echo "$(YELLOW)⚠️  .env file not found. Copy env.example to .env and configure.$(NC)"; }
 	@echo "$(GREEN)✅ Environment check complete.$(NC)"
 
+check-docker: ## Check if Docker is running
+	@echo "$(BLUE)🐳 Checking Docker...$(NC)"
+	@command -v docker >/dev/null 2>&1 || { echo "$(RED)❌ Docker is not installed.$(NC)"; exit 1; }
+	@docker info >/dev/null 2>&1 || { echo "$(RED)❌ Docker daemon is not running. Please start Docker.$(NC)"; exit 1; }
+	@echo "$(GREEN)✅ Docker is running.$(NC)"
+
 install: ## Install all dependencies
 	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
 	npm install
@@ -55,8 +61,10 @@ install: ## Install all dependencies
 	@echo "$(GREEN)✅ Dependencies installed.$(NC)"
 
 ##@ Development
-dev: ## Start both frontend and backend in development mode
-	@echo "$(BLUE)🚀 Starting development servers...$(NC)"
+dev: docker-dev ## Start both frontend and backend in development mode (alias for docker-dev)
+
+dev-local: ## Start development servers locally (without Docker)
+	@echo "$(BLUE)🚀 Starting local development servers...$(NC)"
 	@echo "$(YELLOW)Frontend: http://localhost:5173$(NC)"
 	@echo "$(YELLOW)Backend: http://localhost:8000$(NC)"
 	@echo "$(YELLOW)API Docs: http://localhost:8000/docs$(NC)"
@@ -64,11 +72,11 @@ dev: ## Start both frontend and backend in development mode
 	(cd backend && python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000) & \
 	npm run dev
 
-dev-frontend: ## Start only frontend development server
+dev-frontend: ## Start only frontend development server (local)
 	@echo "$(BLUE)🎨 Starting frontend development server...$(NC)"
 	npm run dev
 
-dev-backend: ## Start only backend development server
+dev-backend: ## Start only backend development server (local)
 	@echo "$(BLUE)⚙️  Starting backend development server...$(NC)"
 	cd backend && python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
@@ -91,6 +99,13 @@ test-unit-backend: ## Run backend unit tests only
 test-e2e: ## Run E2E tests
 	@echo "$(BLUE)🎭 Running E2E tests...$(NC)"
 	npm run test:e2e
+
+test-health: ## Run health check E2E test to verify app is working
+	@echo "$(BLUE)🏥 Running health check E2E test...$(NC)"
+	@echo "$(YELLOW)Testing if the app can load challenges...$(NC)"
+	npm run test:e2e -- --grep "health check" tests/e2e/health-check.spec.ts || true
+	@echo ""
+	@$(MAKE) health
 
 test-e2e-ui: ## Run E2E tests with UI
 	@echo "$(BLUE)🎭 Running E2E tests with UI...$(NC)"
@@ -131,11 +146,24 @@ build-frontend: ## Build frontend Docker image
 	docker build -f Dockerfile.frontend.prod -t $(PROJECT_NAME)-frontend .
 
 ##@ Docker Development
-docker-dev: ## Start development environment with Docker
+docker-dev: check-docker ## Start development environment with Docker
 	@echo "$(BLUE)🐳 Starting Docker development environment...$(NC)"
-	$(DOCKER_COMPOSE) --profile dev up -d
+	@echo "$(YELLOW)Building and starting containers...$(NC)"
+	$(DOCKER_COMPOSE) --profile dev up -d --build
+	@echo ""
+	@echo "$(YELLOW)Waiting for services to be ready...$(NC)"
+	@sleep 8
+	@echo ""
+	@echo "$(GREEN)✅ Development environment started!$(NC)"
 	@echo "$(YELLOW)Frontend: http://localhost:5173$(NC)"
 	@echo "$(YELLOW)Backend: http://localhost:8000$(NC)"
+	@echo "$(YELLOW)API Docs: http://localhost:8000/docs$(NC)"
+	@echo ""
+	@echo "$(CYAN)Running health check...$(NC)"
+	@$(MAKE) test-health
+	@echo ""
+	@echo "$(CYAN)Run 'make docker-dev-logs' to see logs$(NC)"
+	@echo "$(CYAN)Run 'make docker-dev-stop' to stop$(NC)"
 
 docker-dev-logs: ## Show Docker development logs
 	$(DOCKER_COMPOSE) --profile dev logs -f
