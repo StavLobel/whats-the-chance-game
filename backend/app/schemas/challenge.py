@@ -22,6 +22,16 @@ class ChallengeBase(BaseModel):
     )
     from_user: str = Field(..., description="User ID of the challenge creator")
     to_user: str = Field(..., description="User ID of the challenge recipient")
+    category: Optional[str] = Field(
+        "dare", 
+        pattern="^(funny|dare|creative|physical|mental|social)$",
+        description="Challenge category"
+    )
+    difficulty: Optional[str] = Field(
+        "medium",
+        pattern="^(easy|medium|hard)$", 
+        description="Challenge difficulty"
+    )
 
 
 class ChallengeCreate(ChallengeBase):
@@ -93,6 +103,8 @@ class Challenge(BaseModel):
     description: str = Field(..., description="Challenge description")
     from_user: str = Field(..., description="User ID of the challenge creator")
     to_user: str = Field(..., description="User ID of the challenge recipient")
+    category: Optional[str] = Field("dare", description="Challenge category")
+    difficulty: Optional[str] = Field("medium", description="Challenge difficulty")
     status: str = Field(..., description="Challenge status")
     range: Optional[ChallengeRange] = Field(None, description="Number range")
     numbers: Optional[ChallengeNumbers] = Field(None, description="Submitted numbers")

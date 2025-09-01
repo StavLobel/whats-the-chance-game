@@ -1,0 +1,23 @@
+#!/bin/sh
+# Pre-commit hook for What's the Chance? Game
+
+echo "🔍 Running pre-commit checks..."
+
+# Run linting
+echo "📝 Checking code style..."
+make lint
+if [ $? -ne 0 ]; then
+    echo "❌ Linting failed. Please fix the issues before committing."
+    exit 1
+fi
+
+# Run unit tests
+echo "🧪 Running unit tests..."
+make test-unit
+if [ $? -ne 0 ]; then
+    echo "❌ Unit tests failed. Please fix the issues before committing."
+    exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
+exit 0

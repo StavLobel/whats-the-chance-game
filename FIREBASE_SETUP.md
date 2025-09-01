@@ -2,8 +2,8 @@
 
 ## ✅ **Current Status**
 
-- ✅ Firebase project created: `whats-the-chance-game`
-- ✅ Web app created: `whats-the-chance-game-web`
+- ✅ Firebase project created: `your-project-id`
+- ✅ Web app created: `your-project-id-web`
 - ✅ Firebase CLI installed and configured
 - ✅ Firestore rules deployed
 - ⏳ **Pending**: Enable Firestore API and complete setup
@@ -12,7 +12,7 @@
 
 ### 1. Enable Firestore API
 
-Visit: https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=whats-the-chance-game
+Visit: https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=your-project-id
 
 **Steps:**
 
@@ -21,7 +21,7 @@ Visit: https://console.developers.google.com/apis/api/firestore.googleapis.com/o
 
 ### 2. Enable Authentication
 
-Visit: https://console.firebase.google.com/project/whats-the-chance-game/authentication
+Visit: https://console.firebase.google.com/project/your-project-id/authentication
 
 **Steps:**
 
@@ -32,7 +32,7 @@ Visit: https://console.firebase.google.com/project/whats-the-chance-game/authent
 
 ### 3. Create Firestore Database
 
-Visit: https://console.firebase.google.com/project/whats-the-chance-game/firestore
+Visit: https://console.firebase.google.com/project/your-project-id/firestore
 
 **Steps:**
 
@@ -42,7 +42,7 @@ Visit: https://console.firebase.google.com/project/whats-the-chance-game/firesto
 
 ### 4. Generate Service Account Key (for Backend)
 
-Visit: https://console.firebase.google.com/project/whats-the-chance-game/settings/serviceaccounts/adminsdk
+Visit: https://console.firebase.google.com/project/your-project-id/settings/serviceaccounts/adminsdk
 
 **Steps:**
 
@@ -66,13 +66,13 @@ Create a `.env` file in the root directory:
 
 ```env
 # Firebase Configuration
-VITE_FIREBASE_API_KEY=AIzaSyCa_xUyQQtDguN_ZrLDSFPONbT4yFYug4Y
-VITE_FIREBASE_AUTH_DOMAIN=whats-the-chance-game.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=whats-the-chance-game
-VITE_FIREBASE_STORAGE_BUCKET=whats-the-chance-game.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=658680466104
-VITE_FIREBASE_APP_ID=1:658680466104:web:7fa05e23c1c74c56b7424d
-VITE_FIREBASE_MEASUREMENT_ID=G-4NQZL4ZTF1
+VITE_FIREBASE_API_KEY=your_firebase_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id_here
+VITE_FIREBASE_APP_ID=your_app_id_here
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id_here
 
 # Backend API URL
 VITE_API_URL=http://localhost:8000
@@ -84,15 +84,15 @@ Create a `.env` file in the `backend/` directory with the service account detail
 
 ```env
 # Firebase Settings
-FIREBASE_PROJECT_ID=whats-the-chance-game
+FIREBASE_PROJECT_ID=your-project-id
 FIREBASE_PRIVATE_KEY_ID=your-private-key-id
 FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\nYour private key here\n-----END PRIVATE KEY-----\n
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@whats-the-chance-game.iam.gserviceaccount.com
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
 FIREBASE_CLIENT_ID=your-client-id
 FIREBASE_AUTH_URI=https://accounts.google.com/o/oauth2/auth
 FIREBASE_TOKEN_URI=https://oauth2.googleapis.com/token
 FIREBASE_AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
-FIREBASE_CLIENT_X509_CERT_URL=https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxxxx%40whats-the-chance-game.iam.gserviceaccount.com
+FIREBASE_CLIENT_X509_CERT_URL=https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxxxx%40your-project-id.iam.gserviceaccount.com
 ```
 
 ## 🚀 **Verification Steps**
@@ -122,10 +122,10 @@ python -m pytest tests/unit/test_firebase_service.py -v
 
 ## 🔗 **Useful Links**
 
-- **Firebase Console**: https://console.firebase.google.com/project/whats-the-chance-game
-- **Firestore Console**: https://console.firebase.google.com/project/whats-the-chance-game/firestore
-- **Authentication Console**: https://console.firebase.google.com/project/whats-the-chance-game/authentication
-- **Project Settings**: https://console.firebase.google.com/project/whats-the-chance-game/settings
+- **Firebase Console**: https://console.firebase.google.com/project/your-project-id
+- **Firestore Console**: https://console.firebase.google.com/project/your-project-id/firestore
+- **Authentication Console**: https://console.firebase.google.com/project/your-project-id/authentication
+- **Project Settings**: https://console.firebase.google.com/project/your-project-id/settings
 
 ## 📝 **Notes**
 

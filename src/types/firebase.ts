@@ -21,6 +21,13 @@ export interface User {
   profile: UserProfile;
   settings: UserSettings;
   stats: UserStats;
+  // Additional fields for friends feature
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  mutualFriendsCount?: number;
+  isOnline?: boolean;
+  lastActive?: Timestamp | string;
 }
 
 export interface UserProfile {
@@ -304,4 +311,18 @@ export interface FirebaseError extends Error {
   code: string;
   message: string;
   context?: string;
+}
+
+// User search result type
+export interface UserSearchResult extends User {
+  mutualFriendsCount?: number;
+  isFriend?: boolean;
+  hasPendingRequest?: boolean;
+}
+
+// API search response type
+export interface UserSearchResponse {
+  users: UserSearchResult[];
+  total: number;
+  query: string;
 }

@@ -8,12 +8,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Menu, User, Plus, Bell, LogOut, Settings, UserCircle } from 'lucide-react';
+import { Menu, User, Plus, Bell, LogOut, Settings, UserCircle, BellOff } from 'lucide-react';
 import { useState } from 'react';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { AuthModal } from './auth/AuthModal';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from './ThemeToggle';
+import { useNotifications } from '@/contexts/NotificationContext';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface NavBarProps {
   onMenuClick: () => void;
@@ -24,6 +31,7 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
   const { isAuthenticated, user, userDoc, signOut } = useAuth();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { hasPermission, requestPermission, isLoading: notificationLoading } = useNotifications();
 
   return (
     <>
@@ -62,14 +70,40 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
                 Create Challenge
               </Button>
               <ThemeToggle />
-              <Button variant='ghost' size='icon' className='relative' data-testid='notification-bell'>
-                <Bell className='h-5 w-5' />
-                {notificationCount > 0 && (
-                  <span className='absolute -top-1 -right-1 h-5 w-5 bg-secondary text-secondary-foreground text-xs rounded-full flex items-center justify-center animate-bounce-in' data-testid='notification-count'>
-                    {notificationCount > 9 ? '9+' : notificationCount}
-                  </span>
-                )}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant='ghost' 
+                      size='icon' 
+                      className='relative'
+                      onClick={!hasPermission && isAuthenticated ? requestPermission : undefined}
+                      disabled={notificationLoading}
+                      data-testid='notification-bell'
+                    >
+                      {hasPermission ? (
+                        <Bell className='h-5 w-5' />
+                      ) : (
+                        <BellOff className='h-5 w-5' />
+                      )}
+                      {notificationCount > 0 && hasPermission && (
+                        <span className='absolute -top-1 -right-1 h-5 w-5 bg-secondary text-secondary-foreground text-xs rounded-full flex items-center justify-center animate-bounce-in' data-testid='notification-count'>
+                          {notificationCount > 9 ? '9+' : notificationCount}
+                        </span>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {!isAuthenticated ? (
+                      'Sign in to enable notifications'
+                    ) : hasPermission ? (
+                      'Notifications enabled'
+                    ) : (
+                      'Click to enable notifications'
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

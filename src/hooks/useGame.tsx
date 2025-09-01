@@ -3,6 +3,7 @@ import { gameService } from '@/lib/gameService';
 import { Challenge, GameSession } from '@/types/challenge';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { useWebSocket } from './useWebSocket';
 
 export function useGame() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -10,6 +11,7 @@ export function useGame() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { subscribe, isConnected } = useWebSocket();
 
   // Load challenges for the current user
   useEffect(() => {
@@ -79,9 +81,75 @@ export function useGame() {
     };
   }, [user?.uid]);
 
+  // Subscribe to WebSocket events for real-time updates
+  useEffect(() => {
+    if (!user?.uid || !isConnected) return;
+
+    // Subscribe to challenge updates
+    const unsubscribeUpdate = subscribe('challenge_updated', (message) => {
+      if (message.type === 'challenge_updated' && message.data) {
+        setChallenges(prev => prev.map(c => 
+          c.id === message.data.id ? message.data : c
+        ));
+      }
+    });
+
+    // Subscribe to new challenges
+    const unsubscribeCreate = subscribe('challenge_created', (message) => {
+      if (message.type === 'challenge_created' && message.data) {
+        const challenge = message.data;
+        // Only add if user is involved
+        if (challenge.from_user === user.uid || challenge.to_user === user.uid) {
+          setChallenges(prev => [challenge, ...prev]);
+          
+          // Show notification for incoming challenges
+          if (challenge.to_user === user.uid) {
+            toast({
+              title: 'New challenge! 🎲',
+              description: `You've been challenged to: ${challenge.description}`,
+              action: (
+                <button
+                  onClick={() => window.location.href = `/game?challengeId=${challenge.id}`}
+                  className="text-sm font-medium"
+                >
+                  View Challenge
+                </button>
+              ),
+            });
+          }
+        }
+      }
+    });
+
+    // Subscribe to challenge completion
+    const unsubscribeComplete = subscribe('challenge_completed', (message) => {
+      if (message.type === 'challenge_completed' && message.data) {
+        // Refresh challenges to get updated data
+        const loadChallenges = async () => {
+          try {
+            const updatedChallenges = await gameService.getChallenges(user.uid);
+            setChallenges(updatedChallenges);
+          } catch (err) {
+            console.error('Failed to refresh challenges:', err);
+          }
+        };
+        loadChallenges();
+      }
+    });
+
+    return () => {
+      unsubscribeUpdate();
+      unsubscribeCreate();
+      unsubscribeComplete();
+    };
+  }, [user?.uid, isConnected, subscribe, toast]);
+
   // Create a new challenge
   const createChallenge = useCallback(
-    async (toUser: string, description: string) => {
+    async (toUser: string, description: string, options?: { 
+      difficulty?: string; 
+      category?: string;
+    }) => {
       if (!user?.uid) {
         toast({
           title: 'Authentication required',
@@ -92,10 +160,16 @@ export function useGame() {
       }
 
       try {
-        const challengeId = await gameService.createChallenge(user.uid, toUser, description);
+        const challengeId = await gameService.createChallenge(
+          user.uid, 
+          toUser, 
+          description,
+          options?.category,
+          options?.difficulty
+        );
         toast({
           title: 'Challenge sent! 🎲',
-          description: `${toUser} has been challenged to: ${description}`,
+          description: `Challenge sent successfully!`,
         });
         return challengeId;
       } catch (err) {

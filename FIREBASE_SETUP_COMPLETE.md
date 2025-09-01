@@ -4,8 +4,8 @@
 
 ### 🔥 **Firebase Project Setup**
 
-- ✅ **Firebase Project Created**: `whats-the-chance-game`
-- ✅ **Web App Created**: `whats-the-chance-game-web` (ID: `1:658680466104:web:7fa05e23c1c74c56b7424d`)
+- ✅ **Firebase Project Created**: `your-project-id`
+- ✅ **Web App Created**: `your-project-id-web` (ID: `your-app-id`)
 - ✅ **Firebase CLI Installed**: Version 14.11.1
 - ✅ **Google Cloud CLI Installed**: Version 531.0.0
 - ✅ **Authentication**: Logged in as `stavlobel@gmail.com`
@@ -38,7 +38,7 @@
 
 ### 1. **Enable Billing** (Required for Firestore)
 
-**Visit**: https://console.developers.google.com/billing/enable?project=whats-the-chance-game
+**Visit**: https://console.developers.google.com/billing/enable?project=your-project-id
 
 **Steps**:
 
@@ -62,7 +62,7 @@ firebase deploy --only firestore:indexes
 
 ### 4. **Enable Authentication**
 
-**Visit**: https://console.firebase.google.com/project/whats-the-chance-game/authentication
+**Visit**: https://console.firebase.google.com/project/your-project-id/authentication
 
 **Steps**:
 
@@ -72,7 +72,7 @@ firebase deploy --only firestore:indexes
 
 ### 5. **Generate Service Account Key**
 
-**Visit**: https://console.firebase.google.com/project/whats-the-chance-game/settings/serviceaccounts/adminsdk
+**Visit**: https://console.firebase.google.com/project/your-project-id/settings/serviceaccounts/adminsdk
 
 **Steps**:
 
@@ -86,13 +86,13 @@ firebase deploy --only firestore:indexes
 
 ```json
 {
-  "projectId": "whats-the-chance-game",
-  "appId": "1:658680466104:web:7fa05e23c1c74c56b7424d",
-  "storageBucket": "whats-the-chance-game.firebasestorage.app",
-  "apiKey": "AIzaSyCa_xUyQQtDguN_ZrLDSFPONbT4yFYug4Y",
-  "authDomain": "whats-the-chance-game.firebaseapp.com",
-  "messagingSenderId": "658680466104",
-  "measurementId": "G-4NQZL4ZTF1"
+  "projectId": "your-project-id",
+  "appId": "your-app-id",
+  "storageBucket": "your-project-id.firebasestorage.app",
+  "apiKey": "your-api-key",
+  "authDomain": "your-project-id.firebaseapp.com",
+  "messagingSenderId": "your-sender-id",
+  "measurementId": "your-measurement-id"
 }
 ```
 
@@ -134,11 +134,11 @@ python -m pytest tests/unit/test_firebase_service.py -v
 
 ## 🔗 **Useful Links**
 
-- **Firebase Console**: https://console.firebase.google.com/project/whats-the-chance-game
-- **Firestore Console**: https://console.firebase.google.com/project/whats-the-chance-game/firestore
-- **Authentication Console**: https://console.firebase.google.com/project/whats-the-chance-game/authentication
-- **Project Settings**: https://console.firebase.google.com/project/whats-the-chance-game/settings
-- **Billing Setup**: https://console.developers.google.com/billing/enable?project=whats-the-chance-game
+- **Firebase Console**: https://console.firebase.google.com/project/your-project-id
+- **Firestore Console**: https://console.firebase.google.com/project/your-project-id/firestore
+- **Authentication Console**: https://console.firebase.google.com/project/your-project-id/authentication
+- **Project Settings**: https://console.firebase.google.com/project/your-project-id/settings
+- **Billing Setup**: https://console.developers.google.com/billing/enable?project=your-project-id
 
 ## 📝 **Summary**
 

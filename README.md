@@ -47,6 +47,42 @@ The ultimate social game of chance and challenges! Dare your friends and see if 
 - **[Cursor Rules](./.cursor/rules/)** - Development guidelines and coding standards
 - **[Original Design Reference](https://lovable.dev/projects/246aae1e-8a6d-441f-b4ed-446405d5302c)** - Lovable project for visual reference
 
+## 🛠️ Quick Start with Makefile
+
+The project includes a comprehensive Makefile for easy development management:
+
+```bash
+# First time setup
+make setup
+
+# Start development servers (frontend + backend)
+make dev
+
+# Run all tests
+make test
+
+# Check code quality
+make check
+
+# Build for production
+make build
+
+# See all available commands
+make help
+```
+
+### Alternative Development Scripts
+
+You can also use the development script directly:
+
+```bash
+# Start development environment
+./scripts/dev.sh
+
+# Skip dependency installation
+./scripts/dev.sh --no-install
+```
+
 ### How It Works
 
 1. **Challenge**: One user poses a question: "What's the chance you'll do X?"
