@@ -10,6 +10,7 @@ This module provides Firebase Admin SDK integration for:
 
 # TODO: Add json when JSON processing is needed
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import firebase_admin
@@ -45,8 +46,6 @@ class FirebaseService:
             logger.info("Firebase Admin SDK already initialized")
         except ValueError:
             # Initialize Firebase Admin SDK
-            import os
-
             # Try service account file first (for CI/CD)
             if os.path.exists(settings.firebase_service_account_path):
                 cred = credentials.Certificate(settings.firebase_service_account_path)
@@ -209,7 +208,7 @@ class FirebaseService:
             )
             raise
 
-    async def update_document(
+    def update_document(
         self, collection_name: str, document_id: str, data: Dict[str, Any]
     ) -> bool:
         """
@@ -233,7 +232,7 @@ class FirebaseService:
             )
             return False
 
-    async def delete_document(self, collection_name: str, document_id: str) -> bool:
+    def delete_document(self, collection_name: str, document_id: str) -> bool:
         """
         Delete a document from Firestore.
 

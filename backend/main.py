@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.config import settings
-from app.routers import challenges, game_stats, notifications
+from app.routers import challenges, game_stats, notifications, websocket
 
 # Load environment variables
 load_dotenv()
@@ -81,6 +81,7 @@ app.include_router(
     notifications.router, prefix="/api/notifications", tags=["notifications"]
 )
 app.include_router(game_stats.router)
+app.include_router(websocket.router, tags=["websocket"])
 
 if __name__ == "__main__":
     # Development server
