@@ -16,7 +16,7 @@ import type {
   BlockUserRequest,
   FriendPrivacySettings,
 } from '@/types/friends';
-import type { UserSearchResult } from '@/types/firebase';
+import type { UserSearchResult, UserSearchResponse } from '@/types/firebase';
 
 export const friendsApiService = {
   /**
@@ -24,7 +24,8 @@ export const friendsApiService = {
    */
   searchUsers: async (params: FriendSearch): Promise<UserSearchResult[]> => {
     const response = await apiClient.post('/api/friends/search', params);
-    return response.data;
+    const searchResponse: UserSearchResponse = response.data;
+    return searchResponse.users;
   },
 
   /**

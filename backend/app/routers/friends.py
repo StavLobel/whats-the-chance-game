@@ -42,7 +42,7 @@ router = APIRouter(
 friends_service = FriendService()
 
 
-@router.post("/search", response_model=List[UserSearchResult])
+@router.post("/search", response_model=UserSearchResult)
 async def search_users(
     search_params: FriendSearch,
     current_user: Dict[str, Any] = Depends(get_current_user),
