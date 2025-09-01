@@ -206,17 +206,29 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ Comprehensive error handling and loading states
    - ✅ Enhanced home dashboard with friends statistics
 
-9. **👤 Profile Page: User Profile Management After Login** [#35](https://github.com/StavLobel/whats-the-chance-game/issues/35)
+9. **🎯 Add Friend Button Enhancement - Popup Search Window** [#38](https://github.com/StavLobel/whats-the-chance-game/issues/38)
    - **Status**: ⏳ **PENDING**
    - **Priority**: **MEDIUM** ⭐⭐⭐
-   - **Dependencies**: Authentication (#6), Backend (#9), Game Logic (#20) - All completed
-   - Profile information display and editing
-   - Game statistics and achievements system
-   - Game history and activity timeline
-   - Profile privacy settings
-   - Avatar upload and management
+   - **Dependencies**: Friends Feature (#34) - Completed
+   - **Enhancement**: Add prominent "Add Friend" button with popup search modal
+   - **Features**:
+     - Prominent Add Friend button in Friends tab header
+     - Modal popup with real-time search functionality
+     - Direct friend request sending from search results
+     - Mobile-responsive modal design
+     - Accessibility features (keyboard navigation, screen reader support)
 
-10. **⚙️ Settings Page: User Settings and Preferences After Login** [#36](https://github.com/StavLobel/whats-the-chance-game/issues/36)
+10. **👤 Profile Page: User Profile Management After Login** [#35](https://github.com/StavLobel/whats-the-chance-game/issues/35)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **MEDIUM** ⭐⭐⭐
+    - **Dependencies**: Authentication (#6), Backend (#9), Game Logic (#20) - All completed
+    - Profile information display and editing
+    - Game statistics and achievements system
+    - Game history and activity timeline
+    - Profile privacy settings
+    - Avatar upload and management
+
+11. **⚙️ Settings Page: User Settings and Preferences After Login** [#36](https://github.com/StavLobel/whats-the-chance-game/issues/36)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
     - **Dependencies**: Authentication (#6), Backend (#9), Profile Page (#35)
@@ -226,10 +238,10 @@ This document breaks down the Software Requirements Document (SRD) into actionab
     - Notification settings and preferences
     - Game-specific settings and preferences
 
-11. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
+12. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
-    - **Dependencies**: Friends Feature (#34) - PENDING
+    - **Dependencies**: Friends Feature (#34) - Completed
     - Connect existing ChallengeCard components to real data
     - Enhance existing ChallengeDetail with real-time updates
     - Improve existing CreateChallengeModal with validation
@@ -308,10 +320,11 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 ## 🎯 Next Immediate Tasks
 
 1. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
-2. **👤 Profile Page: User Profile Management** (#35) - **MEDIUM** - Complete user profile experience
-3. **⚙️ Settings Page: User Settings and Preferences** (#36) - **MEDIUM** - Centralized settings management
-4. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data (friends feature completed)
-5. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
+2. **🎯 Add Friend Button Enhancement** (#38) - **MEDIUM** - Add popup search modal for friend discovery
+3. **👤 Profile Page: User Profile Management** (#35) - **MEDIUM** - Complete user profile experience
+4. **⚙️ Settings Page: User Settings and Preferences** (#36) - **MEDIUM** - Centralized settings management
+5. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data (friends feature completed)
+6. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
 
 ## 🐛 Recent Bug Fixes
 
