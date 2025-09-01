@@ -331,6 +331,8 @@ async def create_challenge(
             "description": challenge_data.description,
             "from_user": challenge_data.from_user,
             "to_user": challenge_data.to_user,
+            "category": challenge_data.category,
+            "difficulty": challenge_data.difficulty,
             "status": "pending",
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow(),
