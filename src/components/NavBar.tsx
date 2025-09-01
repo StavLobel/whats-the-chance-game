@@ -32,7 +32,13 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
           <div className='flex justify-between items-center h-16'>
             {/* Left: Menu + Logo */}
             <div className='flex items-center'>
-              <Button variant='ghost' size='icon' onClick={onMenuClick} className='lg:hidden'>
+              <Button 
+                variant='ghost' 
+                size='icon' 
+                onClick={onMenuClick} 
+                className='lg:hidden'
+                data-testid='menu-button'
+              >
                 <Menu className='h-6 w-6' />
               </Button>
               <div className='flex items-center'>
@@ -50,15 +56,16 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
                 size='sm'
                 onClick={() => setShowCreateModal(true)}
                 className='hidden sm:flex'
+                data-testid='create-challenge-button'
               >
                 <Plus className='h-4 w-4' />
                 Create Challenge
               </Button>
               <ThemeToggle />
-              <Button variant='ghost' size='icon' className='relative'>
+              <Button variant='ghost' size='icon' className='relative' data-testid='notification-bell'>
                 <Bell className='h-5 w-5' />
                 {notificationCount > 0 && (
-                  <span className='absolute -top-1 -right-1 h-5 w-5 bg-secondary text-secondary-foreground text-xs rounded-full flex items-center justify-center animate-bounce-in'>
+                  <span className='absolute -top-1 -right-1 h-5 w-5 bg-secondary text-secondary-foreground text-xs rounded-full flex items-center justify-center animate-bounce-in' data-testid='notification-count'>
                     {notificationCount > 9 ? '9+' : notificationCount}
                   </span>
                 )}
@@ -66,7 +73,7 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant='ghost' size='icon' className='relative'>
+                    <Button variant='ghost' size='icon' className='relative' data-testid='user-menu'>
                       <Avatar className='h-8 w-8'>
                         <AvatarImage src={user?.photoURL || undefined} />
                         <AvatarFallback>
@@ -103,7 +110,7 @@ export function NavBar({ onMenuClick, notificationCount = 0 }: NavBarProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button variant='ghost' onClick={() => setShowAuthModal(true)}>
+                <Button variant='ghost' onClick={() => setShowAuthModal(true)} data-testid='sign-in-button'>
                   <User className='mr-2 h-4 w-4' />
                   Sign in
                 </Button>

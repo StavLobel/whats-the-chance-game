@@ -87,7 +87,7 @@ export default function Game() {
         return (
           <div className='space-y-6'>
             {/* Welcome Header */}
-            <div className='text-center space-y-2 p-6 bg-gradient-card rounded-lg shadow-card'>
+            <div className='text-center space-y-2 p-6 bg-gradient-card rounded-lg shadow-card' data-testid='dashboard'>
               <h1 className='text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent'>
                 Welcome back, @{user?.displayName || user?.email || 'user'}!
               </h1>

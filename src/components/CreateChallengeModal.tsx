@@ -69,7 +69,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-md bg-gradient-card'>
+      <DialogContent className='sm:max-w-md bg-gradient-card' data-testid='create-challenge-modal'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-xl'>
             <img src='/logo.png' alt="What's the Chance? Logo" className='w-16 h-16' />
@@ -91,6 +91,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
               className='resize-none'
               rows={3}
               dir='auto'
+              data-testid='challenge-description'
             />
           </div>
 
@@ -107,6 +108,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
                 onChange={e => setTargetUser(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
                 dir='auto'
+                data-testid='target-user-input'
               />
               <Button type='button' onClick={addTag} size='sm' variant='outline'>
                 Add
@@ -145,7 +147,7 @@ export function CreateChallengeModal({ open, onOpenChange }: CreateChallengeModa
             >
               Cancel
             </Button>
-            <Button type='submit' className='flex-1' disabled={isSubmitting}>
+            <Button type='submit' className='flex-1' disabled={isSubmitting} data-testid='submit-challenge'>
               {isSubmitting ? 'Sending...' : 'Send Challenge'}
             </Button>
           </div>
