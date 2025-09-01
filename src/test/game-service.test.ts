@@ -43,11 +43,12 @@ describe('GameService', () => {
       const result = await gameService.createChallenge('user1', 'user2', 'Test challenge');
 
       expect(addDoc).toHaveBeenCalledWith(expect.any(Object), {
-        fromUser: 'user1',
-        toUser: 'user2',
+        from_user: 'user1',
+        to_user: 'user2',
         description: 'Test challenge',
         status: 'pending',
-        createdAt: expect.any(Date),
+        created_at: expect.any(Date),
+        updated_at: expect.any(Date),
       });
       expect(result).toBe('challenge-123');
     });
