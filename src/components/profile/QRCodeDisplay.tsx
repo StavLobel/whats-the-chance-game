@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { QrCode, Download, Share2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -106,7 +106,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ className }) => {
             {/* QR Code Preview */}
             <div className="flex justify-center">
               <div className="p-4 bg-white rounded-lg border">
-                <QRCode
+                <QRCodeSVG
                   value={uniqueIdData.unique_id}
                   size={120}
                   level="M"
@@ -134,7 +134,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ className }) => {
                   <div className="flex flex-col items-center space-y-4">
                     {/* Large QR Code */}
                     <div className="p-6 bg-white rounded-lg border">
-                      <QRCode
+                      <QRCodeCanvas
                         id="qr-code-canvas"
                         value={uniqueIdData.unique_id}
                         size={256}
