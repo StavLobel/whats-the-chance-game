@@ -49,7 +49,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 - Include acceptance criteria in issue descriptions
 - Link issues to related tasks in this document
 
-## �� Development Phases & Logical Order
+## 🎯 Development Phases & Logical Order
 
 ### ✅ **COMPLETED PHASES**
 
@@ -83,6 +83,32 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 - ✅ **Hebrew Support for Challenge Descriptions + Dark Mode** 🌍
   - **GitHub Issue**: [#21](https://github.com/StavLobel/whats-the-chance-game/issues/21) ✅ **CLOSED**
 
+#### Phase 3: Backend Development ✅ **COMPLETED**
+
+**Priority: High**
+**Status**: ✅ **COMPLETED** - January 28, 2025
+
+- ✅ **Backend Infrastructure** ⚙️
+  - **GitHub Issue**: [#9](https://github.com/StavLobel/whats-the-chance-game/issues/9) ✅ **CLOSED**
+  - **Status**: ✅ **COMPLETED** - January 28, 2025 - **FIREBASE PRODUCTION READY!**
+  - **Priority**: High
+  - ✅ FastAPI project setup with comprehensive test suite
+  - ✅ Firebase Admin SDK integration with complete service
+  - ✅ **🔥 Real Firebase project created and configured**
+  - ✅ **🗄️ Firestore database created and working**
+  - ✅ **🔐 Service account credentials generated and configured**
+  - ✅ **📁 Firestore security rules and indexes deployed**
+  - ✅ **✅ Authentication enabled and working**
+  - ✅ Database schema and Pydantic models for all entities
+  - ✅ API endpoint implementation with authentication middleware
+  - ✅ Security and token validation middleware
+  - ✅ Complete documentation and deployment configuration
+  - ✅ Docker support and production-ready setup
+  - ✅ **👤 User Schema Enhancement** - Added firstName, lastName, username fields
+  - ✅ **🗄️ Firebase Database Structure** - Complete user profiles, stats, and settings collections
+  - ✅ **🧪 Test Users Creation** - Comprehensive test users with full profiles
+  - ✅ **🔒 Security Enhancement** - Removed secrets from git history, enhanced .gitignore
+
 ### 🔄 **CURRENT DEVELOPMENT PHASE**
 
 #### Phase 4: Integration & Testing
@@ -114,62 +140,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ Updated all components to handle empty states gracefully
    - Prepare for production-ready implementation
 
-3. **🎮 Core Game Logic Implementation** [#20](https://github.com/StavLobel/whats-the-chance-game/issues/20)
-   - **Status**: ⏳ **PENDING**
-   - **Priority**: Critical
-   - Implement core number matching algorithm
-   - Add challenge resolution logic
-   - Create game state management
-   - Implement win/loss conditions
-
-4. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
-   - **Status**: ⏳ **PENDING**
-   - **Priority**: High
-   - Connect existing ChallengeCard components to real data
-   - Enhance existing ChallengeDetail with real-time updates
-   - Improve existing CreateChallengeModal with validation
-   - Add real-time updates to existing number selection interface
-
-### ✅ **COMPLETED PHASES**
-
-#### Phase 3: Backend Development ✅ **COMPLETED**
-
-**Priority: High**
-**Status**: ✅ **COMPLETED** - January 28, 2025
-
-4. **⚙️ Backend Infrastructure** [#9](https://github.com/StavLobel/whats-the-chance-game/issues/9)
-   - **Status**: ✅ **COMPLETED** - January 28, 2025 - **FIREBASE PRODUCTION READY!**
-   - **Priority**: High
-   - ✅ FastAPI project setup with comprehensive test suite
-   - ✅ Firebase Admin SDK integration with complete service
-   - ✅ **🔥 Real Firebase project created and configured**
-   - ✅ **🗄️ Firestore database created and working**
-   - ✅ **🔐 Service account credentials generated and configured**
-   - ✅ **📁 Firestore security rules and indexes deployed**
-   - ✅ **✅ Authentication enabled and working**
-   - ✅ Database schema and Pydantic models for all entities
-   - ✅ API endpoint implementation with authentication middleware
-   - ✅ Security and token validation middleware
-   - ✅ Complete documentation and deployment configuration
-   - ✅ Docker support and production-ready setup
-   - ✅ **👤 User Schema Enhancement** - Added firstName, lastName, username fields
-   - ✅ **🗄️ Firebase Database Structure** - Complete user profiles, stats, and settings collections
-   - ✅ **🧪 Test Users Creation** - Comprehensive test users with full profiles
-   - ✅ **🔒 Security Enhancement** - Removed secrets from git history, enhanced .gitignore
-
-5. **🔄 Real-time Features** [#10](https://github.com/StavLobel/whats-the-chance-game/issues/10)
-   - **Status**: ⏳ **PENDING**
-   - **Priority**: **CRITICAL** ⭐⭐⭐⭐⭐
-   - Firestore integration
-   - Real-time challenge updates
-   - Push notification system (FCM)
-   - WebSocket connections for live updates
-
-#### Phase 4: Integration & Testing
-
-**Priority: Medium**
-
-6. **🔗 Frontend-Backend Integration** [#11](https://github.com/StavLobel/whats-the-chance-game/issues/11)
+3. **🔗 Frontend-Backend Integration** [#11](https://github.com/StavLobel/whats-the-chance-game/issues/11)
    - **Status**: ✅ **COMPLETED** - January 29, 2025
    - **Priority**: Medium
    - ✅ API client implementation with authentication and retry logic
@@ -181,7 +152,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ Comprehensive testing with 100% coverage
    - ✅ Environment configuration for development/production
 
-7. **🧪 End-to-End Testing** [#12](https://github.com/StavLobel/whats-the-chance-game/issues/12)
+4. **🧪 End-to-End Testing** [#12](https://github.com/StavLobel/whats-the-chance-game/issues/12)
    - **Status**: ✅ **COMPLETED** - September 1, 2025
    - **Priority**: **HIGH** ⭐⭐⭐⭐
    - ✅ Playwright E2E test setup with Page Object Model
@@ -190,38 +161,95 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ Performance and error handling tests
    - ✅ Test helpers and fixtures implementation
 
+5. **🔄 Real-time Features** [#10](https://github.com/StavLobel/whats-the-chance-game/issues/10)
+   - **Status**: ✅ **COMPLETED** - September 1, 2025
+   - **Priority**: **CRITICAL** ⭐⭐⭐⭐⭐
+   - ✅ Firestore integration
+   - ✅ Real-time challenge updates
+   - ✅ Push notification system (FCM)
+   - ✅ WebSocket connections for live updates
+
+6. **🔧 CI/CD Pipeline** [#14](https://github.com/StavLobel/whats-the-chance-game/issues/14)
+   - **Status**: ✅ **COMPLETED** - July 29, 2025
+   - **Priority**: Medium
+   - ✅ GitHub Actions workflow
+   - ✅ Automated testing pipeline
+   - ✅ Build and deployment automation
+   - ✅ Allure report generation
+   - ✅ Environment promotion strategy
+
+7. **🐛 Bug Fixes & Docker Environment** [#33](https://github.com/StavLobel/whats-the-chance-game/issues/33)
+   - **Status**: ✅ **COMPLETED** - September 1, 2025
+   - **Priority**: **HIGH** ⭐⭐⭐⭐
+   - ✅ Fixed "Failed to load challenges" error in Docker environment
+   - ✅ Added missing Firebase environment variables to backend container
+   - ✅ Fixed CORS configuration to allow localhost:5173 (Vite dev server)
+   - ✅ Verified Docker containerization works correctly
+   - ✅ Added E2E health check tests for application verification
+
+### ⏳ **PENDING TASKS**
+
+#### Phase 4: Integration & Testing (Continued)
+
+8. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: **MEDIUM** ⭐⭐⭐
+   - Connect existing ChallengeCard components to real data
+   - Enhance existing ChallengeDetail with real-time updates
+   - Improve existing CreateChallengeModal with validation
+   - Add real-time updates to existing number selection interface
+
+9. **🔧 Fix Persistent CI Pipeline Failures** [#29](https://github.com/StavLobel/whats-the-chance-game/issues/29)
+   - **Status**: ⏳ **PENDING**
+   - **Priority**: **HIGH** ⭐⭐⭐⭐
+   - Fix ESLint configuration conflicts between `.eslintrc.json` and `eslint.config.js`
+   - Resolve Pydantic V1 to V2 migration issues
+   - Fix Firebase service initialization issues in CI environment
+   - Ensure all frontend and backend unit tests pass in CI
+
 #### Phase 5: Deployment & DevOps
 
-**Priority: Medium**
+10. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **MEDIUM** ⭐⭐⭐
+    - Hostinger VPS setup with Traefik v3.0
+    - Docker Compose configuration
+    - Let's Encrypt HTTPS certificate automation
 
-8. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
-   - **Status**: ⏳ **PENDING**
-   - **Priority**: Medium
-   - Hostinger VPS setup with Traefik v3.0
-   - Docker Compose configuration
-   - Let's Encrypt HTTPS certificate automation
-
-9. **🔄 CI/CD Pipeline** [#14](https://github.com/StavLobel/whats-the-chance-game/issues/14)
-   - **Status**: ⏳ **PENDING**
-   - **Priority**: Medium
-   - GitHub Actions workflow
-   - Automated testing pipeline
-   - Build and deployment automation
-
-10. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
+11. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Production deployment workflow
     - Versioning and release workflow
     - Advanced testing and monitoring
 
-11. **🔧 Admin Panel - User & Challenge Management System** [#27](https://github.com/StavLobel/whats-the-chance-game/issues/27)
+12. **🔧 Admin Panel - User & Challenge Management System** [#27](https://github.com/StavLobel/whats-the-chance-game/issues/27)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - User CRUD operations (create, read, update, delete)
     - Challenge management and statistics
     - Application analytics dashboard
     - Admin authentication and authorization
+
+#### Phase 6: Advanced Features (Future)
+
+13. **🎯 Enhanced Game Features** [#15](https://github.com/StavLobel/whats-the-chance-game/issues/15)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **LOW** ⭐⭐
+    - Challenge history and statistics
+    - User profiles and avatars
+    - Achievement system
+    - Social features (friends, leaderboards)
+    - Group challenges
+
+14. **📱 Mobile Experience** [#16](https://github.com/StavLobel/whats-the-chance-game/issues/16)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **LOW** ⭐⭐
+    - Progressive Web App (PWA) features
+    - Mobile app considerations
+    - Push notification optimization
+    - Offline-first architecture
+    - App store preparation
 
 ## 📊 Success Metrics
 
@@ -235,17 +263,30 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 - ✅ **Phase 0: Infrastructure & Protection Setup** - **COMPLETED** (July 27, 2025)
 - ✅ **Phase 1: Foundation & TDD Setup** - **COMPLETED** (July 27, 2025)
-- ✅ **Phase 2: Frontend Core Features (Part 1)** - **COMPLETED** (July 28, 2025)
+- ✅ **Phase 2: Frontend Core Features** - **COMPLETED** (July 28, 2025)
 - ✅ **Phase 3: Backend Development** - **COMPLETED** (January 28, 2025)
-- ⏳ **Phase 4: Integration & Testing** - **IN PROGRESS** (Current)
+- 🔄 **Phase 4: Integration & Testing** - **IN PROGRESS** (Current)
 - ⏳ **Phase 5: Deployment & DevOps** - **PENDING**
+- ⏳ **Phase 6: Advanced Features** - **PENDING**
 
 ## 🎯 Next Immediate Tasks
 
-1. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data
-2. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
-3. **🔧 CI/CD Pipeline** (#14) - **MEDIUM** - GitHub Actions and automated deployment
-4. **🔄 Real-time Features** (#10) - **CRITICAL** - Implement WebSocket and FCM notifications
+1. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
+2. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data
+3. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
+
+## 🐛 Recent Bug Fixes
+
+### ✅ **Issue #33 - Docker Environment Bug** (September 1, 2025)
+- **Problem**: "Failed to load challenges" error after login in Docker environment
+- **Root Causes**: 
+  1. Missing Firebase environment variables in backend container
+  2. CORS configuration missing localhost:5173 (Vite dev server)
+- **Solutions Applied**:
+  1. Added Firebase environment variables to `.env` file
+  2. Updated CORS configuration in `backend/app/core/config.py`
+  3. Restarted Docker containers to apply changes
+- **Status**: ✅ **FULLY RESOLVED** - Both Firebase auth and CORS issues fixed
 
 ---
 
