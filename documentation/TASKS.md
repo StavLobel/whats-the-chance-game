@@ -220,19 +220,21 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ E2E tests for complete friend request flow
 
 10. **🔢 Unique User IDs and QR Code Friend Request System** [#40](https://github.com/StavLobel/whats-the-chance-game/issues/40)
-    - **Status**: ⏳ **PENDING**
+    - **Status**: ✅ **COMPLETED** - September 1, 2025
     - **Priority**: **HIGH** ⭐⭐⭐⭐
     - **Dependencies**: Friends Feature (#34), Add Friend Button (#38) - Both completed
-    - **Features**:
-      - Generate 16-digit unique IDs for each user
-      - Store unique IDs in Firebase user profiles
-      - Display unique ID in user profile/settings
-      - Require unique ID for friend requests (enhanced security)
-      - QR code generation for user's unique ID
-      - QR code scanning functionality with camera access
-      - Auto-populate friend request form from scanned QR codes
-      - Mobile-responsive QR scanning interface
-      - Comprehensive validation and error handling
+    - ✅ Generate cryptographically secure 16-digit unique IDs for each user
+    - ✅ Store unique IDs in Firebase user profiles with proper indexing
+    - ✅ Display unique ID in user profile with show/hide and copy functionality
+    - ✅ Require unique ID for friend requests (enhanced security)
+    - ✅ QR code generation component for sharing user's unique ID
+    - ✅ QR code scanning functionality with camera access and permission handling
+    - ✅ Auto-populate friend request form from scanned QR codes
+    - ✅ Mobile-responsive QR scanning interface with development test buttons
+    - ✅ Comprehensive validation and error handling for all operations
+    - ✅ Migration script successfully assigned unique IDs to all existing users
+    - ✅ Enhanced AddFriendModal with tabbed interface (Search, Unique ID, QR Code)
+    - ✅ Complete test coverage with unit and component tests
 
 11. **👤 Profile Page: User Profile Management After Login** [#35](https://github.com/StavLobel/whats-the-chance-game/issues/35)
     - **Status**: ⏳ **PENDING**
@@ -335,14 +337,30 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 ## 🎯 Next Immediate Tasks
 
-1. **🔢 Unique User IDs and QR Code Friend Request System** (#40) - **HIGH** - Implement secure friend request system with unique IDs and QR codes
-2. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
-3. **👤 Profile Page: User Profile Management** (#35) - **MEDIUM** - Complete user profile experience
-4. **⚙️ Settings Page: User Settings and Preferences** (#36) - **MEDIUM** - Centralized settings management
-5. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data (friends feature completed)
-6. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
+1. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
+2. **👤 Profile Page: User Profile Management** (#35) - **MEDIUM** - Complete user profile experience
+3. **⚙️ Settings Page: User Settings and Preferences** (#36) - **MEDIUM** - Centralized settings management
+4. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data (friends feature completed)
+5. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
 
 ## 🐛 Recent Bug Fixes
+
+### ✅ **Issue #40 - Unique User IDs and QR Code Friend Request System** (September 1, 2025)
+- **Feature**: Complete implementation of secure friend request system using unique IDs and QR codes
+- **Backend Implementation**:
+  1. UniqueIDService with cryptographically secure 16-digit ID generation
+  2. Migration script successfully assigned unique IDs to all 3 existing users
+  3. 4 new API endpoints for unique ID validation and user lookup
+  4. Firestore indexes deployed for optimal query performance
+- **Frontend Implementation**:
+  1. UniqueIdDisplay component with show/hide, copy, and regenerate functionality
+  2. QRCodeDisplay component for sharing QR codes with download/share options
+  3. QRCodeScanner component with camera access and real-time scanning
+  4. Enhanced AddFriendModal with tabbed interface (Search, Unique ID, QR Code)
+  5. Complete API service and React hooks with React Query integration
+- **Security Enhancement**: Friend requests now require unique IDs for enhanced security
+- **User Experience**: QR code scanning for instant friend adding with formatted ID display
+- **Status**: ✅ **FULLY IMPLEMENTED** - All features working with comprehensive test coverage
 
 ### ✅ **Issue #38 - Add Friend Button Enhancement** (September 1, 2025)
 - **Problem**: Missing prominent "Add Friend" button with popup search functionality
