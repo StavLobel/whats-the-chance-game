@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { friendsApiService } from '@/lib/friendsApiService';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import type {
   FriendRequestCreate,
   FriendRequestUpdate,
@@ -35,10 +36,11 @@ const FRIENDS_KEYS = {
  * Hook to search for users
  */
 export const useSearchUsers = (params: FriendSearch, enabled = true) => {
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: FRIENDS_KEYS.search(params),
     queryFn: () => friendsApiService.searchUsers(params),
-    enabled: enabled && params.query.length > 0,
+    enabled: enabled && params.query.length > 0 && isAuthenticated,
     staleTime: 30000, // 30 seconds
   });
 };
@@ -47,9 +49,11 @@ export const useSearchUsers = (params: FriendSearch, enabled = true) => {
  * Hook to get friends list
  */
 export const useFriendsList = (page = 1, perPage = 20, onlineOnly = false) => {
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: FRIENDS_KEYS.list(page, perPage, onlineOnly),
     queryFn: () => friendsApiService.getFriendsList(page, perPage, onlineOnly),
+    enabled: isAuthenticated,
     staleTime: 60000, // 1 minute
   });
 };
@@ -58,9 +62,11 @@ export const useFriendsList = (page = 1, perPage = 20, onlineOnly = false) => {
  * Hook to get received friend requests
  */
 export const useReceivedFriendRequests = (page = 1, perPage = 20) => {
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: FRIENDS_KEYS.received(page, perPage),
     queryFn: () => friendsApiService.getReceivedRequests(page, perPage),
+    enabled: isAuthenticated,
     staleTime: 30000, // 30 seconds
   });
 };
@@ -69,9 +75,11 @@ export const useReceivedFriendRequests = (page = 1, perPage = 20) => {
  * Hook to get sent friend requests
  */
 export const useSentFriendRequests = (page = 1, perPage = 20) => {
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: FRIENDS_KEYS.sent(page, perPage),
     queryFn: () => friendsApiService.getSentRequests(page, perPage),
+    enabled: isAuthenticated,
     staleTime: 30000, // 30 seconds
   });
 };
@@ -80,9 +88,11 @@ export const useSentFriendRequests = (page = 1, perPage = 20) => {
  * Hook to get friend suggestions
  */
 export const useFriendSuggestions = (limit = 10) => {
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: FRIENDS_KEYS.suggestions(limit),
     queryFn: () => friendsApiService.getFriendSuggestions(limit),
+    enabled: isAuthenticated,
     staleTime: 300000, // 5 minutes
   });
 };
@@ -100,7 +110,7 @@ export const useSendFriendRequest = () => {
     onSuccess: () => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: FRIENDS_KEYS.requests() });
-      queryClient.invalidateQueries({ queryKey: FRIENDS_KEYS.search });
+      queryClient.invalidateQueries({ queryKey: FRIENDS_KEYS.all });
       
       toast({
         title: 'Friend request sent!',
@@ -108,9 +118,15 @@ export const useSendFriendRequest = () => {
       });
     },
     onError: (error: any) => {
+      const errorMessage = typeof error?.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : typeof error?.message === 'string' 
+        ? error.message 
+        : 'Something went wrong';
+      
       toast({
         title: 'Failed to send request',
-        description: error.response?.data?.detail || 'Something went wrong',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -150,9 +166,15 @@ export const useUpdateFriendRequest = () => {
       }
     },
     onError: (error: any) => {
+      const errorMessage = typeof error?.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : typeof error?.message === 'string' 
+        ? error.message 
+        : 'Something went wrong';
+      
       toast({
         title: 'Failed to update request',
-        description: error.response?.data?.detail || 'Something went wrong',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -178,9 +200,15 @@ export const useRemoveFriend = () => {
       });
     },
     onError: (error: any) => {
+      const errorMessage = typeof error?.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : typeof error?.message === 'string' 
+        ? error.message 
+        : 'Something went wrong';
+      
       toast({
         title: 'Failed to remove friend',
-        description: error.response?.data?.detail || 'Something went wrong',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -207,9 +235,15 @@ export const useBlockUser = () => {
       });
     },
     onError: (error: any) => {
+      const errorMessage = typeof error?.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : typeof error?.message === 'string' 
+        ? error.message 
+        : 'Something went wrong';
+      
       toast({
         title: 'Failed to block user',
-        description: error.response?.data?.detail || 'Something went wrong',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -235,9 +269,15 @@ export const useUnblockUser = () => {
       });
     },
     onError: (error: any) => {
+      const errorMessage = typeof error?.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : typeof error?.message === 'string' 
+        ? error.message 
+        : 'Something went wrong';
+      
       toast({
         title: 'Failed to unblock user',
-        description: error.response?.data?.detail || 'Something went wrong',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
@@ -260,9 +300,15 @@ export const useUpdatePrivacySettings = () => {
       });
     },
     onError: (error: any) => {
+      const errorMessage = typeof error?.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : typeof error?.message === 'string' 
+        ? error.message 
+        : 'Something went wrong';
+      
       toast({
         title: 'Failed to update settings',
-        description: error.response?.data?.detail || 'Something went wrong',
+        description: errorMessage,
         variant: 'destructive',
       });
     },

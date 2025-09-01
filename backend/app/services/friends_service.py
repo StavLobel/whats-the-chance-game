@@ -46,7 +46,7 @@ class FriendService:
         self, 
         current_user_id: str, 
         search_params: FriendSearch
-    ) -> List[Dict[str, Any]]:
+    ) -> Dict[str, Any]:
         """Search for users based on query parameters."""
         users_ref = self.db.collection('users')
         
@@ -54,7 +54,7 @@ class FriendService:
         blocked_ids = await self._get_blocked_user_ids(current_user_id)
         blocked_ids.add(current_user_id)  # Exclude self
         
-        # Search by username, displayName, or email prefix
+        # Search by username, displayName, or email
         query = search_params.query.lower()
         results = []
         
@@ -71,11 +71,23 @@ class FriendService:
         
         # If we need more results, search in displayName
         if len(results) < search_params.limit:
-            display_query = users_ref.where('displayName', '>=', query).where('displayName', '<=', query + '\uf8ff')
+            display_query = users_ref.where('display_name', '>=', query).where('display_name', '<=', query + '\uf8ff')
             display_results = display_query.limit(search_params.limit - len(results)).get()
             
             existing_ids = {user['uid'] for user in results}
             for doc in display_results:
+                if doc.id not in existing_ids and doc.id not in blocked_ids:
+                    user_data = doc.to_dict()
+                    user_data['uid'] = doc.id
+                    results.append(user_data)
+        
+        # If we still need more results, search in email
+        if len(results) < search_params.limit:
+            email_query = users_ref.where('email', '>=', query).where('email', '<=', query + '\uf8ff')
+            email_results = email_query.limit(search_params.limit - len(results)).get()
+            
+            existing_ids = {user['uid'] for user in results}
+            for doc in email_results:
                 if doc.id not in existing_ids and doc.id not in blocked_ids:
                     user_data = doc.to_dict()
                     user_data['uid'] = doc.id
@@ -100,7 +112,12 @@ class FriendService:
                     filtered_results.append(user)
             results = filtered_results
         
-        return results[:search_params.limit]
+        # Return results in the expected format
+        return {
+            "users": results[:search_params.limit],
+            "total": len(results),
+            "query": search_params.query
+        }
     
     async def send_friend_request(
         self, 
@@ -109,22 +126,22 @@ class FriendService:
     ) -> FriendRequest:
         """Send a friend request to another user."""
         # Check if already friends
-        if await self._are_friends(from_user_id, request.to_user_id):
+        if await self._are_friends(from_user_id, request.toUserId):
             raise ValueError("Already friends with this user")
         
         # Check if request already exists
-        existing = await self._get_pending_request(from_user_id, request.to_user_id)
+        existing = await self._get_pending_request(from_user_id, request.toUserId)
         if existing:
             raise ValueError("Friend request already sent")
         
         # Check if blocked
-        if await self._is_blocked(from_user_id, request.to_user_id):
+        if await self._is_blocked(from_user_id, request.toUserId):
             raise ValueError("Cannot send friend request to this user")
         
         # Create friend request
         request_data = {
             'fromUserId': from_user_id,
-            'toUserId': request.to_user_id,
+            'toUserId': request.toUserId,
             'message': request.message,
             'status': 'pending',
             'createdAt': firestore.SERVER_TIMESTAMP,
@@ -136,7 +153,7 @@ class FriendService:
         
         # Create notification
         await self.firebase_service.create_notification(
-            user_id=request.to_user_id,
+            user_id=request.toUserId,
             notification_type='friend_request',
             title='New Friend Request',
             message=f'You have a new friend request',
@@ -167,6 +184,9 @@ class FriendService:
         query = query.where('status', '==', 'pending')
         query = query.order_by('createdAt', direction=Query.DESCENDING)
         
+        # Get total count first (before pagination)
+        total = len(query.get())
+        
         # Pagination
         offset = (page - 1) * per_page
         requests_docs = query.offset(offset).limit(per_page).get()
@@ -187,9 +207,6 @@ class FriendService:
                 to_user=to_user
             )
             requests_with_users.append(request_with_users)
-        
-        # Get total count
-        total = len(query.get())
         
         return {
             'requests': requests_with_users,

@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 # Security scheme for Bearer token authentication
 security = HTTPBearer()
 
+# Optional security scheme for endpoints that don't require authentication
+optional_security = HTTPBearer(auto_error=False)
+
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -96,7 +99,7 @@ async def get_current_user(
 
 
 async def get_current_user_optional(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
 ) -> Optional[dict]:
     """
     Validate Firebase ID token and return current user information (optional).

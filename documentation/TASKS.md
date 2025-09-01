@@ -207,18 +207,34 @@ This document breaks down the Software Requirements Document (SRD) into actionab
    - ✅ Enhanced home dashboard with friends statistics
 
 9. **🎯 Add Friend Button Enhancement - Popup Search Window** [#38](https://github.com/StavLobel/whats-the-chance-game/issues/38)
-   - **Status**: ⏳ **PENDING**
+   - **Status**: ✅ **COMPLETED** - September 1, 2025
    - **Priority**: **MEDIUM** ⭐⭐⭐
    - **Dependencies**: Friends Feature (#34) - Completed
-   - **Enhancement**: Add prominent "Add Friend" button with popup search modal
-   - **Features**:
-     - Prominent Add Friend button in Friends tab header
-     - Modal popup with real-time search functionality
-     - Direct friend request sending from search results
-     - Mobile-responsive modal design
-     - Accessibility features (keyboard navigation, screen reader support)
+   - ✅ Prominent Add Friend button in Friends tab header
+   - ✅ Modal popup with real-time search functionality
+   - ✅ Direct friend request sending from search results
+   - ✅ Mobile-responsive modal design
+   - ✅ Accessibility features (keyboard navigation, screen reader support)
+   - ✅ Comprehensive error handling and loading states
+   - ✅ Unit tests for AddFriendButton and AddFriendModal components
+   - ✅ E2E tests for complete friend request flow
 
-10. **👤 Profile Page: User Profile Management After Login** [#35](https://github.com/StavLobel/whats-the-chance-game/issues/35)
+10. **🔢 Unique User IDs and QR Code Friend Request System** [#40](https://github.com/StavLobel/whats-the-chance-game/issues/40)
+    - **Status**: ⏳ **PENDING**
+    - **Priority**: **HIGH** ⭐⭐⭐⭐
+    - **Dependencies**: Friends Feature (#34), Add Friend Button (#38) - Both completed
+    - **Features**:
+      - Generate 16-digit unique IDs for each user
+      - Store unique IDs in Firebase user profiles
+      - Display unique ID in user profile/settings
+      - Require unique ID for friend requests (enhanced security)
+      - QR code generation for user's unique ID
+      - QR code scanning functionality with camera access
+      - Auto-populate friend request form from scanned QR codes
+      - Mobile-responsive QR scanning interface
+      - Comprehensive validation and error handling
+
+11. **👤 Profile Page: User Profile Management After Login** [#35](https://github.com/StavLobel/whats-the-chance-game/issues/35)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
     - **Dependencies**: Authentication (#6), Backend (#9), Game Logic (#20) - All completed
@@ -228,7 +244,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
     - Profile privacy settings
     - Avatar upload and management
 
-11. **⚙️ Settings Page: User Settings and Preferences After Login** [#36](https://github.com/StavLobel/whats-the-chance-game/issues/36)
+12. **⚙️ Settings Page: User Settings and Preferences After Login** [#36](https://github.com/StavLobel/whats-the-chance-game/issues/36)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
     - **Dependencies**: Authentication (#6), Backend (#9), Profile Page (#35)
@@ -238,7 +254,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
     - Notification settings and preferences
     - Game-specific settings and preferences
 
-12. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
+13. **🎮 Challenge Management Enhancement** [#8](https://github.com/StavLobel/whats-the-chance-game/issues/8)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
     - **Dependencies**: Friends Feature (#34) - Completed
@@ -247,7 +263,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
     - Improve existing CreateChallengeModal with validation
     - Add real-time updates to existing number selection interface
 
-12. **🔧 Fix Persistent CI Pipeline Failures** [#29](https://github.com/StavLobel/whats-the-chance-game/issues/29)
+14. **🔧 Fix Persistent CI Pipeline Failures** [#29](https://github.com/StavLobel/whats-the-chance-game/issues/29)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **HIGH** ⭐⭐⭐⭐
     - Fix ESLint configuration conflicts between `.eslintrc.json` and `eslint.config.js`
@@ -257,21 +273,21 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 #### Phase 5: Deployment & DevOps
 
-13. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
+15. **🚀 Deployment Infrastructure** [#13](https://github.com/StavLobel/whats-the-chance-game/issues/13)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **MEDIUM** ⭐⭐⭐
     - Hostinger VPS setup with Traefik v3.0
     - Docker Compose configuration
     - Let's Encrypt HTTPS certificate automation
 
-14. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
+16. **🚀 Enhance CI/CD Pipeline with Advanced Workflows** [#22](https://github.com/StavLobel/whats-the-chance-game/issues/22)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Production deployment workflow
     - Versioning and release workflow
     - Advanced testing and monitoring
 
-15. **🔧 Admin Panel - User & Challenge Management System** [#27](https://github.com/StavLobel/whats-the-chance-game/issues/27)
+17. **🔧 Admin Panel - User & Challenge Management System** [#27](https://github.com/StavLobel/whats-the-chance-game/issues/27)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - User CRUD operations (create, read, update, delete)
@@ -281,7 +297,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 #### Phase 6: Advanced Features (Future)
 
-16. **🎯 Enhanced Game Features** [#15](https://github.com/StavLobel/whats-the-chance-game/issues/15)
+18. **🎯 Enhanced Game Features** [#15](https://github.com/StavLobel/whats-the-chance-game/issues/15)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Challenge history and statistics
@@ -290,7 +306,7 @@ This document breaks down the Software Requirements Document (SRD) into actionab
     - Social features (friends, leaderboards)
     - Group challenges
 
-17. **📱 Mobile Experience** [#16](https://github.com/StavLobel/whats-the-chance-game/issues/16)
+19. **📱 Mobile Experience** [#16](https://github.com/StavLobel/whats-the-chance-game/issues/16)
     - **Status**: ⏳ **PENDING**
     - **Priority**: **LOW** ⭐⭐
     - Progressive Web App (PWA) features
@@ -319,14 +335,30 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 ## 🎯 Next Immediate Tasks
 
-1. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
-2. **🎯 Add Friend Button Enhancement** (#38) - **MEDIUM** - Add popup search modal for friend discovery
+1. **🔢 Unique User IDs and QR Code Friend Request System** (#40) - **HIGH** - Implement secure friend request system with unique IDs and QR codes
+2. **🔧 Fix Persistent CI Pipeline Failures** (#29) - **HIGH** - Resolve CI/CD pipeline issues
 3. **👤 Profile Page: User Profile Management** (#35) - **MEDIUM** - Complete user profile experience
 4. **⚙️ Settings Page: User Settings and Preferences** (#36) - **MEDIUM** - Centralized settings management
 5. **🎮 Challenge Management Enhancement** (#8) - **MEDIUM** - Enhance existing UI with real data (friends feature completed)
 6. **🚀 Deployment Infrastructure** (#13) - **MEDIUM** - Set up production deployment
 
 ## 🐛 Recent Bug Fixes
+
+### ✅ **Issue #38 - Add Friend Button Enhancement** (September 1, 2025)
+- **Problem**: Missing prominent "Add Friend" button with popup search functionality
+- **Root Causes**: 
+  1. Friends feature implemented but lacked easy discovery mechanism
+  2. No real-time search modal for adding friends
+  3. Missing mobile-responsive friend request interface
+- **Solutions Applied**:
+  1. Created AddFriendButton component with UserPlus icon
+  2. Implemented AddFriendModal with debounced search functionality
+  3. Added real-time user search with Firebase integration
+  4. Created useDebounce hook for optimized API calls
+  5. Added comprehensive unit tests and E2E tests
+  6. Fixed multiple backend issues (500 errors, 422 validation, authentication)
+  7. Deployed Firebase indexes for complex queries
+- **Status**: ✅ **FULLY RESOLVED** - Complete add friend functionality with search and requests
 
 ### ✅ **Issue #34 - Friends Feature Implementation** (July 29, 2025)
 - **Problem**: Friends tab showing "Friend features coming soon" placeholder
@@ -355,5 +387,5 @@ This document breaks down the Software Requirements Document (SRD) into actionab
 
 ---
 
-_Last updated: July 29, 2025_
+_Last updated: September 1, 2025_
 _See [SRD.md](./SRD.md) for detailed technical specifications_

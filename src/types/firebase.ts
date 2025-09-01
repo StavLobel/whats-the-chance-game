@@ -319,3 +319,10 @@ export interface UserSearchResult extends User {
   isFriend?: boolean;
   hasPendingRequest?: boolean;
 }
+
+// API search response type
+export interface UserSearchResponse {
+  users: UserSearchResult[];
+  total: number;
+  query: string;
+}

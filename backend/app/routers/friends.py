@@ -15,6 +15,7 @@ from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.core.auth import get_current_user
 from app.services.friends_service import FriendService
+from app.services.unique_id_service import UniqueIDService
 from app.schemas.friends import (
     FriendRequest,
     FriendRequestCreate,
@@ -31,7 +32,7 @@ from app.schemas.friends import (
     BlockUserRequest,
     FriendPrivacySettings,
 )
-from app.schemas.user import UserSearchResult
+from app.schemas.user import UserSearchResult, User
 
 router = APIRouter(
     prefix="/api/friends",
@@ -40,9 +41,10 @@ router = APIRouter(
 )
 
 friends_service = FriendService()
+unique_id_service = UniqueIDService()
 
 
-@router.post("/search", response_model=List[UserSearchResult])
+@router.post("/search", response_model=UserSearchResult)
 async def search_users(
     search_params: FriendSearch,
     current_user: Dict[str, Any] = Depends(get_current_user),
@@ -284,5 +286,122 @@ async def update_privacy_settings(
             current_user["uid"],
             settings
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Unique ID Endpoints
+
+@router.get("/unique-id/validate/{unique_id}")
+async def validate_unique_id(
+    unique_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Validate if a unique ID has the correct format and exists.
+    
+    - **unique_id**: The 16-digit unique ID to validate
+    """
+    try:
+        # Validate format
+        is_valid_format = await unique_id_service.validate_unique_id_format(unique_id)
+        if not is_valid_format:
+            return {
+                "valid": False,
+                "exists": False,
+                "error": "Invalid unique ID format. Must be exactly 16 digits."
+            }
+        
+        # Check if ID exists
+        user_data = await unique_id_service.find_user_by_unique_id(unique_id)
+        exists = user_data is not None
+        
+        return {
+            "valid": True,
+            "exists": exists,
+            "error": None
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/unique-id/lookup/{unique_id}", response_model=User)
+async def lookup_user_by_unique_id(
+    unique_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Look up a user by their unique ID.
+    
+    - **unique_id**: The 16-digit unique ID to look up
+    """
+    try:
+        # Validate format
+        is_valid_format = await unique_id_service.validate_unique_id_format(unique_id)
+        if not is_valid_format:
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid unique ID format. Must be exactly 16 digits."
+            )
+        
+        # Find user
+        user_data = await unique_id_service.find_user_by_unique_id(unique_id)
+        if not user_data:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return User(**user_data)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/unique-id/generate")
+async def generate_unique_id_for_user(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Generate a new unique ID for the current user.
+    This will overwrite any existing unique ID.
+    """
+    try:
+        unique_id = await unique_id_service.assign_unique_id_to_user(current_user["uid"])
+        return {
+            "unique_id": unique_id,
+            "message": "Unique ID generated successfully"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/unique-id/my")
+async def get_my_unique_id(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Get the current user's unique ID.
+    If the user doesn't have one, it will be generated automatically.
+    """
+    try:
+        # Check if user already has a unique ID
+        users_ref = unique_id_service.db.collection('users').document(current_user["uid"])
+        user_doc = users_ref.get()
+        
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            existing_unique_id = user_data.get('unique_id')
+            
+            if existing_unique_id:
+                return {
+                    "unique_id": existing_unique_id,
+                    "message": "Existing unique ID retrieved"
+                }
+        
+        # Generate new unique ID if none exists
+        unique_id = await unique_id_service.assign_unique_id_to_user(current_user["uid"])
+        return {
+            "unique_id": unique_id,
+            "message": "New unique ID generated"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

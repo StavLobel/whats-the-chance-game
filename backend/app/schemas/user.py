@@ -26,6 +26,7 @@ class UserBase(BaseModel):
     )
     last_name: Optional[str] = Field(None, max_length=50, description="User last name")
     username: Optional[str] = Field(None, max_length=30, description="Unique username")
+    unique_id: Optional[str] = Field(None, min_length=16, max_length=16, description="16-digit unique user ID for friend requests")
     photo_url: Optional[str] = Field(None, description="User profile photo URL")
 
 
@@ -74,6 +75,20 @@ class UserCreate(UserBase):
                 )
         return v
 
+    @field_validator("unique_id")
+    @classmethod
+    def validate_unique_id(cls, v):
+        """Validate unique_id if provided."""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("Unique ID cannot be empty if provided")
+            if len(v) != 16:
+                raise ValueError("Unique ID must be exactly 16 characters long")
+            if not v.isdigit():
+                raise ValueError("Unique ID must contain only digits")
+        return v
+
 
 class UserUpdate(BaseModel):
     """Schema for updating user profile."""
@@ -86,6 +101,7 @@ class UserUpdate(BaseModel):
     )
     last_name: Optional[str] = Field(None, max_length=50, description="User last name")
     username: Optional[str] = Field(None, max_length=30, description="Unique username")
+    unique_id: Optional[str] = Field(None, min_length=16, max_length=16, description="16-digit unique user ID for friend requests")
     photo_url: Optional[str] = Field(None, description="User profile photo URL")
 
     @field_validator("display_name")
@@ -126,6 +142,20 @@ class UserUpdate(BaseModel):
                 raise ValueError(
                     "Username can only contain letters, numbers, underscores, and hyphens"
                 )
+        return v
+
+    @field_validator("unique_id")
+    @classmethod
+    def validate_unique_id(cls, v):
+        """Validate unique_id if provided."""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("Unique ID cannot be empty if provided")
+            if len(v) != 16:
+                raise ValueError("Unique ID must be exactly 16 characters long")
+            if not v.isdigit():
+                raise ValueError("Unique ID must contain only digits")
         return v
 
 

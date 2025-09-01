@@ -16,22 +16,23 @@ import type {
   BlockUserRequest,
   FriendPrivacySettings,
 } from '@/types/friends';
-import type { UserSearchResult } from '@/types/firebase';
+import type { UserSearchResult, UserSearchResponse } from '@/types/firebase';
 
 export const friendsApiService = {
   /**
    * Search for users
    */
   searchUsers: async (params: FriendSearch): Promise<UserSearchResult[]> => {
-    const response = await apiClient.post('/friends/search', params);
-    return response.data;
+    const response = await apiClient.post('/api/friends/search', params);
+    const searchResponse: UserSearchResponse = response.data;
+    return searchResponse.users;
   },
 
   /**
    * Send a friend request
    */
   sendFriendRequest: async (request: FriendRequestCreate): Promise<FriendRequest> => {
-    const response = await apiClient.post('/friends/request', request);
+    const response = await apiClient.post('/api/friends/request', request);
     return response.data;
   },
 
@@ -39,7 +40,7 @@ export const friendsApiService = {
    * Get received friend requests
    */
   getReceivedRequests: async (page = 1, perPage = 20): Promise<FriendRequestList> => {
-    const response = await apiClient.get('/friends/requests/received', {
+    const response = await apiClient.get('/api/friends/requests/received', {
       params: { page, per_page: perPage },
     });
     return response.data;
@@ -49,7 +50,7 @@ export const friendsApiService = {
    * Get sent friend requests
    */
   getSentRequests: async (page = 1, perPage = 20): Promise<FriendRequestList> => {
-    const response = await apiClient.get('/friends/requests/sent', {
+    const response = await apiClient.get('/api/friends/requests/sent', {
       params: { page, per_page: perPage },
     });
     return response.data;
@@ -62,7 +63,7 @@ export const friendsApiService = {
     requestId: string,
     update: FriendRequestUpdate
   ): Promise<FriendRequest> => {
-    const response = await apiClient.put(`/friends/request/${requestId}`, update);
+    const response = await apiClient.put(`/api/friends/request/${requestId}`, update);
     return response.data;
   },
 
@@ -74,7 +75,7 @@ export const friendsApiService = {
     perPage = 20,
     onlineOnly = false
   ): Promise<FriendList> => {
-    const response = await apiClient.get('/friends/list', {
+    const response = await apiClient.get('/api/friends/list', {
       params: { page, per_page: perPage, online_only: onlineOnly },
     });
     return response.data;
@@ -84,14 +85,14 @@ export const friendsApiService = {
    * Remove a friend
    */
   removeFriend: async (friendId: string): Promise<void> => {
-    await apiClient.delete(`/friends/${friendId}`);
+    await apiClient.delete(`/api/friends/${friendId}`);
   },
 
   /**
    * Get friend suggestions
    */
   getFriendSuggestions: async (limit = 10): Promise<FriendSuggestionList> => {
-    const response = await apiClient.get('/friends/suggestions', {
+    const response = await apiClient.get('/api/friends/suggestions', {
       params: { limit },
     });
     return response.data;
@@ -101,7 +102,7 @@ export const friendsApiService = {
    * Block a user
    */
   blockUser: async (request: BlockUserRequest): Promise<BlockedUser> => {
-    const response = await apiClient.post('/friends/block', request);
+    const response = await apiClient.post('/api/friends/block', request);
     return response.data;
   },
 
@@ -109,7 +110,7 @@ export const friendsApiService = {
    * Unblock a user
    */
   unblockUser: async (blockedId: string): Promise<void> => {
-    await apiClient.delete(`/friends/block/${blockedId}`);
+    await apiClient.delete(`/api/friends/block/${blockedId}`);
   },
 
   /**
@@ -118,7 +119,7 @@ export const friendsApiService = {
   updatePrivacySettings: async (
     settings: FriendPrivacySettings
   ): Promise<FriendPrivacySettings> => {
-    const response = await apiClient.put('/friends/privacy', settings);
+    const response = await apiClient.put('/api/friends/privacy', settings);
     return response.data;
   },
 };
