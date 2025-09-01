@@ -24,11 +24,19 @@ export class GameService {
   /**
    * Create a new challenge
    */
-  async createChallenge(fromUser: string, toUser: string, description: string): Promise<string> {
+  async createChallenge(
+    fromUser: string, 
+    toUser: string, 
+    description: string,
+    category: string = 'dare',
+    difficulty: string = 'medium'
+  ): Promise<string> {
     const challengeRef = await addDoc(this.challengesCollection, {
       from_user: fromUser,
       to_user: toUser,
       description,
+      category,
+      difficulty,
       status: 'pending',
       created_at: serverTimestamp(),
       updated_at: serverTimestamp(),
