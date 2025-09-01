@@ -4,7 +4,7 @@
  */
 
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
-import { app } from './firebase';
+import app, { messaging } from './firebase';
 import { api } from './api';
 
 // FCM VAPID key (you'll need to get this from Firebase console)
@@ -18,7 +18,7 @@ class FCMService {
     // Check if notifications are supported
     if (typeof window !== 'undefined' && 'Notification' in window) {
       this.isSupported = true;
-      this.messaging = getMessaging(app);
+      this.messaging = messaging || getMessaging(app);
     }
   }
 
