@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,10 +18,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { X, Dice1, Clock, Zap, Heart, Sparkles } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { X, Dice1, Clock, Zap, Heart, Sparkles, Users, Search, UserPlus } from 'lucide-react';
 import { Challenge } from '@/types/challenge';
 import { useGame } from '@/hooks/useGame';
+import { useFriendsList } from '@/hooks/useFriendsApi';
 import { cn } from '@/lib/utils';
 
 interface CreateChallengeModalProps {
@@ -38,7 +41,7 @@ export function CreateChallengeModal({ open, onOpenChange, preselectedUserId }: 
   const [selectedCategory, setSelectedCategory] = useState<string>('dare');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createChallenge } = useGame();
-  const { data: friendsData, isLoading: isLoadingFriends } = useFriends();
+  const { data: friendsData, isLoading: isLoadingFriends } = useFriendsList();
 
   const friends = friendsData?.friends || [];
 

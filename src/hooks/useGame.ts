@@ -146,7 +146,10 @@ export function useGame() {
 
   // Create a new challenge
   const createChallenge = useCallback(
-    async (toUser: string, description: string) => {
+    async (toUser: string, description: string, options?: { 
+      difficulty?: string; 
+      category?: string;
+    }) => {
       if (!user?.uid) {
         toast({
           title: 'Authentication required',
@@ -157,10 +160,16 @@ export function useGame() {
       }
 
       try {
-        const challengeId = await gameService.createChallenge(user.uid, toUser, description);
+        const challengeId = await gameService.createChallenge(
+          user.uid, 
+          toUser, 
+          description,
+          options?.category,
+          options?.difficulty
+        );
         toast({
           title: 'Challenge sent! 🎲',
-          description: `${toUser} has been challenged to: ${description}`,
+          description: `Challenge sent successfully!`,
         });
         return challengeId;
       } catch (err) {
