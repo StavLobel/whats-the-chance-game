@@ -13,8 +13,8 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
-import { Search, UserPlus, UserX, X, QrCode, Hash } from 'lucide-react';
-import { useSearchUsers, useSendFriendRequest } from '@/hooks/useFriendsApi';
+import { UserPlus, UserX, X, QrCode, Hash } from 'lucide-react';
+import { useSendFriendRequest } from '@/hooks/useFriendsApi';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,26 +27,17 @@ interface AddFriendModalProps {
 }
 
 export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [uniqueId, setUniqueId] = useState('');
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('search');
+  const [activeTab, setActiveTab] = useState('unique-id');
   
-  const debouncedQuery = useDebounce(searchQuery, 300);
   const debouncedUniqueId = useDebounce(uniqueId, 500);
   
-  const inputRef = useRef<HTMLInputElement>(null);
   const uniqueIdRef = useRef<HTMLInputElement>(null);
   
   const { user } = useAuth();
   const { toast } = useToast();
   const { validateFormat, cleanUniqueId, formatForDisplay } = useUniqueIdValidation();
-
-  // Query for search results
-  const { data: searchResults, isLoading: searchLoading } = useSearchUsers(
-    { query: debouncedQuery },
-    debouncedQuery.length > 0
-  );
 
   // Query for unique ID lookup
   const cleanedUniqueId = cleanUniqueId(debouncedUniqueId);
@@ -59,10 +50,10 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
   // Mutation for sending friend requests
   const sendFriendRequest = useSendFriendRequest();
 
-  // Focus input when modal opens
+  // Focus unique ID input when modal opens
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => uniqueIdRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
@@ -81,7 +72,6 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
     try {
       await sendFriendRequest.mutateAsync({ toUserId });
       // Clear inputs after successful request
-      setSearchQuery('');
       setUniqueId('');
     } catch (error) {
       // Error handling is done in the hook
@@ -108,67 +98,7 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
     return formatForDisplay(cleaned);
   };
 
-  const renderSearchResults = () => {
-    if (debouncedQuery.length === 0) {
-      return (
-        <EmptyState
-          icon={<Search className="w-12 h-12" />}
-          title="Search for friends"
-          description="Start typing a name or email to find people to connect with."
-        />
-      );
-    }
 
-    if (searchLoading) {
-      return <LoadingState message="Searching users..." />;
-    }
-
-    if (searchResults && searchResults.length > 0) {
-      return (
-        <div className="grid gap-3 max-h-[400px] overflow-y-auto p-1">
-          {searchResults.map((userResult) => (
-            <Card key={userResult.uid || userResult.id} className="p-4 hover:bg-accent transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={userResult.photoURL || undefined} />
-                    <AvatarFallback>
-                      {userResult.displayName?.charAt(0) || userResult.email?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">
-                      {userResult.displayName || userResult.email}
-                    </div>
-                    <div className="text-sm text-muted-foreground truncate">
-                      {userResult.email}
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => handleSendFriendRequest(userResult.uid || userResult.id)}
-                  disabled={sendFriendRequest.isPending || (userResult.uid || userResult.id) === user?.uid}
-                  aria-label={`Send friend request to ${userResult.displayName || userResult.email}`}
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  {(userResult.uid || userResult.id) === user?.uid ? 'You' : 'Add Friend'}
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      );
-    }
-
-    return (
-      <EmptyState
-        icon={<UserX className="w-12 h-12" />}
-        title="No users found"
-        description={`No users found matching "${debouncedQuery}". Try a different search term.`}
-      />
-    );
-  };
 
   const renderUniqueIdResults = () => {
     if (!cleanedUniqueId) {
@@ -251,57 +181,24 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[600px]" aria-describedby="add-friend-dialog-description">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Add Friends</DialogTitle>
-            <DialogDescription id="add-friend-dialog-description">
-              Find and add friends using their name, email, unique ID, or QR code.
-            </DialogDescription>
-          </DialogHeader>
+                  <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">Add Friends</DialogTitle>
+          <DialogDescription id="add-friend-dialog-description">
+            Add friends securely using their unique ID or by scanning their QR code.
+          </DialogDescription>
+        </DialogHeader>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="search" className="flex items-center gap-2">
-                <Search className="w-4 h-4" />
-                Search
-              </TabsTrigger>
-              <TabsTrigger value="unique-id" className="flex items-center gap-2">
-                <Hash className="w-4 h-4" />
-                Unique ID
-              </TabsTrigger>
-              <TabsTrigger value="qr-code" className="flex items-center gap-2">
-                <QrCode className="w-4 h-4" />
-                QR Code
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="search" className="space-y-4 mt-4">
-              {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search by name or email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4"
-                  aria-label="Search for users"
-                  autoComplete="off"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="Clear search"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-              
-              {/* Search Results */}
-              <div className="min-h-[200px]">{renderSearchResults()}</div>
-            </TabsContent>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="unique-id" className="flex items-center gap-2">
+              <Hash className="w-4 h-4" />
+              Unique ID
+            </TabsTrigger>
+            <TabsTrigger value="qr-code" className="flex items-center gap-2">
+              <QrCode className="w-4 h-4" />
+              QR Code
+            </TabsTrigger>
+          </TabsList>
 
             <TabsContent value="unique-id" className="space-y-4 mt-4">
               {/* Unique ID Input */}
