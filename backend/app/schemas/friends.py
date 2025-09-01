@@ -25,7 +25,7 @@ class FriendRequestBase(BaseModel):
 class FriendRequestCreate(BaseModel):
     """Schema for creating a friend request."""
     
-    to_user_id: str = Field(..., description="User ID to send request to")
+    toUserId: str = Field(..., description="User ID to send request to", alias="to_user_id")
     message: Optional[str] = Field(None, max_length=500, description="Optional message with request")
     
     @field_validator("message")
