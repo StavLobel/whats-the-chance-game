@@ -14,13 +14,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Challenge } from '@/types/challenge';
-import { Plus, Trophy, Bell, Users, Target, Zap, Search, UserPlus, UserCheck, UserX, Clock, Check, X } from 'lucide-react';
+import { Plus, Trophy, Bell, Users, Target, Zap, UserPlus, UserCheck, UserX, Clock, Check, X } from 'lucide-react';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
-import { useFriendsList, useReceivedFriendRequests, useSentFriendRequests, useSearchUsers, useSendFriendRequest, useUpdateFriendRequest } from '@/hooks/useFriendsApi';
+import { useFriendsList, useReceivedFriendRequests, useSentFriendRequests, useSendFriendRequest, useUpdateFriendRequest } from '@/hooks/useFriendsApi';
 import { useToast } from '@/hooks/use-toast';
 import { AddFriendButton } from '@/components/friends/AddFriendButton';
 import { AddFriendModal } from '@/components/friends/AddFriendModal';
+import { UniqueIdDisplay, QRCodeDisplay } from '@/components/profile';
 
 type TabType = 'home' | 'my-challenges' | 'create' | 'notifications' | 'friends' | 'settings';
 
@@ -29,7 +30,7 @@ export default function Game() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -48,7 +49,7 @@ export default function Game() {
   const { data: friendsData, isLoading: friendsLoading } = useFriendsList();
   const { data: receivedRequests, isLoading: receivedLoading } = useReceivedFriendRequests();
   const { data: sentRequests, isLoading: sentLoading } = useSentFriendRequests();
-  const { data: searchResults, isLoading: searchLoading } = useSearchUsers({ query: searchQuery }, searchQuery.length > 0);
+
   
   const sendFriendRequest = useSendFriendRequest();
   const updateFriendRequest = useUpdateFriendRequest();
@@ -261,26 +262,14 @@ export default function Game() {
           <div className='space-y-6'>
             <div className='flex items-center justify-between'>
               <h1 className='text-2xl font-bold'>Friends</h1>
-              <div className='flex items-center space-x-2'>
-                <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
-                  <Input
-                    placeholder='Search users...'
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className='pl-10 w-64'
-                  />
-                </div>
-                <AddFriendButton onClick={() => setShowAddFriendModal(true)} />
-              </div>
+              <AddFriendButton onClick={() => setShowAddFriendModal(true)} />
             </div>
 
             <Tabs defaultValue='friends' className='w-full'>
-              <TabsList className='grid w-full grid-cols-4'>
+              <TabsList className='grid w-full grid-cols-3'>
                 <TabsTrigger value='friends'>Friends ({friendsData?.friends?.length || 0})</TabsTrigger>
                 <TabsTrigger value='received'>Received ({receivedRequests?.requests?.length || 0})</TabsTrigger>
                 <TabsTrigger value='sent'>Sent ({sentRequests?.requests?.length || 0})</TabsTrigger>
-                <TabsTrigger value='search'>Search</TabsTrigger>
               </TabsList>
 
               <TabsContent value='friends' className='space-y-4'>
@@ -420,52 +409,7 @@ export default function Game() {
                 )}
               </TabsContent>
 
-              <TabsContent value='search' className='space-y-4'>
-                {searchQuery.length === 0 ? (
-                  <EmptyState
-                    icon={<Search className='w-12 h-12' />}
-                    title='Search for users'
-                    description="Enter a name or email to search for users to add as friends."
-                  />
-                ) : searchLoading ? (
-                  <LoadingState message='Searching users...' />
-                ) : searchResults && searchResults.length > 0 ? (
-                  <div className='grid gap-4'>
-                                          {searchResults.map((userResult) => (
-                      <Card key={userResult.id} className='p-4'>
-                        <div className='flex items-center justify-between'>
-                          <div className='flex items-center space-x-3'>
-                            <Avatar>
-                              <AvatarImage src={userResult.photoURL || undefined} />
-                              <AvatarFallback>
-                                {userResult.displayName?.charAt(0) || userResult.email?.charAt(0) || 'U'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className='font-medium'>{userResult.displayName || userResult.email}</div>
-                              <div className='text-sm text-muted-foreground'>{userResult.email}</div>
-                            </div>
-                          </div>
-                          <Button
-                            size='sm'
-                            onClick={() => handleSendFriendRequest(userResult.id)}
-                            disabled={sendFriendRequest.isPending}
-                          >
-                            <UserPlus className='mr-2 h-4 w-4' />
-                            Add Friend
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState
-                    icon={<UserX className='w-12 h-12' />}
-                    title='No users found'
-                    description={`No users found matching "${searchQuery}". Try a different search term.`}
-                  />
-                )}
-              </TabsContent>
+
             </Tabs>
           </div>
         );
@@ -474,11 +418,26 @@ export default function Game() {
         return (
           <div className='space-y-6'>
             <h1 className='text-2xl font-bold'>Settings</h1>
-            <EmptyState
-              icon={<Trophy className='w-12 h-12' />}
-              title='Settings panel coming soon'
-              description="We're working on bringing you comprehensive settings. Stay tuned!"
-            />
+            
+            {/* Unique ID Section */}
+            <div className='grid gap-6 md:grid-cols-2'>
+              <UniqueIdDisplay />
+              <QRCodeDisplay />
+            </div>
+            
+            {/* Additional Settings Placeholder */}
+            <Card className='p-6'>
+              <CardHeader>
+                <CardTitle>Additional Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <EmptyState
+                  icon={<Trophy className='w-12 h-12' />}
+                  title='More settings coming soon'
+                  description="We're working on bringing you comprehensive settings for privacy, notifications, and preferences."
+                />
+              </CardContent>
+            </Card>
           </div>
         );
 
