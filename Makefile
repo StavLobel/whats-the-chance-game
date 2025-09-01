@@ -61,7 +61,7 @@ dev: ## Start both frontend and backend in development mode
 	@echo "$(YELLOW)Backend: http://localhost:8000$(NC)"
 	@echo "$(YELLOW)API Docs: http://localhost:8000/docs$(NC)"
 	@trap 'kill 0' INT; \
-	(cd backend && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000) & \
+	(cd backend && python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000) & \
 	npm run dev
 
 dev-frontend: ## Start only frontend development server
@@ -70,7 +70,7 @@ dev-frontend: ## Start only frontend development server
 
 dev-backend: ## Start only backend development server
 	@echo "$(BLUE)⚙️  Starting backend development server...$(NC)"
-	cd backend && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+	cd backend && python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ##@ Testing
 test: test-unit test-e2e ## Run all tests (unit + E2E)

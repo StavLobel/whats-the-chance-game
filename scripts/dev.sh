@@ -68,7 +68,7 @@ start_services() {
     # Start backend
     echo -e "${BLUE}⚙️  Starting backend server...${NC}"
     cd backend
-    python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 &
+    python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 &
     BACKEND_PID=$!
     cd ..
     
