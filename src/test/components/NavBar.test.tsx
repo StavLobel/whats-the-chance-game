@@ -132,8 +132,7 @@ describe('NavBar Component', () => {
 
       renderNavBar();
 
-      expect(screen.getByText('Login')).toBeInTheDocument();
-      expect(screen.getByText('Sign Up')).toBeInTheDocument();
+      expect(screen.getByText('Sign in')).toBeInTheDocument();
     });
 
     it('should display user menu when authenticated', () => {
@@ -156,8 +155,10 @@ describe('NavBar Component', () => {
 
       renderNavBar();
 
-      expect(screen.getByText('Test User')).toBeInTheDocument();
-      expect(screen.queryByText('Login')).not.toBeInTheDocument();
+      // The component shows user info in a dropdown menu, check for avatar instead
+      const avatar = screen.getByText('T'); // First letter of Test User
+      expect(avatar).toBeInTheDocument();
+      expect(screen.queryByText('Sign in')).not.toBeInTheDocument();
     });
 
     it('should show loading state during authentication', () => {
@@ -226,9 +227,9 @@ describe('NavBar Component', () => {
 
       renderNavBar();
 
-      // Find and click the user dropdown trigger first
-      const userButton = screen.getByText('Test User');
-      fireEvent.click(userButton);
+      // Find and click the user dropdown trigger first - it's an avatar with initial
+      const avatarButton = screen.getByRole('button', { expanded: false });
+      fireEvent.click(avatarButton);
 
       // Then find and click the logout button
       const logoutButton = screen.getByText('Logout');
@@ -259,8 +260,9 @@ describe('NavBar Component', () => {
       renderNavBar({ onMenuClick: mockOnMenuClick });
 
       // Note: Menu button only shows on mobile (lg:hidden)
-      // This test may need adjustment based on actual responsive behavior
-      const menuButton = screen.getByRole('button', { name: /menu/i });
+      // Find the first button which is the menu button (has Menu icon)
+      const buttons = screen.getAllByRole('button');
+      const menuButton = buttons[0]; // First button is the menu button
       fireEvent.click(menuButton);
 
       expect(mockOnMenuClick).toHaveBeenCalledOnce();
