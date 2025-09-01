@@ -40,7 +40,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-md p-0 gap-0'>
+      <DialogContent className='sm:max-w-md p-0 gap-0' data-testid='auth-modal'>
         <DialogHeader className='sr-only'>
           <DialogTitle>{mode === 'login' ? 'Sign In' : 'Sign Up'}</DialogTitle>
           <DialogDescription>

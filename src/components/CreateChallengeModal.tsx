@@ -146,7 +146,7 @@ export function CreateChallengeModal({ open, onOpenChange, preselectedUserId }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-2xl bg-gradient-card'>
+      <DialogContent className='sm:max-w-2xl bg-gradient-card' data-testid='create-challenge-modal'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-xl'>
             <img src='/logo.png' alt="What's the Chance? Logo" className='w-16 h-16' />
@@ -168,6 +168,7 @@ export function CreateChallengeModal({ open, onOpenChange, preselectedUserId }: 
               className='resize-none'
               rows={3}
               dir='auto'
+              data-testid='challenge-description'
             />
           </div>
 
@@ -340,6 +341,7 @@ export function CreateChallengeModal({ open, onOpenChange, preselectedUserId }: 
               type='submit' 
               className='flex-1' 
               disabled={isSubmitting || targetUsers.length === 0 || !task.trim()}
+              data-testid='submit-challenge'
             >
               {isSubmitting ? 'Sending...' : `Challenge ${targetUsers.length} Friend${targetUsers.length !== 1 ? 's' : ''}`}
             </Button>

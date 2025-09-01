@@ -48,6 +48,7 @@ const Index = () => {
           <div className='space-y-4 animate-slide-up'>
             <Button
               variant='game'
+              data-testid='start-playing-button'
               size='lg'
               onClick={() => setShowGame(true)}
               className='text-lg px-8 py-6 h-auto'

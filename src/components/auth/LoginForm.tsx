@@ -117,6 +117,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignUp, onSucces
                 disabled={isFormDisabled}
                 className='pl-10'
                 required
+                data-testid='email-input'
               />
             </div>
           </div>
@@ -135,11 +136,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignUp, onSucces
                 disabled={isFormDisabled}
                 className='pl-10'
                 required
+                data-testid='password-input'
               />
             </div>
           </div>
 
-          <Button type='submit' className='w-full' disabled={isFormDisabled}>
+          <Button type='submit' className='w-full' disabled={isFormDisabled} data-testid='submit-login'>
             {isSubmitting ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
