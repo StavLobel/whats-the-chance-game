@@ -19,6 +19,8 @@ import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
 import { useFriendsList, useReceivedFriendRequests, useSentFriendRequests, useSearchUsers, useSendFriendRequest, useUpdateFriendRequest } from '@/hooks/useFriendsApi';
 import { useToast } from '@/hooks/use-toast';
+import { AddFriendButton } from '@/components/friends/AddFriendButton';
+import { AddFriendModal } from '@/components/friends/AddFriendModal';
 
 type TabType = 'home' | 'my-challenges' | 'create' | 'notifications' | 'friends' | 'settings';
 
@@ -28,6 +30,7 @@ export default function Game() {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const {
@@ -268,6 +271,7 @@ export default function Game() {
                     className='pl-10 w-64'
                   />
                 </div>
+                <AddFriendButton onClick={() => setShowAddFriendModal(true)} />
               </div>
             </div>
 
@@ -500,6 +504,7 @@ export default function Game() {
       </div>
 
       <CreateChallengeModal open={showCreateModal} onOpenChange={setShowCreateModal} />
+      <AddFriendModal isOpen={showAddFriendModal} onClose={() => setShowAddFriendModal(false)} />
     </div>
   );
 }
