@@ -24,7 +24,14 @@ export const useMyUniqueId = () => {
 
   return useQuery({
     queryKey: UNIQUE_ID_KEYS.my(),
-    queryFn: () => uniqueIdApiService.getMyUniqueId(),
+    queryFn: async () => {
+      const result = await uniqueIdApiService.getMyUniqueId();
+      // Ensure we always return a valid object
+      if (!result) {
+        throw new Error('No unique ID data received from server');
+      }
+      return result;
+    },
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error: any) => {

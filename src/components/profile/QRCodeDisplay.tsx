@@ -124,10 +124,10 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ className }) => {
                     View Full Size
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md" aria-describedby="qr-code-description">
                   <DialogHeader>
                     <DialogTitle>My Unique ID QR Code</DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription id="qr-code-description">
                       Friends can scan this code to add you instantly
                     </DialogDescription>
                   </DialogHeader>
