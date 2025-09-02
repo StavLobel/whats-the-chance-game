@@ -64,9 +64,16 @@ class FriendIdApiService {
   async generateFriendId(): Promise<FriendIdResponse> {
     try {
       const response = await api.post('/api/friends/unique-id/generate');
+      console.log('Generate Friend ID Response:', response);
+      console.log('Generate Response data:', response.data);
+      
+      if (!response || !response.data || !response.data.unique_id) {
+        throw new Error('Invalid response from generate Friend ID API');
+      }
+      
       return {
         friend_id: response.data.unique_id,
-        message: response.data.message
+        message: response.data.message || 'Friend ID generated'
       };
     } catch (error) {
       console.error('Error generating Friend ID:', error);
@@ -83,14 +90,22 @@ class FriendIdApiService {
       const response = await api.get('/api/friends/unique-id/my');
       console.log('Friend ID API Response:', response);
       console.log('Response data:', response.data);
+      console.log('Response status:', response.status);
+      console.log('Full response:', JSON.stringify(response, null, 2));
       
-      if (!response.data) {
+      if (!response || !response.data) {
         throw new Error('No data received from Friend ID API');
       }
       
+      // Handle the actual backend response format
+      const data = response.data;
+      if (!data.unique_id) {
+        throw new Error('Invalid response format: missing unique_id');
+      }
+      
       return {
-        friend_id: response.data.unique_id,
-        message: response.data.message
+        friend_id: data.unique_id,
+        message: data.message || 'Friend ID retrieved'
       };
     } catch (error) {
       console.error('Error getting Friend ID:', error);
