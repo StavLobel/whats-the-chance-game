@@ -21,7 +21,7 @@ import { useFriendsList, useReceivedFriendRequests, useSentFriendRequests, useSe
 import { useToast } from '@/hooks/use-toast';
 import { AddFriendButton } from '@/components/friends/AddFriendButton';
 import { AddFriendModal } from '@/components/friends/AddFriendModal';
-import { UniqueIdDisplay, QRCodeDisplay } from '@/components/profile';
+import { FriendIdDisplay, QRCodeDisplay } from '@/components/profile';
 
 type TabType = 'home' | 'my-challenges' | 'create' | 'notifications' | 'friends' | 'settings';
 
@@ -32,6 +32,7 @@ export default function Game() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
+  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const {
@@ -265,6 +266,13 @@ export default function Game() {
               <AddFriendButton onClick={() => setShowAddFriendModal(true)} />
             </div>
 
+            {/* Friend ID Section */}
+            <FriendIdDisplay 
+              compact={true} 
+              onShowQRCode={() => setShowQRCodeModal(true)}
+              className="mb-4"
+            />
+
             <Tabs defaultValue='friends' className='w-full'>
               <TabsList className='grid w-full grid-cols-3'>
                 <TabsTrigger value='friends'>Friends ({friendsData?.friends?.length || 0})</TabsTrigger>
@@ -419,22 +427,16 @@ export default function Game() {
           <div className='space-y-6'>
             <h1 className='text-2xl font-bold'>Settings</h1>
             
-            {/* Unique ID Section */}
-            <div className='grid gap-6 md:grid-cols-2'>
-              <UniqueIdDisplay />
-              <QRCodeDisplay />
-            </div>
-            
-            {/* Additional Settings Placeholder */}
+            {/* Settings Placeholder */}
             <Card className='p-6'>
               <CardHeader>
-                <CardTitle>Additional Settings</CardTitle>
+                <CardTitle>App Settings</CardTitle>
               </CardHeader>
               <CardContent>
                 <EmptyState
                   icon={<Trophy className='w-12 h-12' />}
-                  title='More settings coming soon'
-                  description="We're working on bringing you comprehensive settings for privacy, notifications, and preferences."
+                  title='Settings coming soon'
+                  description="We're working on bringing you comprehensive settings for privacy, notifications, and preferences. Your Friend ID can be found in the Friends tab."
                 />
               </CardContent>
             </Card>
@@ -464,6 +466,14 @@ export default function Game() {
 
       <CreateChallengeModal open={showCreateModal} onOpenChange={setShowCreateModal} />
       <AddFriendModal isOpen={showAddFriendModal} onClose={() => setShowAddFriendModal(false)} />
+      
+      {/* QR Code Modal */}
+      {showQRCodeModal && (
+        <QRCodeDisplay 
+          isOpen={showQRCodeModal}
+          onClose={() => setShowQRCodeModal(false)}
+        />
+      )}
     </div>
   );
 }

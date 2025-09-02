@@ -3,6 +3,6 @@
  * Exports all profile-related components
  */
 
-export { UniqueIdDisplay } from './UniqueIdDisplay';
+export { FriendIdDisplay } from './FriendIdDisplay';
 export { QRCodeDisplay } from './QRCodeDisplay';
 export { QRCodeScanner } from './QRCodeScanner';

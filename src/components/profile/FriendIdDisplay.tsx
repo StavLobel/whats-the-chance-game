@@ -1,36 +1,39 @@
 /**
- * Unique ID Display Component
- * Shows the user's unique ID with copy functionality and regeneration option
+ * Friend ID Display Component
+ * Shows the user's Friend ID with copy functionality and regeneration option
+ * Designed for integration into the Friends tab
  */
 
 import React, { useState } from 'react';
-import { Copy, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Copy, RefreshCw, Eye, EyeOff, QrCode } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useMyUniqueId, useGenerateUniqueId, useUniqueIdValidation } from '@/hooks/useUniqueId';
+import { useMyFriendId, useGenerateFriendId, useFriendIdValidation } from '@/hooks/useFriendId';
 
-interface UniqueIdDisplayProps {
+interface FriendIdDisplayProps {
   className?: string;
+  compact?: boolean;
+  onShowQRCode?: () => void;
 }
 
-export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) => {
+export const FriendIdDisplay: React.FC<FriendIdDisplayProps> = ({ className, compact = false, onShowQRCode }) => {
   const [isVisible, setIsVisible] = useState(false);
   const { toast } = useToast();
-  const { formatForDisplay } = useUniqueIdValidation();
+  const { formatForDisplay } = useFriendIdValidation();
 
-  const { data: uniqueIdData, isLoading, error } = useMyUniqueId();
-  const generateUniqueId = useGenerateUniqueId();
+  const { data: friendIdData, isLoading, error } = useMyFriendId();
+  const generateFriendId = useGenerateFriendId();
 
   const handleCopyToClipboard = async () => {
-    if (!uniqueIdData?.unique_id) return;
+    if (!friendIdData?.friend_id) return;
 
     try {
-      await navigator.clipboard.writeText(uniqueIdData.unique_id);
+      await navigator.clipboard.writeText(friendIdData.friend_id);
       toast({
         title: 'Copied!',
-        description: 'Your unique ID has been copied to clipboard',
+        description: 'Your Friend ID has been copied to clipboard',
       });
     } catch (error) {
       toast({
@@ -42,7 +45,7 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
   };
 
   const handleRegenerateId = () => {
-    generateUniqueId.mutate();
+    generateFriendId.mutate();
   };
 
   const toggleVisibility = () => {
@@ -56,13 +59,76 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
     return formatForDisplay(id);
   };
 
+  // Compact mode for Friends tab header
+  if (compact) {
+    if (isLoading) {
+      return (
+        <div className={`flex items-center justify-between p-3 bg-muted rounded-lg ${className}`} data-testid="friend-id-display">
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-gray-300 rounded animate-pulse" />
+            <span className="text-sm">Loading Friend ID...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (error || !friendIdData?.friend_id) {
+      return (
+        <div className={`flex items-center justify-between p-3 bg-muted rounded-lg ${className}`} data-testid="friend-id-display">
+          <span className="text-sm text-muted-foreground">Friend ID not available</span>
+          <Button size="sm" variant="outline" onClick={handleRegenerateId} disabled={generateFriendId.isPending}>
+            Generate
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`flex items-center justify-between p-3 bg-muted rounded-lg ${className}`} data-testid="friend-id-display">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium">My Friend ID:</span>
+          <span className="font-mono text-sm">{formatIdForDisplay(friendIdData.friend_id)}</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={toggleVisibility}
+            data-testid={isVisible ? "hide-friend-id" : "show-friend-id"}
+          >
+            {isVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleCopyToClipboard}
+            disabled={!isVisible}
+            data-testid="copy-friend-id"
+          >
+            <Copy className="w-4 h-4" />
+          </Button>
+          {onShowQRCode && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onShowQRCode}
+              data-testid="show-qr-code"
+            >
+              <QrCode className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <Card className={className}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="w-5 h-5 bg-gray-300 rounded animate-pulse" />
-            Unique ID
+            Friend ID
           </CardTitle>
           <CardDescription>Your personal 16-digit identifier for friend requests</CardDescription>
         </CardHeader>
@@ -84,8 +150,8 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle className="text-destructive">Error Loading Unique ID</CardTitle>
-          <CardDescription>Unable to load your unique ID</CardDescription>
+          <CardTitle className="text-destructive">Error Loading Friend ID</CardTitle>
+          <CardDescription>Unable to load your Friend ID</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
@@ -103,29 +169,29 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
     );
   }
 
-  if (!uniqueIdData?.unique_id) {
+  if (!friendIdData?.friend_id) {
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Unique ID</CardTitle>
+          <CardTitle>Friend ID</CardTitle>
           <CardDescription>Generate your personal identifier for friend requests</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            You don't have a unique ID yet. Generate one to allow friends to find you easily.
+            You don't have a Friend ID yet. Generate one to allow friends to find you easily.
           </p>
           <Button 
             onClick={handleRegenerateId}
-            disabled={generateUniqueId.isPending}
+            disabled={generateFriendId.isPending}
             className="w-full"
           >
-            {generateUniqueId.isPending ? (
+            {generateFriendId.isPending ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                 Generating...
               </>
             ) : (
-              'Generate Unique ID'
+              'Generate Friend ID'
             )}
           </Button>
         </CardContent>
@@ -137,9 +203,9 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Unique ID</span>
+          <span>Friend ID</span>
           <Badge variant="secondary" className="text-xs">
-            {uniqueIdData.message?.includes('generated') ? 'New' : 'Active'}
+            {friendIdData.message?.includes('generated') ? 'New' : 'Active'}
           </Badge>
         </CardTitle>
         <CardDescription>
@@ -148,10 +214,10 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Unique ID Display */}
+          {/* Friend ID Display */}
           <div className="relative">
             <div className="font-mono text-lg font-semibold p-3 bg-muted rounded-lg border text-center tracking-wider">
-              {formatIdForDisplay(uniqueIdData.unique_id)}
+              {formatIdForDisplay(friendIdData.friend_id)}
             </div>
           </div>
 
@@ -192,9 +258,10 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
               variant="outline"
               size="sm"
               className="flex-1 min-w-0"
-              disabled={generateUniqueId.isPending}
+              disabled={generateFriendId.isPending}
+              data-testid="regenerate-friend-id"
             >
-              {generateUniqueId.isPending ? (
+              {generateFriendId.isPending ? (
                 <>
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                   Regenerating...
@@ -211,7 +278,7 @@ export const UniqueIdDisplay: React.FC<UniqueIdDisplayProps> = ({ className }) =
           {/* Help Text */}
           <div className="text-xs text-muted-foreground space-y-1">
             <p>• Friends need this exact 16-digit number to send you requests</p>
-            <p>• You can regenerate it anytime, but old IDs won't work anymore</p>
+            <p>• You can regenerate it anytime, but old Friend IDs won't work anymore</p>
             <p>• Keep it private - only share with people you trust</p>
           </div>
         </div>
