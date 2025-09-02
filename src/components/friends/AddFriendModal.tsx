@@ -18,7 +18,7 @@ import { useSendFriendRequest } from '@/hooks/useFriendsApi';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { useLookupUserByUniqueId, useUniqueIdValidation } from '@/hooks/useUniqueId';
+import { useLookupUserByFriendId, useFriendIdValidation } from '@/hooks/useFriendId';
 import { QRCodeScanner } from '@/components/profile/QRCodeScanner';
 
 interface AddFriendModalProps {
@@ -27,33 +27,33 @@ interface AddFriendModalProps {
 }
 
 export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
-  const [uniqueId, setUniqueId] = useState('');
+  const [friendId, setFriendId] = useState('');
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('unique-id');
+  const [activeTab, setActiveTab] = useState('friend-id');
   
-  const debouncedUniqueId = useDebounce(uniqueId, 500);
+  const debouncedFriendId = useDebounce(friendId, 500);
   
-  const uniqueIdRef = useRef<HTMLInputElement>(null);
+  const friendIdRef = useRef<HTMLInputElement>(null);
   
   const { user } = useAuth();
   const { toast } = useToast();
-  const { validateFormat, cleanUniqueId, formatForDisplay } = useUniqueIdValidation();
+  const { validateFormat, cleanFriendId, formatForDisplay } = useFriendIdValidation();
 
-  // Query for unique ID lookup
-  const cleanedUniqueId = cleanUniqueId(debouncedUniqueId);
-  const uniqueIdValidation = validateFormat(cleanedUniqueId);
-  const { data: uniqueIdUser, isLoading: uniqueIdLoading, error: uniqueIdError } = useLookupUserByUniqueId(
-    cleanedUniqueId,
-    Boolean(cleanedUniqueId && uniqueIdValidation.valid)
+  // Query for Friend ID lookup
+  const cleanedFriendId = cleanFriendId(debouncedFriendId);
+  const friendIdValidation = validateFormat(cleanedFriendId);
+  const { data: friendIdUser, isLoading: friendIdLoading, error: friendIdError } = useLookupUserByFriendId(
+    cleanedFriendId,
+    Boolean(cleanedFriendId && friendIdValidation.valid)
   );
 
   // Mutation for sending friend requests
   const sendFriendRequest = useSendFriendRequest();
 
-  // Focus unique ID input when modal opens
+  // Focus Friend ID input when modal opens
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => uniqueIdRef.current?.focus(), 100);
+      setTimeout(() => friendIdRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
@@ -72,7 +72,7 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
     try {
       await sendFriendRequest.mutateAsync({ toUserId });
       // Clear inputs after successful request
-      setUniqueId('');
+      setFriendId('');
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -84,89 +84,89 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
     setIsQRScannerOpen(false);
   };
 
-  const handleUniqueIdChange = (value: string) => {
+  const handleFriendIdChange = (value: string) => {
     // Allow only digits and spaces, limit to 16 digits
     const cleaned = value.replace(/[^\d\s]/g, '');
     if (cleaned.replace(/\s/g, '').length <= 16) {
-      setUniqueId(cleaned);
+      setFriendId(cleaned);
     }
   };
 
-  const formatUniqueIdInput = (value: string) => {
+  const formatFriendIdInput = (value: string) => {
     // Format as user types: 1234 5678 9012 3456
-    const cleaned = cleanUniqueId(value);
+    const cleaned = cleanFriendId(value);
     return formatForDisplay(cleaned);
   };
 
 
 
-  const renderUniqueIdResults = () => {
-    if (!cleanedUniqueId) {
+  const renderFriendIdResults = () => {
+    if (!cleanedFriendId) {
       return (
         <EmptyState
           icon={<Hash className="w-12 h-12" />}
-          title="Enter a Unique ID"
-          description="Type a 16-digit unique ID to find and add a friend instantly."
+          title="Enter a Friend ID"
+          description="Type a 16-digit Friend ID to find and add a friend instantly."
         />
       );
     }
 
-    if (!uniqueIdValidation.valid) {
+    if (!friendIdValidation.valid) {
       return (
         <EmptyState
           icon={<UserX className="w-12 h-12" />}
-          title="Invalid Unique ID"
-          description={uniqueIdValidation.error || "Please enter a valid 16-digit unique ID."}
+          title="Invalid Friend ID"
+          description={friendIdValidation.error || "Please enter a valid 16-digit Friend ID."}
         />
       );
     }
 
-    if (uniqueIdLoading) {
+    if (friendIdLoading) {
       return <LoadingState message="Looking up user..." />;
     }
 
-    if (uniqueIdError) {
+    if (friendIdError) {
       return (
         <EmptyState
           icon={<UserX className="w-12 h-12" />}
           title="User not found"
-          description="No user found with this unique ID. Please check the ID and try again."
+          description="No user found with this Friend ID. Please check the ID and try again."
         />
       );
     }
 
-    if (uniqueIdUser) {
+    if (friendIdUser) {
       return (
         <div className="p-1">
           <Card className="p-4 hover:bg-accent transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={uniqueIdUser.photo_url || undefined} />
+                  <AvatarImage src={friendIdUser.photo_url || undefined} />
                   <AvatarFallback>
-                    {uniqueIdUser.display_name?.charAt(0) || uniqueIdUser.email?.charAt(0) || 'U'}
+                    {friendIdUser.display_name?.charAt(0) || friendIdUser.email?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
                   <div className="font-medium truncate">
-                    {uniqueIdUser.display_name || uniqueIdUser.email}
+                    {friendIdUser.display_name || friendIdUser.email}
                   </div>
                   <div className="text-sm text-muted-foreground truncate">
-                    {uniqueIdUser.email}
+                    {friendIdUser.email}
                   </div>
                   <div className="text-xs text-muted-foreground font-mono">
-                    ID: {formatForDisplay(cleanedUniqueId)}
+                    ID: {formatForDisplay(cleanedFriendId)}
                   </div>
                 </div>
               </div>
               <Button
                 size="sm"
-                onClick={() => handleSendFriendRequest(uniqueIdUser.uid)}
-                disabled={sendFriendRequest.isPending || uniqueIdUser.uid === user?.uid}
-                aria-label={`Send friend request to ${uniqueIdUser.display_name || uniqueIdUser.email}`}
+                onClick={() => handleSendFriendRequest(friendIdUser.uid)}
+                disabled={sendFriendRequest.isPending || friendIdUser.uid === user?.uid}
+                aria-label={`Send friend request to ${friendIdUser.display_name || friendIdUser.email}`}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
-                {uniqueIdUser.uid === user?.uid ? 'You' : 'Add Friend'}
+                {friendIdUser.uid === user?.uid ? 'You' : 'Add Friend'}
               </Button>
             </div>
           </Card>
@@ -181,45 +181,46 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[600px]" aria-describedby="add-friend-dialog-description">
-                  <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Add Friends</DialogTitle>
-          <DialogDescription id="add-friend-dialog-description">
-            Add friends securely using their unique ID or by scanning their QR code.
-          </DialogDescription>
-        </DialogHeader>
+                            <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">Add Friends</DialogTitle>
+            <DialogDescription id="add-friend-dialog-description">
+              Add friends securely using their Friend ID or by scanning their QR code.
+            </DialogDescription>
+          </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="unique-id" className="flex items-center gap-2">
-              <Hash className="w-4 h-4" />
-              Unique ID
-            </TabsTrigger>
-            <TabsTrigger value="qr-code" className="flex items-center gap-2">
-              <QrCode className="w-4 h-4" />
-              QR Code
-            </TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="friend-id" className="flex items-center gap-2" data-testid="friend-id-tab">
+                <Hash className="w-4 h-4" />
+                Friend ID
+              </TabsTrigger>
+              <TabsTrigger value="qr-code" className="flex items-center gap-2" data-testid="qr-code-tab">
+                <QrCode className="w-4 h-4" />
+                QR Code
+              </TabsTrigger>
+            </TabsList>
 
-            <TabsContent value="unique-id" className="space-y-4 mt-4">
-              {/* Unique ID Input */}
+            <TabsContent value="friend-id" className="space-y-4 mt-4" data-testid="friend-id-tab-content">
+              {/* Friend ID Input */}
               <div className="relative">
                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  ref={uniqueIdRef}
+                  ref={friendIdRef}
                   type="text"
-                  placeholder="Enter 16-digit unique ID..."
-                  value={formatUniqueIdInput(uniqueId)}
-                  onChange={(e) => handleUniqueIdChange(e.target.value)}
+                  placeholder="Enter 16-digit Friend ID..."
+                  value={formatFriendIdInput(friendId)}
+                  onChange={(e) => handleFriendIdChange(e.target.value)}
                   className="pl-9 pr-4 font-mono tracking-wider"
-                  aria-label="Enter unique ID"
+                  aria-label="Enter Friend ID"
                   autoComplete="off"
                   maxLength={19} // 16 digits + 3 spaces
+                  data-testid="friend-id-input"
                 />
-                {uniqueId && (
+                {friendId && (
                   <button
-                    onClick={() => setUniqueId('')}
+                    onClick={() => setFriendId('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="Clear unique ID"
+                    aria-label="Clear Friend ID"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -227,15 +228,15 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
               </div>
 
               {/* Validation Status */}
-              {uniqueId && !uniqueIdValidation.valid && (
-                <p className="text-sm text-destructive">{uniqueIdValidation.error}</p>
+              {friendId && !friendIdValidation.valid && (
+                <p className="text-sm text-destructive" data-testid="friend-id-validation-message">{friendIdValidation.error}</p>
               )}
               
-              {/* Unique ID Results */}
-              <div className="min-h-[200px]">{renderUniqueIdResults()}</div>
+              {/* Friend ID Results */}
+              <div className="min-h-[200px]" data-testid="friend-lookup-results">{renderFriendIdResults()}</div>
             </TabsContent>
 
-            <TabsContent value="qr-code" className="space-y-4 mt-4">
+            <TabsContent value="qr-code" className="space-y-4 mt-4" data-testid="qr-code-tab-content">
               <div className="min-h-[200px] flex items-center justify-center">
                 <div className="text-center space-y-4">
                   <QrCode className="w-16 h-16 mx-auto text-muted-foreground" />
@@ -244,7 +245,7 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Ask your friend to show their QR code and scan it to add them instantly.
                     </p>
-                    <Button onClick={() => setIsQRScannerOpen(true)} className="w-full">
+                    <Button onClick={() => setIsQRScannerOpen(true)} className="w-full" data-testid="open-camera-scanner">
                       <QrCode className="w-4 h-4 mr-2" />
                       Open Camera Scanner
                     </Button>
@@ -256,7 +257,7 @@ export const AddFriendModal = ({ isOpen, onClose }: AddFriendModalProps) => {
 
           {/* Footer */}
           <div className="mt-4 flex justify-end">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} data-testid="close-modal">
               Close
             </Button>
           </div>

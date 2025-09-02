@@ -78,6 +78,13 @@ class UniqueIdApiService {
   async getMyUniqueId(): Promise<UniqueIdResponse> {
     try {
       const response = await api.get('/api/friends/unique-id/my');
+      console.log('Unique ID API Response:', response);
+      console.log('Response data:', response.data);
+      
+      if (!response.data) {
+        throw new Error('No data received from unique ID API');
+      }
+      
       return response.data;
     } catch (error) {
       console.error('Error getting unique ID:', error);
