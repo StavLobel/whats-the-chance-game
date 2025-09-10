@@ -1,0 +1,360 @@
+name: 🔗 Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Specific integration test to run (optional)'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'friend-id-workflow'
+          - 'game-service'
+          - 'api-integration'
+          - 'realtime-features'
+        default: 'all'
+  workflow_call:
+    inputs:
+      test_suite:
+        required: false
+        type: string
+        default: 'all'
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+  VITE_API_BASE_URL: 'http://localhost:8000'
+  VITE_WEBSOCKET_URL: 'ws://localhost:8000/ws'
+
+jobs:
+  # Setup services for integration tests
+  setup-services:
+    runs-on: ubuntu-latest
+    name: '🚀 Setup Test Services'
+    outputs:
+      backend-ready: ${{ steps.backend-health.outputs.ready }}
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install backend dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 📥 Install frontend dependencies
+        run: npm ci
+
+      - name: 🚀 Start backend service
+        working-directory: ./backend
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          echo $! > backend.pid
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: ⏳ Wait for backend to be ready
+        id: backend-health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8000/api/health; then
+              echo "ready=true" >> $GITHUB_OUTPUT
+              echo "✅ Backend is ready"
+              break
+            fi
+            echo "⏳ Waiting for backend... ($i/30)"
+            sleep 2
+          done
+          
+          if [ "$i" -eq 30 ]; then
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "❌ Backend failed to start"
+            exit 1
+          fi
+
+      - name: 📋 Save service PIDs
+        run: |
+          echo "BACKEND_PID=$(cat backend/backend.pid)" >> $GITHUB_ENV
+
+  # I-01: Friend ID API Integration
+  friend-id-workflow-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-id-workflow' }}
+    needs: setup-services
+    runs-on: ubuntu-latest
+    name: 'I-01: Friend ID Workflow'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+
+      - name: 🚀 Start backend service
+        working-directory: ./backend
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 🧪 Run Friend ID Integration Tests
+        run: |
+          npm run test -- src/lib/__tests__/friendIdApiService.integration.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json \
+            --coverage.reporter=text
+        env:
+          VITEST_REPORTER: verbose
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-coverage-friend-id
+          path: coverage/
+          retention-days: 30
+
+  # I-02: Game Service Integration
+  game-service-integration-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-service' }}
+    needs: setup-services
+    runs-on: ubuntu-latest
+    name: 'I-02: Game Service Integration'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+
+      - name: 🚀 Start backend service
+        working-directory: ./backend
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 🧪 Run Game Service Integration Tests
+        run: |
+          npm run test -- src/test/game-service.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json \
+            --coverage.reporter=text
+        env:
+          VITEST_REPORTER: verbose
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-coverage-game-service
+          path: coverage/
+          retention-days: 30
+
+  # API Integration Tests
+  api-integration-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'api-integration' }}
+    needs: setup-services
+    runs-on: ubuntu-latest
+    name: 'I-03: API Integration'
+    
+    strategy:
+      matrix:
+        api-test: ['challenges', 'friends', 'users', 'notifications']
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+
+      - name: 🚀 Start backend service
+        working-directory: ./backend
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 🧪 Run API Integration Tests - ${{ matrix.api-test }}
+        run: |
+          npm run test -- "src/lib/__tests__/**/*${{ matrix.api-test }}*.integration.test.ts" \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-coverage-api-${{ matrix.api-test }}
+          path: coverage/
+          retention-days: 30
+
+  # Real-time Features Integration
+  realtime-features-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'realtime-features' }}
+    needs: setup-services
+    runs-on: ubuntu-latest
+    name: 'I-04: Real-time Features'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+
+      - name: 🚀 Start backend service
+        working-directory: ./backend
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 🧪 Run Real-time Integration Tests
+        run: |
+          npm run test -- src/test/realtime.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json \
+            --coverage.reporter=text
+        env:
+          VITEST_REPORTER: verbose
+          VITE_API_BASE_URL: http://localhost:8000
+          VITE_WEBSOCKET_URL: ws://localhost:8000/ws
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-coverage-realtime
+          path: coverage/
+          retention-days: 30
+
+  # Summary Job
+  integration-tests-summary:
+    if: always()
+    needs: [friend-id-workflow-tests, game-service-integration-tests, api-integration-tests, realtime-features-tests]
+    runs-on: ubuntu-latest
+    name: '📊 Integration Tests Summary'
+    
+    steps:
+      - name: 📊 Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: integration-coverage-*
+          path: coverage-reports/
+          merge-multiple: true
+
+      - name: 📈 Generate integration test summary
+        run: |
+          echo "## 🔗 Integration Tests Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| I-01: Friend ID Workflow | ${{ needs.friend-id-workflow-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| I-02: Game Service Integration | ${{ needs.game-service-integration-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| I-03: API Integration | ${{ needs.api-integration-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| I-04: Real-time Features | ${{ needs.realtime-features-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Integration Test Coverage**: Frontend ↔ Backend ↔ Firebase" >> $GITHUB_STEP_SUMMARY
+
+      - name: ✅ Mark as successful
+        if: ${{ needs.friend-id-workflow-tests.result == 'success' && needs.game-service-integration-tests.result == 'success' && needs.api-integration-tests.result == 'success' && needs.realtime-features-tests.result == 'success' }}
+        run: echo "🎉 All integration tests passed!"
+
+      - name: ❌ Mark as failed
+        if: ${{ needs.friend-id-workflow-tests.result == 'failure' || needs.game-service-integration-tests.result == 'failure' || needs.api-integration-tests.result == 'failure' || needs.realtime-features-tests.result == 'failure' }}
+        run: |
+          echo "❌ Some integration tests failed!"
+          exit 1

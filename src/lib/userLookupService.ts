@@ -1,0 +1,160 @@
+import { api } from './api';
+
+export interface UserDisplayInfo {
+  uid: string;
+  displayName: string;
+  username?: string;
+  email?: string;
+  photoURL?: string;
+}
+
+export interface UserLookupResponse {
+  users: Record<string, UserDisplayInfo>;
+  errors: string[];
+}
+
+class UserLookupService {
+  private cache = new Map<string, UserDisplayInfo>();
+  private pendingRequests = new Map<string, Promise<UserDisplayInfo | null>>();
+
+  /**
+   * Get display information for multiple users efficiently
+   */
+  async getUsersDisplayInfo(userIds: string[]): Promise<UserLookupResponse> {
+    const users: Record<string, UserDisplayInfo> = {};
+    const errors: string[] = [];
+    const uncachedIds: string[] = [];
+
+    // Check cache first
+    for (const uid of userIds) {
+      const cached = this.cache.get(uid);
+      if (cached) {
+        users[uid] = cached;
+      } else {
+        uncachedIds.push(uid);
+      }
+    }
+
+    // Fetch uncached users
+    if (uncachedIds.length > 0) {
+      try {
+        const response = await api.post('/api/users/lookup', { 
+          user_ids: uncachedIds 
+        });
+        
+        for (const userData of response.users || []) {
+          const displayInfo: UserDisplayInfo = {
+            uid: userData.uid,
+            displayName: this.getDisplayName(userData),
+            username: userData.username,
+            email: userData.email,
+            photoURL: userData.photoURL,
+          };
+          
+          this.cache.set(userData.uid, displayInfo);
+          users[userData.uid] = displayInfo;
+        }
+      } catch (error) {
+        console.error('Failed to lookup users:', error);
+        
+        // Create fallback entries for failed lookups
+        for (const uid of uncachedIds) {
+          const fallback: UserDisplayInfo = {
+            uid,
+            displayName: this.createFallbackDisplayName(uid),
+          };
+          
+          this.cache.set(uid, fallback);
+          users[uid] = fallback;
+          errors.push(`Failed to lookup user ${uid}`);
+        }
+      }
+    }
+
+    return { users, errors };
+  }
+
+  /**
+   * Get display information for a single user
+   */
+  async getUserDisplayInfo(userId: string): Promise<UserDisplayInfo> {
+    // Check cache
+    const cached = this.cache.get(userId);
+    if (cached) return cached;
+
+    // Check for pending request
+    const pending = this.pendingRequests.get(userId);
+    if (pending) return (await pending) || this.createFallbackUser(userId);
+
+    // Create new request
+    const request = this.fetchUserInfo(userId);
+    this.pendingRequests.set(userId, request);
+
+    try {
+      const result = await request;
+      return result || this.createFallbackUser(userId);
+    } finally {
+      this.pendingRequests.delete(userId);
+    }
+  }
+
+  private async fetchUserInfo(userId: string): Promise<UserDisplayInfo | null> {
+    try {
+      const response = await api.get(`/api/users/${userId}`);
+      const userData = response.data || response;
+      
+      const displayInfo: UserDisplayInfo = {
+        uid: userData.uid,
+        displayName: this.getDisplayName(userData),
+        username: userData.username,
+        email: userData.email,
+        photoURL: userData.photoURL,
+      };
+      
+      this.cache.set(userId, displayInfo);
+      return displayInfo;
+    } catch (error) {
+      console.error(`Failed to fetch user info for ${userId}:`, error);
+      return null;
+    }
+  }
+
+  private getDisplayName(userData: any): string {
+    return userData.username || 
+           userData.displayName || 
+           userData.display_name ||
+           (userData.email ? userData.email.split('@')[0] : null) ||
+           'Unknown User';
+  }
+
+  private createFallbackDisplayName(userId: string): string {
+    return `User ${userId.substring(0, 8)}...`;
+  }
+
+  private createFallbackUser(userId: string): UserDisplayInfo {
+    const fallback: UserDisplayInfo = {
+      uid: userId,
+      displayName: this.createFallbackDisplayName(userId),
+    };
+    
+    this.cache.set(userId, fallback);
+    return fallback;
+  }
+
+  /**
+   * Clear cache (useful for testing or when user data changes)
+   */
+  clearCache(): void {
+    this.cache.clear();
+    this.pendingRequests.clear();
+  }
+
+  /**
+   * Preload user data for better performance
+   */
+  async preloadUsers(userIds: string[]): Promise<void> {
+    await this.getUsersDisplayInfo(userIds);
+  }
+}
+
+export const userLookupService = new UserLookupService();

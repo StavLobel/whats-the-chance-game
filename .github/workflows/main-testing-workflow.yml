@@ -1,0 +1,320 @@
+name: 🧪 Main Testing Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_suites:
+        description: 'Test suites to run'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'unit-tests-only'
+          - 'integration-tests-only'
+          - 'e2e-tests-only'
+          - 'security-tests-only'
+          - 'frontend-backend-only'
+          - 'quick-tests'
+        default: 'all'
+      browser:
+        description: 'Browser for E2E tests'
+        required: false
+        type: choice
+        options:
+          - 'chromium'
+          - 'firefox'
+          - 'webkit'
+          - 'all'
+        default: 'chromium'
+      parallel_execution:
+        description: 'Run test suites in parallel'
+        required: false
+        type: boolean
+        default: true
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+
+jobs:
+  # Pre-flight checks
+  preflight-checks:
+    runs-on: ubuntu-latest
+    name: '🚀 Pre-flight Checks'
+    outputs:
+      should-run-frontend: ${{ steps.check-suites.outputs.frontend }}
+      should-run-backend: ${{ steps.check-suites.outputs.backend }}
+      should-run-integration: ${{ steps.check-suites.outputs.integration }}
+      should-run-e2e: ${{ steps.check-suites.outputs.e2e }}
+      should-run-security: ${{ steps.check-suites.outputs.security }}
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📊 Check which test suites to run
+        id: check-suites
+        run: |
+          case "${{ inputs.test_suites }}" in
+            "all")
+              echo "frontend=true" >> $GITHUB_OUTPUT
+              echo "backend=true" >> $GITHUB_OUTPUT
+              echo "integration=true" >> $GITHUB_OUTPUT
+              echo "e2e=true" >> $GITHUB_OUTPUT
+              echo "security=true" >> $GITHUB_OUTPUT
+              ;;
+            "unit-tests-only")
+              echo "frontend=true" >> $GITHUB_OUTPUT
+              echo "backend=true" >> $GITHUB_OUTPUT
+              echo "integration=false" >> $GITHUB_OUTPUT
+              echo "e2e=false" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "integration-tests-only")
+              echo "frontend=false" >> $GITHUB_OUTPUT
+              echo "backend=false" >> $GITHUB_OUTPUT
+              echo "integration=true" >> $GITHUB_OUTPUT
+              echo "e2e=false" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "e2e-tests-only")
+              echo "frontend=false" >> $GITHUB_OUTPUT
+              echo "backend=false" >> $GITHUB_OUTPUT
+              echo "integration=false" >> $GITHUB_OUTPUT
+              echo "e2e=true" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "security-tests-only")
+              echo "frontend=false" >> $GITHUB_OUTPUT
+              echo "backend=false" >> $GITHUB_OUTPUT
+              echo "integration=false" >> $GITHUB_OUTPUT
+              echo "e2e=false" >> $GITHUB_OUTPUT
+              echo "security=true" >> $GITHUB_OUTPUT
+              ;;
+            "frontend-backend-only")
+              echo "frontend=true" >> $GITHUB_OUTPUT
+              echo "backend=true" >> $GITHUB_OUTPUT
+              echo "integration=true" >> $GITHUB_OUTPUT
+              echo "e2e=false" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "quick-tests")
+              echo "frontend=true" >> $GITHUB_OUTPUT
+              echo "backend=true" >> $GITHUB_OUTPUT
+              echo "integration=false" >> $GITHUB_OUTPUT
+              echo "e2e=false" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "frontend=true" >> $GITHUB_OUTPUT
+              echo "backend=true" >> $GITHUB_OUTPUT
+              echo "integration=true" >> $GITHUB_OUTPUT
+              echo "e2e=true" >> $GITHUB_OUTPUT
+              echo "security=true" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: 📋 Display test plan
+        run: |
+          echo "## 🧪 Test Execution Plan" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Selected Test Suites**: ${{ inputs.test_suites }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Browser for E2E**: ${{ inputs.browser }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Parallel Execution**: ${{ inputs.parallel_execution }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 Frontend Unit Tests | ${{ steps.check-suites.outputs.frontend == 'true' && '✅ Enabled' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔧 Backend Unit Tests | ${{ steps.check-suites.outputs.backend == 'true' && '✅ Enabled' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔗 Integration Tests | ${{ steps.check-suites.outputs.integration == 'true' && '✅ Enabled' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎭 E2E Tests | ${{ steps.check-suites.outputs.e2e == 'true' && '✅ Enabled' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔒 Security & Audit | ${{ steps.check-suites.outputs.security == 'true' && '✅ Enabled' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+
+  # Frontend Unit Tests
+  frontend-unit-tests:
+    if: ${{ needs.preflight-checks.outputs.should-run-frontend == 'true' }}
+    needs: preflight-checks
+    uses: ./.github/workflows/frontend-unit-tests.yml
+    with:
+      test_suite: 'all'
+    secrets: inherit
+
+  # Backend Unit Tests
+  backend-unit-tests:
+    if: ${{ needs.preflight-checks.outputs.should-run-backend == 'true' }}
+    needs: preflight-checks
+    uses: ./.github/workflows/backend-unit-tests.yml
+    with:
+      test_suite: 'all'
+    secrets: inherit
+
+  # Integration Tests
+  integration-tests:
+    if: ${{ needs.preflight-checks.outputs.should-run-integration == 'true' }}
+    needs: preflight-checks
+    uses: ./.github/workflows/integration-tests.yml
+    with:
+      test_suite: 'all'
+    secrets: inherit
+
+  # E2E Tests
+  e2e-tests:
+    if: ${{ needs.preflight-checks.outputs.should-run-e2e == 'true' }}
+    needs: preflight-checks
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      test_suite: 'all'
+      browser: ${{ inputs.browser }}
+    secrets: inherit
+
+  # Security & Audit Tests
+  security-audit-tests:
+    if: ${{ needs.preflight-checks.outputs.should-run-security == 'true' }}
+    needs: preflight-checks
+    uses: ./.github/workflows/security-audit-tests.yml
+    with:
+      scan_type: 'all'
+    secrets: inherit
+
+  # Coverage Collection & Analysis
+  coverage-analysis:
+    if: always() && (needs.frontend-unit-tests.result == 'success' || needs.backend-unit-tests.result == 'success' || needs.integration-tests.result == 'success')
+    needs: [preflight-checks, frontend-unit-tests, backend-unit-tests, integration-tests]
+    runs-on: ubuntu-latest
+    name: '📊 Coverage Analysis'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📊 Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*coverage*"
+          path: coverage-reports/
+          merge-multiple: true
+
+      - name: 📦 Setup Node.js for coverage tools
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📥 Install coverage tools
+        run: |
+          npm install -g nyc
+          pip install coverage
+
+      - name: 📈 Generate combined coverage report
+        run: |
+          echo "## 📊 Test Coverage Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check if we have coverage data
+          if [ -d "coverage-reports" ] && [ "$(ls -A coverage-reports)" ]; then
+            echo "### Coverage Reports Available:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- Frontend Unit Tests Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "- Backend Unit Tests Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "- Integration Tests Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Target Coverage**: 90%" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📋 **Coverage Reports**: Available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ No coverage reports found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 📊 Upload combined coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: combined-coverage-analysis
+          path: coverage-reports/
+          retention-days: 30
+
+  # Test Results Summary
+  test-results-summary:
+    if: always()
+    needs: [preflight-checks, frontend-unit-tests, backend-unit-tests, integration-tests, e2e-tests, security-audit-tests, coverage-analysis]
+    runs-on: ubuntu-latest
+    name: '📈 Final Test Results Summary'
+    
+    steps:
+      - name: 📊 Download all test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-test-results/
+          merge-multiple: true
+
+      - name: 📈 Generate final summary
+        run: |
+          echo "# 🧪 Complete Test Suite Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status | Duration |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 Frontend Unit Tests | ${{ needs.frontend-unit-tests.result == 'success' && '✅ Passed' || needs.frontend-unit-tests.result == 'failure' && '❌ Failed' || '⏭️ Skipped' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔧 Backend Unit Tests | ${{ needs.backend-unit-tests.result == 'success' && '✅ Passed' || needs.backend-unit-tests.result == 'failure' && '❌ Failed' || '⏭️ Skipped' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔗 Integration Tests | ${{ needs.integration-tests.result == 'success' && '✅ Passed' || needs.integration-tests.result == 'failure' && '❌ Failed' || '⏭️ Skipped' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎭 E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || needs.e2e-tests.result == 'failure' && '❌ Failed' || '⏭️ Skipped' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔒 Security & Audit | ${{ needs.security-audit-tests.result == 'success' && '✅ Passed' || needs.security-audit-tests.result == 'failure' && '❌ Failed' || '⏭️ Skipped' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📊 Coverage Analysis | ${{ needs.coverage-analysis.result == 'success' && '✅ Completed' || needs.coverage-analysis.result == 'failure' && '❌ Failed' || '⏭️ Skipped' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Calculate overall status
+          overall_status="✅ SUCCESS"
+          if [[ "${{ needs.frontend-unit-tests.result }}" == "failure" || "${{ needs.backend-unit-tests.result }}" == "failure" || "${{ needs.integration-tests.result }}" == "failure" || "${{ needs.e2e-tests.result }}" == "failure" || "${{ needs.security-audit-tests.result }}" == "failure" ]]; then
+            overall_status="❌ FAILURE"
+          fi
+          
+          echo "## Overall Test Status: $overall_status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$overall_status" == "✅ SUCCESS" ]]; then
+            echo "🎉 **All enabled test suites passed successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Code is ready for deployment" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ All quality gates have been met" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Security scans completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some test suites failed. Please review the results.**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Action Required:" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔍 Review failed test details" >> $GITHUB_STEP_SUMMARY
+            echo "- 🛠️ Fix identified issues" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔄 Re-run tests after fixes" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Artifacts Available:" >> $GITHUB_STEP_SUMMARY
+          echo "- 📊 Coverage Reports" >> $GITHUB_STEP_SUMMARY
+          echo "- 📋 Test Results (HTML/JSON)" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎯 Allure Reports" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎭 Playwright Reports" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📊 Upload final summary
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: final-test-summary
+          path: all-test-results/
+          retention-days: 90
+
+      - name: ✅ Mark workflow as successful
+        if: ${{ needs.frontend-unit-tests.result != 'failure' && needs.backend-unit-tests.result != 'failure' && needs.integration-tests.result != 'failure' && needs.e2e-tests.result != 'failure' && needs.security-audit-tests.result != 'failure' }}
+        run: |
+          echo "🎉 All test suites completed successfully!"
+          echo "✅ Quality gates have been met"
+          echo "🚀 Code is ready for deployment"
+
+      - name: ❌ Mark workflow as failed
+        if: ${{ needs.frontend-unit-tests.result == 'failure' || needs.backend-unit-tests.result == 'failure' || needs.integration-tests.result == 'failure' || needs.e2e-tests.result == 'failure' || needs.security-audit-tests.result == 'failure' }}
+        run: |
+          echo "❌ Some test suites failed!"
+          echo "🔍 Please review the test results and fix the issues"
+          echo "🔄 Re-run the tests after making necessary fixes"
+          exit 1

@@ -1,0 +1,399 @@
+name: 🔧 Backend Unit Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Specific test suite to run (optional)'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'models'
+          - 'validation'
+          - 'friend-id-api'
+          - 'firebase-service'
+          - 'game-stats'
+        default: 'all'
+  workflow_call:
+    inputs:
+      test_suite:
+        required: false
+        type: string
+        default: 'all'
+
+env:
+  PYTHON_VERSION: '3.11'
+  FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+
+jobs:
+  # B-01: User Model Tests
+  models-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'models' }}
+    runs-on: ubuntu-latest
+    name: 'B-01: User Models'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-html allure-pytest
+
+      - name: 🧪 Run Model Tests
+        working-directory: ./backend
+        run: |
+          pytest tests/unit/test_models.py \
+            -v \
+            --cov=app.models \
+            --cov-report=html:coverage-html \
+            --cov-report=json:coverage.json \
+            --cov-report=term \
+            --alluredir=allure-results \
+            --html=reports/models-report.html \
+            --self-contained-html
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-models
+          path: backend/coverage-html/
+          retention-days: 30
+
+      - name: 📋 Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-reports-models
+          path: backend/reports/
+          retention-days: 30
+
+      - name: 🎯 Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-allure-models
+          path: backend/allure-results/
+          retention-days: 30
+
+  # B-02: Challenge Validation Tests
+  validation-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'validation' }}
+    runs-on: ubuntu-latest
+    name: 'B-02: Challenge Validation'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-html allure-pytest
+
+      - name: 🧪 Run Validation Tests
+        working-directory: ./backend
+        run: |
+          pytest tests/unit/test_challenge_validation.py \
+            -v \
+            --cov=app.schemas \
+            --cov-report=html:coverage-html \
+            --cov-report=json:coverage.json \
+            --cov-report=term \
+            --alluredir=allure-results \
+            --html=reports/validation-report.html \
+            --self-contained-html
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-validation
+          path: backend/coverage-html/
+          retention-days: 30
+
+      - name: 📋 Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-reports-validation
+          path: backend/reports/
+          retention-days: 30
+
+      - name: 🎯 Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-allure-validation
+          path: backend/allure-results/
+          retention-days: 30
+
+  # B-03: Friend ID API Tests
+  friend-id-api-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-id-api' }}
+    runs-on: ubuntu-latest
+    name: 'B-03: Friend ID API'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-html allure-pytest
+
+      - name: 🧪 Run Friend ID API Tests
+        working-directory: ./backend
+        run: |
+          pytest tests/unit/test_friend_id_api.py \
+            -v \
+            --cov=app.routers \
+            --cov=app.services \
+            --cov-report=html:coverage-html \
+            --cov-report=json:coverage.json \
+            --cov-report=term \
+            --alluredir=allure-results \
+            --html=reports/friend-id-api-report.html \
+            --self-contained-html
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-friend-id-api
+          path: backend/coverage-html/
+          retention-days: 30
+
+      - name: 📋 Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-reports-friend-id-api
+          path: backend/reports/
+          retention-days: 30
+
+      - name: 🎯 Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-allure-friend-id-api
+          path: backend/allure-results/
+          retention-days: 30
+
+  # B-04: Firebase Service Tests
+  firebase-service-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'firebase-service' }}
+    runs-on: ubuntu-latest
+    name: 'B-04: Firebase Service'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-html allure-pytest
+
+      - name: 🧪 Run Firebase Service Tests
+        working-directory: ./backend
+        run: |
+          pytest tests/unit/test_firebase_service.py \
+            -v \
+            --cov=app.services.firebase_service \
+            --cov-report=html:coverage-html \
+            --cov-report=json:coverage.json \
+            --cov-report=term \
+            --alluredir=allure-results \
+            --html=reports/firebase-service-report.html \
+            --self-contained-html
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-firebase-service
+          path: backend/coverage-html/
+          retention-days: 30
+
+      - name: 📋 Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-reports-firebase-service
+          path: backend/reports/
+          retention-days: 30
+
+      - name: 🎯 Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-allure-firebase-service
+          path: backend/allure-results/
+          retention-days: 30
+
+  # B-05: Game Stats Tests
+  game-stats-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-stats' }}
+    runs-on: ubuntu-latest
+    name: 'B-05: Game Stats'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-html allure-pytest
+
+      - name: 🧪 Run Game Stats Tests
+        working-directory: ./backend
+        run: |
+          pytest tests/unit/test_game_stats.py \
+            -v \
+            --cov=app.routers.game_stats \
+            --cov-report=html:coverage-html \
+            --cov-report=json:coverage.json \
+            --cov-report=term \
+            --alluredir=allure-results \
+            --html=reports/game-stats-report.html \
+            --self-contained-html
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-game-stats
+          path: backend/coverage-html/
+          retention-days: 30
+
+      - name: 📋 Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-reports-game-stats
+          path: backend/reports/
+          retention-days: 30
+
+      - name: 🎯 Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-allure-game-stats
+          path: backend/allure-results/
+          retention-days: 30
+
+  # Summary Job
+  backend-unit-tests-summary:
+    if: always()
+    needs: [models-tests, validation-tests, friend-id-api-tests, firebase-service-tests, game-stats-tests]
+    runs-on: ubuntu-latest
+    name: '📊 Backend Unit Tests Summary'
+    
+    steps:
+      - name: 📊 Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: backend-coverage-*
+          path: coverage-reports/
+          merge-multiple: true
+
+      - name: 📊 Download all test reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: backend-reports-*
+          path: test-reports/
+          merge-multiple: true
+
+      - name: 🎯 Download all Allure results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: backend-allure-*
+          path: allure-results/
+          merge-multiple: true
+
+      - name: 📈 Generate combined coverage report
+        run: |
+          echo "## 🔧 Backend Unit Tests Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| B-01: User Models | ${{ needs.models-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| B-02: Challenge Validation | ${{ needs.validation-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| B-03: Friend ID API | ${{ needs.friend-id-api-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| B-04: Firebase Service | ${{ needs.firebase-service-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| B-05: Game Stats | ${{ needs.game-stats-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Coverage**: 90%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📋 **Reports Available**: HTML, Allure, Coverage" >> $GITHUB_STEP_SUMMARY
+
+      - name: ✅ Mark as successful
+        if: ${{ needs.models-tests.result == 'success' && needs.validation-tests.result == 'success' && needs.friend-id-api-tests.result == 'success' && needs.firebase-service-tests.result == 'success' && needs.game-stats-tests.result == 'success' }}
+        run: echo "🎉 All backend unit tests passed!"
+
+      - name: ❌ Mark as failed
+        if: ${{ needs.models-tests.result == 'failure' || needs.validation-tests.result == 'failure' || needs.friend-id-api-tests.result == 'failure' || needs.firebase-service-tests.result == 'failure' || needs.game-stats-tests.result == 'failure' }}
+        run: |
+          echo "❌ Some backend unit tests failed!"
+          exit 1

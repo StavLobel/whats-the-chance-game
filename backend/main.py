@@ -18,7 +18,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from app.core.config import settings
-from app.routers import challenges, friends, game_stats, notifications, websocket
+from app.routers import challenges, friends, game_stats, notifications, websocket, users
 
 # Load environment variables
 load_dotenv()
@@ -92,6 +92,7 @@ async def root():
             "friends": "/api/friends",
             "notifications": "/api/notifications",
             "game_stats": "/api/game-stats",
+            "users": "/api/users",
         },
     }
 
@@ -103,6 +104,7 @@ app.include_router(
     notifications.router, prefix="/api/notifications", tags=["notifications"]
 )
 app.include_router(game_stats.router)
+app.include_router(users.router, tags=["users"])
 app.include_router(websocket.router, tags=["websocket"])
 
 if __name__ == "__main__":

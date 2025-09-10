@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from 'lucide-react';
 import { Challenge } from '@/types/challenge';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserDisplay } from '@/hooks/useUserDisplay';
 // TODO: Implement LoadingState and ErrorState components when needed
 // import { LoadingState } from '@/components/LoadingState';
 // import { ErrorState } from '@/components/ErrorState';
@@ -26,6 +27,9 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
   const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenge);
   const { user } = useAuth();
   const { acceptChallenge, rejectChallenge, submitNumber, subscribeToChallenge } = useGame();
+  
+  // Use the user display hook to resolve user ID to display name
+  const { displayName, userInfo, loading } = useUserDisplay(challenge.from_user);
 
   // Subscribe to real-time updates
   useEffect(() => {
@@ -264,12 +268,15 @@ export function ChallengeDetail({ challenge, onBack }: ChallengeDetailProps) {
         </Button>
         <div className='flex items-center gap-3 flex-1'>
           <Avatar className='h-10 w-10'>
+            {userInfo?.photoURL && <AvatarImage src={userInfo.photoURL} />}
             <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-              {challenge.from_user.charAt(0).toUpperCase()}
+              {loading ? '...' : displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className='font-medium'>@{challenge.from_user}</p>
+            <p className='font-medium'>
+              @{loading ? 'Loading...' : displayName}
+            </p>
             <Badge variant='secondary' className='text-xs'>
               {challenge.status}
             </Badge>

@@ -1,9 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Clock, Zap } from 'lucide-react';
 import { Challenge } from '@/types/challenge';
+import { useUserDisplay } from '@/hooks/useUserDisplay';
 
 interface ChallengeCardProps {
   challenge: Challenge;
@@ -13,6 +14,9 @@ interface ChallengeCardProps {
 }
 
 export function ChallengeCard({ challenge, onAccept, onReject, onClick }: ChallengeCardProps) {
+  // Use the user display hook to resolve user ID to display name
+  const { displayName, userInfo, loading } = useUserDisplay(challenge.from_user);
+  
   const getStatusColor = (status: Challenge['status']) => {
     switch (status) {
       case 'pending':
@@ -67,12 +71,15 @@ export function ChallengeCard({ challenge, onAccept, onReject, onClick }: Challe
         <div className='flex items-start justify-between'>
           <div className='flex items-center gap-3'>
             <Avatar className='h-10 w-10'>
+              {userInfo?.photoURL && <AvatarImage src={userInfo.photoURL} />}
               <AvatarFallback className='bg-primary/10 text-primary font-semibold'>
-                {challenge.from_user?.charAt(0).toUpperCase() || '?'}
+                {loading ? '...' : displayName.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className='font-medium text-foreground'>@{challenge.from_user}</p>
+              <p className='font-medium text-foreground'>
+                @{loading ? 'Loading...' : displayName}
+              </p>
               <p className='text-sm text-muted-foreground'>challenged you</p>
             </div>
           </div>

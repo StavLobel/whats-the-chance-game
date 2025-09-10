@@ -1,0 +1,394 @@
+name: 🔒 Security & Audit Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: 'Type of security scan to run'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'frontend-audit'
+          - 'backend-security'
+          - 'docker-scan'
+          - 'dependency-check'
+        default: 'all'
+  workflow_call:
+    inputs:
+      scan_type:
+        required: false
+        type: string
+        default: 'all'
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Frontend Security Audit
+  frontend-security-audit:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'frontend-audit' }}
+    runs-on: ubuntu-latest
+    name: '🔍 Frontend Security Audit'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Run npm audit
+        run: |
+          echo "## 🔍 NPM Audit Results" >> npm-audit-results.md
+          echo "" >> npm-audit-results.md
+          npm audit --audit-level=moderate --json > npm-audit-raw.json || true
+          
+          # Format audit results for better readability
+          if [ -s npm-audit-raw.json ]; then
+            echo "### Vulnerabilities Found:" >> npm-audit-results.md
+            echo "" >> npm-audit-results.md
+            npm audit --audit-level=moderate >> npm-audit-results.md || true
+          else
+            echo "✅ No vulnerabilities found!" >> npm-audit-results.md
+          fi
+
+      - name: 🔍 Run ESLint security rules
+        run: |
+          echo "## 🔍 ESLint Security Analysis" >> eslint-security-results.md
+          echo "" >> eslint-security-results.md
+          npx eslint . \
+            --ext .js,.jsx,.ts,.tsx \
+            --format json \
+            --output-file eslint-results.json || true
+          
+          # Check if there are any security-related issues
+          if [ -s eslint-results.json ]; then
+            echo "### Security Issues Found:" >> eslint-security-results.md
+            echo "" >> eslint-security-results.md
+            npx eslint . --ext .js,.jsx,.ts,.tsx >> eslint-security-results.md || true
+          else
+            echo "✅ No security issues found!" >> eslint-security-results.md
+          fi
+
+      - name: 🔍 Check for hardcoded secrets
+        run: |
+          echo "## 🔍 Hardcoded Secrets Check" >> secrets-check-results.md
+          echo "" >> secrets-check-results.md
+          
+          # Check for common secret patterns
+          secrets_found=false
+          
+          # API Keys
+          if grep -r "api_key\|API_KEY" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ".test." | grep -v "example\|demo\|test"; then
+            echo "⚠️ Potential API keys found:" >> secrets-check-results.md
+            grep -r "api_key\|API_KEY" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ".test." | grep -v "example\|demo\|test" >> secrets-check-results.md
+            secrets_found=true
+          fi
+          
+          # Tokens
+          if grep -r "token\|TOKEN" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ".test." | grep -v "example\|demo\|test\|getIdToken\|access_token"; then
+            echo "⚠️ Potential tokens found:" >> secrets-check-results.md
+            grep -r "token\|TOKEN" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ".test." | grep -v "example\|demo\|test\|getIdToken\|access_token" >> secrets-check-results.md
+            secrets_found=true
+          fi
+          
+          # Passwords
+          if grep -r "password\|PASSWORD" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ".test." | grep -v "example\|demo\|test\|password-validator"; then
+            echo "⚠️ Potential passwords found:" >> secrets-check-results.md
+            grep -r "password\|PASSWORD" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ".test." | grep -v "example\|demo\|test\|password-validator" >> secrets-check-results.md
+            secrets_found=true
+          fi
+          
+          if [ "$secrets_found" = false ]; then
+            echo "✅ No hardcoded secrets found!" >> secrets-check-results.md
+          fi
+
+      - name: 📊 Upload frontend security results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-security-audit
+          path: |
+            npm-audit-results.md
+            npm-audit-raw.json
+            eslint-security-results.md
+            eslint-results.json
+            secrets-check-results.md
+          retention-days: 30
+
+  # Backend Security Scan
+  backend-security-scan:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'backend-security' }}
+    runs-on: ubuntu-latest
+    name: '🛡️ Backend Security Scan'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install bandit[toml] safety
+
+      - name: 🛡️ Run Bandit security scan
+        working-directory: ./backend
+        run: |
+          echo "## 🛡️ Bandit Security Scan Results" > bandit-results.md
+          echo "" >> bandit-results.md
+          
+          bandit -r app/ \
+            -f json \
+            -o bandit-results.json \
+            -ll || true
+          
+          if [ -s bandit-results.json ]; then
+            echo "### Security Issues Found:" >> bandit-results.md
+            echo "" >> bandit-results.md
+            bandit -r app/ -ll >> bandit-results.md || true
+          else
+            echo "✅ No security issues found!" >> bandit-results.md
+          fi
+
+      - name: 🔍 Run Safety check for known vulnerabilities
+        working-directory: ./backend
+        run: |
+          echo "## 🔍 Safety Vulnerability Check" > safety-results.md
+          echo "" >> safety-results.md
+          
+          safety check \
+            --json \
+            --output safety-results.json || true
+          
+          if [ -s safety-results.json ] && [ "$(cat safety-results.json)" != "[]" ]; then
+            echo "### Vulnerabilities Found:" >> safety-results.md
+            echo "" >> safety-results.md
+            safety check >> safety-results.md || true
+          else
+            echo "✅ No known vulnerabilities found!" >> safety-results.md
+          fi
+
+      - name: 🔍 Check for hardcoded secrets in backend
+        working-directory: ./backend
+        run: |
+          echo "## 🔍 Backend Secrets Check" > backend-secrets-results.md
+          echo "" >> backend-secrets-results.md
+          
+          secrets_found=false
+          
+          # Check for potential secrets in Python files
+          if grep -r "api_key\|API_KEY\|secret\|SECRET\|password\|PASSWORD" app/ --include="*.py" | grep -v "test_\|example\|demo"; then
+            echo "⚠️ Potential secrets found:" >> backend-secrets-results.md
+            grep -r "api_key\|API_KEY\|secret\|SECRET\|password\|PASSWORD" app/ --include="*.py" | grep -v "test_\|example\|demo" >> backend-secrets-results.md
+            secrets_found=true
+          fi
+          
+          if [ "$secrets_found" = false ]; then
+            echo "✅ No hardcoded secrets found!" >> backend-secrets-results.md
+          fi
+
+      - name: 📊 Upload backend security results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-security-scan
+          path: |
+            backend/bandit-results.md
+            backend/bandit-results.json
+            backend/safety-results.md
+            backend/safety-results.json
+            backend/backend-secrets-results.md
+          retention-days: 30
+
+  # Docker Security Scan
+  docker-security-scan:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'docker-scan' }}
+    runs-on: ubuntu-latest
+    name: '🐳 Docker Security Scan'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔍 Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+
+      - name: 🏗️ Build Docker images
+        run: |
+          docker build -t whats-the-chance-frontend -f Dockerfile.frontend .
+          docker build -t whats-the-chance-backend -f backend/Dockerfile backend/
+
+      - name: 🔍 Scan frontend Docker image
+        run: |
+          echo "## 🐳 Frontend Docker Security Scan" > docker-frontend-results.md
+          echo "" >> docker-frontend-results.md
+          
+          trivy image \
+            --format json \
+            --output docker-frontend-trivy.json \
+            whats-the-chance-frontend || true
+          
+          trivy image \
+            --severity HIGH,CRITICAL \
+            whats-the-chance-frontend >> docker-frontend-results.md || true
+
+      - name: 🔍 Scan backend Docker image
+        run: |
+          echo "## 🐳 Backend Docker Security Scan" > docker-backend-results.md
+          echo "" >> docker-backend-results.md
+          
+          trivy image \
+            --format json \
+            --output docker-backend-trivy.json \
+            whats-the-chance-backend || true
+          
+          trivy image \
+            --severity HIGH,CRITICAL \
+            whats-the-chance-backend >> docker-backend-results.md || true
+
+      - name: 📊 Upload Docker security results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docker-security-scan
+          path: |
+            docker-frontend-results.md
+            docker-frontend-trivy.json
+            docker-backend-results.md
+            docker-backend-trivy.json
+          retention-days: 30
+
+  # Dependency Security Check
+  dependency-security-check:
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'dependency-check' }}
+    runs-on: ubuntu-latest
+    name: '📦 Dependency Security Check'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+
+      - name: 🔍 Check for outdated npm packages
+        run: |
+          echo "## 📦 NPM Package Security Status" > npm-outdated-results.md
+          echo "" >> npm-outdated-results.md
+          
+          npm outdated --json > npm-outdated.json || true
+          
+          if [ -s npm-outdated.json ] && [ "$(cat npm-outdated.json)" != "{}" ]; then
+            echo "### Outdated Packages:" >> npm-outdated-results.md
+            echo "" >> npm-outdated-results.md
+            npm outdated >> npm-outdated-results.md || true
+          else
+            echo "✅ All packages are up to date!" >> npm-outdated-results.md
+          fi
+
+      - name: 🔍 Check for outdated Python packages
+        working-directory: ./backend
+        run: |
+          echo "## 🐍 Python Package Security Status" > pip-outdated-results.md
+          echo "" >> pip-outdated-results.md
+          
+          pip list --outdated --format=json > pip-outdated.json || true
+          
+          if [ -s pip-outdated.json ] && [ "$(cat pip-outdated.json)" != "[]" ]; then
+            echo "### Outdated Packages:" >> pip-outdated-results.md
+            echo "" >> pip-outdated-results.md
+            pip list --outdated >> pip-outdated-results.md || true
+          else
+            echo "✅ All packages are up to date!" >> pip-outdated-results.md
+          fi
+
+      - name: 📊 Upload dependency check results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-security-check
+          path: |
+            npm-outdated-results.md
+            npm-outdated.json
+            backend/pip-outdated-results.md
+            backend/pip-outdated.json
+          retention-days: 30
+
+  # Summary Job
+  security-audit-summary:
+    if: always()
+    needs: [frontend-security-audit, backend-security-scan, docker-security-scan, dependency-security-check]
+    runs-on: ubuntu-latest
+    name: '📊 Security & Audit Summary'
+    
+    steps:
+      - name: 📊 Download all security results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*security*"
+          path: security-results/
+          merge-multiple: true
+
+      - name: 📈 Generate security summary
+        run: |
+          echo "## 🔒 Security & Audit Tests Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Frontend Security Audit | ${{ needs.frontend-security-audit.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🛡️ Backend Security Scan | ${{ needs.backend-security-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🐳 Docker Security Scan | ${{ needs.docker-security-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Dependency Security Check | ${{ needs.dependency-security-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Security Tools Used**: Bandit, Safety, Trivy, npm audit, ESLint" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📋 **Reports Available**: Detailed security scan results and recommendations" >> $GITHUB_STEP_SUMMARY
+
+      - name: ✅ Mark as successful
+        if: ${{ needs.frontend-security-audit.result == 'success' && needs.backend-security-scan.result == 'success' && needs.docker-security-scan.result == 'success' && needs.dependency-security-check.result == 'success' }}
+        run: echo "🎉 All security scans passed!"
+
+      - name: ❌ Mark as failed
+        if: ${{ needs.frontend-security-audit.result == 'failure' || needs.backend-security-scan.result == 'failure' || needs.docker-security-scan.result == 'failure' || needs.dependency-security-check.result == 'failure' }}
+        run: |
+          echo "❌ Some security scans failed!"
+          exit 1

@@ -1,0 +1,328 @@
+name: 🧪 Frontend Unit Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Specific test suite to run (optional)'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'friend-id-api'
+          - 'friend-id-integration'
+          - 'hooks'
+          - 'game-service'
+          - 'game-utils'
+          - 'realtime'
+        default: 'all'
+  workflow_call:
+    inputs:
+      test_suite:
+        required: false
+        type: string
+        default: 'all'
+
+env:
+  NODE_VERSION: '18'
+  VITE_API_BASE_URL: 'http://localhost:8000'
+  VITE_WEBSOCKET_URL: 'ws://localhost:8000/ws'
+
+jobs:
+  # F-01: Friend ID API Service Tests
+  friend-id-api-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-id-api' }}
+    runs-on: ubuntu-latest
+    name: 'F-01: Friend ID API Service'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run Friend ID API Service Tests
+        run: |
+          npm run test -- src/lib/__tests__/friendIdApiService.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json \
+            --coverage.reporter=text
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-friend-id-api
+          path: coverage/
+          retention-days: 30
+
+  # F-02: Friend ID Integration Tests
+  friend-id-integration-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-id-integration' }}
+    runs-on: ubuntu-latest
+    name: 'F-02: Friend ID Integration'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run Friend ID Integration Tests
+        run: |
+          npm run test -- src/lib/__tests__/friendIdApiService.integration.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-friend-id-integration
+          path: coverage/
+          retention-days: 30
+
+  # F-03: useFriendId Hook Tests
+  hooks-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'hooks' }}
+    runs-on: ubuntu-latest
+    name: 'F-03: React Hooks'
+    
+    strategy:
+      matrix:
+        hook: ['useFriendId', 'useUserDisplay']
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run Hook Tests - ${{ matrix.hook }}
+        run: |
+          npm run test -- src/hooks/__tests__/${{ matrix.hook }}.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-${{ matrix.hook }}
+          path: coverage/
+          retention-days: 30
+
+  # F-04: Game Service Tests
+  game-service-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-service' }}
+    runs-on: ubuntu-latest
+    name: 'F-04: Game Service'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run Game Service Tests
+        run: |
+          npm run test -- src/test/game-service.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-game-service
+          path: coverage/
+          retention-days: 30
+
+  # F-05: Game Utils Tests
+  game-utils-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-utils' }}
+    runs-on: ubuntu-latest
+    name: 'F-05: Game Utils'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run Game Utils Tests
+        run: |
+          npm run test -- src/test/utils/game-utils.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-game-utils
+          path: coverage/
+          retention-days: 30
+
+  # F-06: Realtime Connection Tests
+  realtime-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'realtime' }}
+    runs-on: ubuntu-latest
+    name: 'F-06: Realtime Connections'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run Realtime Tests
+        run: |
+          npm run test -- src/test/realtime.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-realtime
+          path: coverage/
+          retention-days: 30
+
+  # User Lookup Service Tests (New - for Issue #50 fix)
+  user-lookup-tests:
+    if: ${{ inputs.test_suite == 'all' }}
+    runs-on: ubuntu-latest
+    name: 'F-07: User Lookup Service'
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run User Lookup Tests
+        run: |
+          npm run test -- src/lib/__tests__/userLookupService.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --coverage.reporter=json
+        env:
+          VITEST_REPORTER: verbose
+
+      - name: 📊 Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-user-lookup
+          path: coverage/
+          retention-days: 30
+
+  # Summary Job
+  frontend-unit-tests-summary:
+    if: always()
+    needs: [friend-id-api-tests, friend-id-integration-tests, hooks-tests, game-service-tests, game-utils-tests, realtime-tests, user-lookup-tests]
+    runs-on: ubuntu-latest
+    name: '📊 Frontend Unit Tests Summary'
+    
+    steps:
+      - name: 📊 Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: frontend-coverage-*
+          path: coverage-reports/
+          merge-multiple: true
+
+      - name: 📈 Generate combined coverage report
+        run: |
+          echo "## 🧪 Frontend Unit Tests Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| F-01: Friend ID API | ${{ needs.friend-id-api-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| F-02: Friend ID Integration | ${{ needs.friend-id-integration-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| F-03: React Hooks | ${{ needs.hooks-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| F-04: Game Service | ${{ needs.game-service-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| F-05: Game Utils | ${{ needs.game-utils-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| F-06: Realtime | ${{ needs.realtime-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| F-07: User Lookup | ${{ needs.user-lookup-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Coverage**: 90%" >> $GITHUB_STEP_SUMMARY
+
+      - name: ✅ Mark as successful
+        if: ${{ needs.friend-id-api-tests.result == 'success' && needs.friend-id-integration-tests.result == 'success' && needs.hooks-tests.result == 'success' && needs.game-service-tests.result == 'success' && needs.game-utils-tests.result == 'success' && needs.realtime-tests.result == 'success' && needs.user-lookup-tests.result == 'success' }}
+        run: echo "🎉 All frontend unit tests passed!"
+
+      - name: ❌ Mark as failed
+        if: ${{ needs.friend-id-api-tests.result == 'failure' || needs.friend-id-integration-tests.result == 'failure' || needs.hooks-tests.result == 'failure' || needs.game-service-tests.result == 'failure' || needs.game-utils-tests.result == 'failure' || needs.realtime-tests.result == 'failure' || needs.user-lookup-tests.result == 'failure' }}
+        run: |
+          echo "❌ Some frontend unit tests failed!"
+          exit 1

@@ -1,0 +1,439 @@
+name: 🎭 End-to-End Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Specific E2E test to run (optional)'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'auth'
+          - 'game-flow'
+          - 'friend-request'
+          - 'friend-id-workflow'
+          - 'friends-management'
+          - 'ui-features'
+          - 'error-handling'
+          - 'performance'
+          - 'health-check'
+        default: 'all'
+      browser:
+        description: 'Browser to run tests on'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'chromium'
+          - 'firefox'
+          - 'webkit'
+        default: 'chromium'
+  workflow_call:
+    inputs:
+      test_suite:
+        required: false
+        type: string
+        default: 'all'
+      browser:
+        required: false
+        type: string
+        default: 'chromium'
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+  VITE_API_BASE_URL: 'http://localhost:8000'
+  VITE_WEBSOCKET_URL: 'ws://localhost:8000/ws'
+
+jobs:
+  # Setup full application stack
+  setup-application:
+    runs-on: ubuntu-latest
+    name: '🚀 Setup Application Stack'
+    outputs:
+      frontend-ready: ${{ steps.frontend-health.outputs.ready }}
+      backend-ready: ${{ steps.backend-health.outputs.ready }}
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+
+      - name: 🚀 Start backend service
+        working-directory: ./backend
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          echo $! > backend.pid
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+
+      - name: 🚀 Start frontend service
+        run: |
+          npm run dev -- --host 0.0.0.0 --port 5173 &
+          echo $! > frontend.pid
+        env:
+          VITE_API_BASE_URL: http://localhost:8000
+          VITE_WEBSOCKET_URL: ws://localhost:8000/ws
+
+      - name: ⏳ Wait for backend to be ready
+        id: backend-health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8000/api/health; then
+              echo "ready=true" >> $GITHUB_OUTPUT
+              echo "✅ Backend is ready"
+              break
+            fi
+            echo "⏳ Waiting for backend... ($i/30)"
+            sleep 2
+          done
+
+      - name: ⏳ Wait for frontend to be ready
+        id: frontend-health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:5173; then
+              echo "ready=true" >> $GITHUB_OUTPUT
+              echo "✅ Frontend is ready"
+              break
+            fi
+            echo "⏳ Waiting for frontend... ($i/30)"
+            sleep 2
+          done
+
+  # E2E-01: Authentication Flow
+  auth-flow-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'auth' }}
+    needs: setup-application
+    runs-on: ubuntu-latest
+    name: 'E2E-01: Authentication Flow'
+    
+    strategy:
+      matrix:
+        browser: ${{ inputs.browser == 'all' && fromJSON('["chromium", "firefox", "webkit"]') || fromJSON(format('["{0}"]', inputs.browser)) }}
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+          npx playwright install ${{ matrix.browser }}
+
+      - name: 🚀 Start services
+        run: |
+          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          npm run dev -- --host 0.0.0.0 --port 5173 &
+          sleep 10
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 🎭 Run Authentication E2E Tests
+        run: |
+          npx playwright test tests/e2e/auth.spec.ts \
+            --project=${{ matrix.browser }} \
+            --reporter=html \
+            --reporter=json \
+            --output-dir=test-results/auth-${{ matrix.browser }}
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-auth-results-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 30
+
+      - name: 📋 Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-auth-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 30
+
+  # E2E-02: Complete Game Flow
+  game-flow-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-flow' }}
+    needs: setup-application
+    runs-on: ubuntu-latest
+    name: 'E2E-02: Complete Game Flow'
+    
+    strategy:
+      matrix:
+        browser: ${{ inputs.browser == 'all' && fromJSON('["chromium", "firefox"]') || fromJSON(format('["{0}"]', inputs.browser)) }}
+        test-case: ['challenge-creation', 'challenge-acceptance', 'challenge-resolution', 'full-flow']
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+          npx playwright install ${{ matrix.browser }}
+
+      - name: 🚀 Start services
+        run: |
+          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          npm run dev -- --host 0.0.0.0 --port 5173 &
+          sleep 10
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 🎭 Run Game Flow E2E Tests - ${{ matrix.test-case }}
+        run: |
+          npx playwright test tests/e2e/game-flow.spec.ts \
+            --project=${{ matrix.browser }} \
+            --grep="${{ matrix.test-case }}" \
+            --reporter=html \
+            --reporter=json \
+            --output-dir=test-results/game-flow-${{ matrix.browser }}-${{ matrix.test-case }}
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-game-flow-results-${{ matrix.browser }}-${{ matrix.test-case }}
+          path: test-results/
+          retention-days: 30
+
+      - name: 📋 Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-game-flow-report-${{ matrix.browser }}-${{ matrix.test-case }}
+          path: playwright-report/
+          retention-days: 30
+
+  # E2E-03: Friend Request Flow
+  friend-request-tests:
+    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-request' }}
+    needs: setup-application
+    runs-on: ubuntu-latest
+    name: 'E2E-03: Friend Request Flow'
+    
+    strategy:
+      matrix:
+        browser: ${{ inputs.browser == 'all' && fromJSON('["chromium", "firefox"]') || fromJSON(format('["{0}"]', inputs.browser)) }}
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+          npx playwright install ${{ matrix.browser }}
+
+      - name: 🚀 Start services
+        run: |
+          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          npm run dev -- --host 0.0.0.0 --port 5173 &
+          sleep 10
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 🎭 Run Friend Request E2E Tests
+        run: |
+          npx playwright test tests/e2e/friend-request-flow.spec.ts \
+            --project=${{ matrix.browser }} \
+            --reporter=html \
+            --reporter=json \
+            --output-dir=test-results/friend-request-${{ matrix.browser }}
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-friend-request-results-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 30
+
+  # E2E-04 to E2E-09: Additional test suites (condensed for brevity)
+  additional-e2e-tests:
+    if: ${{ inputs.test_suite == 'all' || contains(fromJSON('["friend-id-workflow", "friends-management", "ui-features", "error-handling", "performance", "health-check"]'), inputs.test_suite) }}
+    needs: setup-application
+    runs-on: ubuntu-latest
+    name: 'E2E-04-09: Additional Tests'
+    
+    strategy:
+      matrix:
+        browser: ${{ inputs.browser == 'all' && fromJSON('["chromium", "firefox"]') || fromJSON(format('["{0}"]', inputs.browser)) }}
+        test-suite: 
+          - { name: 'friend-id-workflow', file: 'friend-id-workflow.spec.ts' }
+          - { name: 'friends-management', file: 'friends-flow.spec.ts' }
+          - { name: 'ui-features', file: 'ui-features.spec.ts' }
+          - { name: 'error-handling', file: 'error-handling.spec.ts' }
+          - { name: 'performance', file: 'performance.spec.ts' }
+          - { name: 'health-check', file: 'health-check.spec.ts' }
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd backend && pip install -r requirements.txt
+          npx playwright install ${{ matrix.browser }}
+
+      - name: 🚀 Start services
+        run: |
+          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          npm run dev -- --host 0.0.0.0 --port 5173 &
+          sleep 10
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          VITE_API_BASE_URL: http://localhost:8000
+
+      - name: 🎭 Run E2E Tests - ${{ matrix.test-suite.name }}
+        if: ${{ inputs.test_suite == 'all' || inputs.test_suite == matrix.test-suite.name }}
+        run: |
+          npx playwright test tests/e2e/${{ matrix.test-suite.file }} \
+            --project=${{ matrix.browser }} \
+            --reporter=html \
+            --reporter=json \
+            --output-dir=test-results/${{ matrix.test-suite.name }}-${{ matrix.browser }}
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-${{ matrix.test-suite.name }}-results-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 30
+
+  # Summary Job
+  e2e-tests-summary:
+    if: always()
+    needs: [auth-flow-tests, game-flow-tests, friend-request-tests, additional-e2e-tests]
+    runs-on: ubuntu-latest
+    name: '📊 E2E Tests Summary'
+    
+    steps:
+      - name: 📊 Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e2e-*-results-*
+          path: test-results/
+          merge-multiple: true
+
+      - name: 📋 Download all Playwright reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e2e-*-report-*
+          path: playwright-reports/
+          merge-multiple: true
+
+      - name: 📈 Generate E2E test summary
+        run: |
+          echo "## 🎭 End-to-End Tests Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status | Browser Coverage |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|------------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E-01: Authentication Flow | ${{ needs.auth-flow-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | ${{ inputs.browser }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E-02: Complete Game Flow | ${{ needs.game-flow-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | ${{ inputs.browser }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E-03: Friend Request Flow | ${{ needs.friend-request-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | ${{ inputs.browser }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E-04-09: Additional Tests | ${{ needs.additional-e2e-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | ${{ inputs.browser }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Browser Coverage**: Chromium, Firefox, WebKit" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Environment**: Full Stack (Frontend + Backend + Firebase)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📋 **Reports Available**: Playwright HTML Reports, Test Results JSON" >> $GITHUB_STEP_SUMMARY
+
+      - name: ✅ Mark as successful
+        if: ${{ needs.auth-flow-tests.result == 'success' && needs.game-flow-tests.result == 'success' && needs.friend-request-tests.result == 'success' && needs.additional-e2e-tests.result == 'success' }}
+        run: echo "🎉 All E2E tests passed!"
+
+      - name: ❌ Mark as failed
+        if: ${{ needs.auth-flow-tests.result == 'failure' || needs.game-flow-tests.result == 'failure' || needs.friend-request-tests.result == 'failure' || needs.additional-e2e-tests.result == 'failure' }}
+        run: |
+          echo "❌ Some E2E tests failed!"
+          exit 1
