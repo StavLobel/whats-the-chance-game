@@ -24,6 +24,7 @@ class TestFriendIdAPI:
             "display_name": "Test User"
         }
         
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_get_my_friend_id_existing(self, mock_service, mock_auth):
@@ -47,6 +48,7 @@ class TestFriendIdAPI:
         assert data['unique_id'] == '1234567890123456'
         assert data['message'] == 'Existing unique ID retrieved'
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_get_my_friend_id_generate_new(self, mock_service, mock_auth):
@@ -67,6 +69,7 @@ class TestFriendIdAPI:
         assert data['unique_id'] == '9876543210987654'
         assert data['message'] == 'New unique ID generated'
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_validate_friend_id_valid_existing(self, mock_service, mock_auth):
@@ -90,6 +93,7 @@ class TestFriendIdAPI:
         assert data['exists'] is True
         assert data['error'] is None
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_validate_friend_id_invalid_format(self, mock_service, mock_auth):
@@ -108,6 +112,7 @@ class TestFriendIdAPI:
         assert data['exists'] is False
         assert 'Invalid unique ID format' in data['error']
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_lookup_user_by_friend_id_success(self, mock_service, mock_auth):
@@ -136,6 +141,7 @@ class TestFriendIdAPI:
         assert data['display_name'] == 'Found User'
         assert data['unique_id'] == '1234567890123456'
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_lookup_user_by_friend_id_not_found(self, mock_service, mock_auth):
@@ -153,6 +159,7 @@ class TestFriendIdAPI:
         data = response.json()
         assert data['detail'] == 'User not found'
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_generate_friend_id(self, mock_service, mock_auth):
@@ -188,6 +195,7 @@ class TestFriendIdAPI:
             # Should require authentication
             assert response.status_code == 403  # Forbidden without auth
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_friend_id_validation_edge_cases(self, mock_service, mock_auth):
@@ -213,6 +221,7 @@ class TestFriendIdAPI:
             data = response.json()
             assert data['valid'] is False, f"Failed for {description}: {invalid_id}"
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_friend_id_lookup_invalid_format(self, mock_service, mock_auth):
@@ -229,6 +238,7 @@ class TestFriendIdAPI:
         data = response.json()
         assert 'Invalid unique ID format' in data['detail']
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_friend_id_service_error_handling(self, mock_service, mock_auth):
@@ -247,6 +257,7 @@ class TestFriendIdAPI:
         data = response.json()
         assert 'Database connection failed' in data['detail']
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_friend_id_concurrent_access(self, mock_service, mock_auth):
@@ -273,6 +284,7 @@ class TestFriendIdAPI:
             data = response.json()
             assert data['unique_id'] == '1234567890123456'
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_friend_id_cache_behavior(self, mock_service, mock_auth):
@@ -404,6 +416,7 @@ class TestFriendIdSecurity:
         assert friend_id != '1111111111111111'
         assert friend_id != '1234567890123456' or len(set(friend_id)) > 4
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
     async def test_friend_id_access_control(self, mock_service, mock_auth):
@@ -433,6 +446,7 @@ class TestFriendIdSecurity:
 class TestFriendIdIntegration:
     """Test cases for Friend ID integration with friend requests."""
 
+    @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.friends_service')
     @patch('app.routers.friends.unique_id_service')
