@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Home, Trophy, Plus, Bell, Settings, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ export function Sidebar({
   onTabChange,
   notificationCount = 0,
 }: SidebarProps) {
+  const { user, userDoc, isAuthenticated } = useAuth();
+  
   const menuItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'my-challenges', label: 'My Challenges', icon: Trophy },
@@ -85,12 +88,40 @@ export function Sidebar({
         {/* User Profile */}
         <div className='p-4 border-t border-border bg-gradient-to-t from-background/80 to-transparent'>
           <div className='flex items-center p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200'>
-            <div className='w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0'>
-              <span className='text-primary-foreground font-bold'>U</span>
+            {/* Profile Picture */}
+            <div className='w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden'>
+              {isAuthenticated && user?.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || 'Profile'}
+                  className='w-full h-full object-cover'
+                />
+              ) : (
+                <span className='text-primary-foreground font-bold'>
+                  {isAuthenticated && user?.displayName 
+                    ? user.displayName.charAt(0).toUpperCase()
+                    : isAuthenticated && user?.email
+                    ? user.email.charAt(0).toUpperCase()
+                    : 'U'
+                  }
+                </span>
+              )}
             </div>
+            {/* User Info */}
             <div className='min-w-0 flex-1 ml-3'>
-              <p className='font-medium text-foreground truncate'>@user</p>
-              <p className='text-sm text-muted-foreground truncate'>Online</p>
+              <p className='font-medium text-foreground truncate'>
+                {isAuthenticated && userDoc?.username
+                  ? `@${userDoc.username}`
+                  : isAuthenticated && user?.displayName
+                  ? user.displayName
+                  : isAuthenticated && user?.email
+                  ? user.email.split('@')[0]
+                  : '@user'
+                }
+              </p>
+              <p className='text-sm text-muted-foreground truncate'>
+                {isAuthenticated ? 'Online' : 'Offline'}
+              </p>
             </div>
           </div>
         </div>
