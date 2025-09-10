@@ -26,7 +26,7 @@ class TestFriendIdAPI:
         
     @patch('app.routers.friends.get_current_user')
     @patch('app.routers.friends.unique_id_service')
-    def test_get_my_friend_id_existing(self, mock_service, mock_auth):
+    async def test_get_my_friend_id_existing(self, mock_service, mock_auth):
         """Test getting existing Friend ID."""
         # Setup mocks
         mock_auth.return_value = self.mock_current_user
