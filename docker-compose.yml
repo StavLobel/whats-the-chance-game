@@ -51,8 +51,13 @@ services:
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
       - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
       - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - REDIS_URL=redis://redis:6379
+      - REDIS_DB=0
     networks:
       - whats-the-chance-network
+    depends_on:
+      redis:
+        condition: service_healthy
     profiles:
       - dev
 
@@ -93,11 +98,16 @@ services:
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
       - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
       - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - REDIS_URL=redis://redis:6379
+      - REDIS_DB=0
     volumes:
       - ./backend/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - whats-the-chance-network
       - traefik # Connect to existing Traefik network
+    depends_on:
+      redis:
+        condition: service_healthy
     profiles:
       - production
     labels:
@@ -125,10 +135,18 @@ services:
       - '6379:6379'
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ""
     networks:
       - whats-the-chance-network
     profiles:
       - production
+      - dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Testing Environment
   test:

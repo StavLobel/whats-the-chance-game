@@ -45,9 +45,11 @@ backend/
 
 - **🔐 Firebase Authentication**: Secure user authentication with Firebase Admin SDK
 - **🗄️ Firestore Database**: NoSQL database for game data and user management
+- **⚡ Redis Caching**: High-performance caching and session management
 - **📱 Push Notifications**: Firebase Cloud Messaging for real-time notifications
 - **🛡️ Security**: JWT tokens, CORS protection, and input validation
 - **📊 Real-time Updates**: WebSocket support for live game updates
+- **🐳 Docker Support**: Containerized development and production environments
 - **🧪 Comprehensive Testing**: Unit, integration, and E2E tests
 - **📈 Monitoring**: Structured logging and error tracking
 
@@ -113,7 +115,8 @@ Copy `env.example` to `.env` and configure the following variables:
 - `DEBUG`: Enable debug mode (default: false)
 - `PORT`: Server port (default: 8000)
 - `ALLOWED_ORIGINS`: CORS allowed origins (comma-separated)
-- `REDIS_URL`: Redis connection URL for caching
+- `REDIS_URL`: Redis connection URL for caching (default: redis://localhost:6379)
+- `REDIS_DB`: Redis database number (default: 0)
 
 ### Firebase Setup
 
@@ -205,39 +208,68 @@ The project aims for 90%+ test coverage across all modules.
 
 ## 🐳 Docker Deployment
 
-### Build Image
+### Development with Docker Compose
+
+For local development with Redis caching:
 
 ```bash
-docker build -t whats-the-chance-backend .
+# Start development environment with Redis
+docker-compose -f docker-compose.dev.yml up
+
+# Or using the main compose file with dev profile
+docker-compose --profile dev up
 ```
 
-### Run Container
+This will start:
+- Backend API on `http://localhost:8000`
+- Frontend on `http://localhost:8080`
+- Redis cache on `localhost:6379`
+
+### Production Deployment
 
 ```bash
+# Start production environment
+docker-compose --profile production up -d
+```
+
+### Manual Docker Build
+
+```bash
+# Build backend image
+docker build -t whats-the-chance-backend .
+
+# Run with Redis dependency
 docker run -p 8000:8000 --env-file .env whats-the-chance-backend
 ```
 
-### Docker Compose
+### Docker Compose Configuration
 
+The project includes comprehensive Docker Compose configurations:
+
+#### Development (`docker-compose.dev.yml`)
 ```yaml
-version: '3.8'
 services:
   backend:
     build: ./backend
-    ports:
-      - '8000:8000'
+    ports: ["8000:8000"]
     environment:
-      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
-      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
-      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 
   redis:
-    image: redis:alpine
-    ports:
-      - '6379:6379'
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
 ```
+
+#### Production (`docker-compose.yml`)
+- Includes Traefik reverse proxy integration
+- SSL/TLS termination
+- Redis persistence with volume mounting
+- Health checks for all services
 
 ## 🔧 Development
 

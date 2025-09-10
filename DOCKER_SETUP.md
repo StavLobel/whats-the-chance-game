@@ -8,6 +8,7 @@ This document describes the containerized development environment for the "What'
 
 - **Backend**: FastAPI application with hot reload
 - **Frontend**: React/Vite application with hot reload
+- **Redis**: High-performance caching and session storage
 - **Network**: Custom bridge network for inter-service communication
 
 ### Files Created
@@ -54,6 +55,7 @@ This document describes the containerized development environment for the "What'
 - **Frontend**: http://localhost:8080
 - **Backend**: http://localhost:8000
 - **Backend API Docs**: http://localhost:8000/docs
+- **Redis**: localhost:6379 (for debugging tools)
 
 ## 🔄 Development Workflow
 
@@ -116,6 +118,7 @@ This document describes the containerized development environment for the "What'
 
 - Backend uses port 8000
 - Frontend uses port 8080
+- Redis uses port 6379
 - Ensure these ports are available on your host
 
 ### Dependency Issues
@@ -147,6 +150,13 @@ docker system prune -f
 - **Port**: 8080
 - **Command**: `npm run dev -- --host 0.0.0.0 --port 8080`
 - **Hot Reload**: ✅ Enabled
+
+### Redis Container
+
+- **Base**: Redis 7-alpine
+- **Port**: 6379
+- **Persistence**: ✅ Volume mounted
+- **Health Checks**: ✅ Enabled
 
 ## 🎯 Benefits
 

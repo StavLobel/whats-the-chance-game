@@ -19,6 +19,7 @@ from pydantic import ValidationError
 
 from app.core.config import settings
 from app.routers import challenges, friends, game_stats, notifications, websocket, users
+from app.services.redis_service import redis_service
 
 # Load environment variables
 load_dotenv()
@@ -49,6 +50,25 @@ app.add_middleware(
 )
 
 
+# Application lifecycle events
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on application startup."""
+    print("🚀 Starting What's the Chance API...")
+    
+    # Initialize Redis
+    await redis_service.initialize()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up services on application shutdown."""
+    print("🛑 Shutting down What's the Chance API...")
+    
+    # Close Redis connection
+    await redis_service.close()
+
+
 # Custom validation error handler
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -70,11 +90,15 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint for monitoring and load balancers."""
+    # Get Redis health status
+    redis_health = await redis_service.health_check()
+    
     return {
         "status": "healthy",
         "service": "whats-the-chance-api",
         "version": settings.app_version,
         "environment": "development" if settings.debug else "production",
+        "services": redis_health,
     }
 
 
