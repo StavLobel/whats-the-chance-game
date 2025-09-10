@@ -80,13 +80,19 @@ async def send_friend_request(
     - **message**: Optional message to include with the request
     """
     try:
+        print(f"DEBUG: Received friend request: {request}")
+        print(f"DEBUG: Current user: {current_user['uid']}")
         return await friends_service.send_friend_request(
             current_user["uid"], 
             request
         )
     except ValueError as e:
+        print(f"DEBUG: ValueError in send_friend_request: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        print(f"DEBUG: Exception in send_friend_request: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -104,6 +110,7 @@ async def get_received_friend_requests(
             page=page,
             per_page=per_page
         )
+        # Return properly structured response like sent requests
         return FriendRequestList(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -117,14 +124,19 @@ async def get_sent_friend_requests(
 ):
     """Get sent friend requests by the current user."""
     try:
+        print(f"DEBUG: Getting sent requests for user: {current_user['uid']}")
         result = await friends_service.get_friend_requests(
             current_user["uid"],
             request_type="sent",
             page=page,
             per_page=per_page
         )
+        print(f"DEBUG: Sent requests result: {result}")
         return FriendRequestList(**result)
     except Exception as e:
+        print(f"DEBUG: Exception in get_sent_friend_requests: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -141,14 +153,25 @@ async def update_friend_request(
     - **status**: New status ('accepted' or 'rejected')
     """
     try:
-        return await friends_service.update_friend_request(
+        print(f"DEBUG: Accept request - request_id: {request_id}")
+        print(f"DEBUG: Accept request - update: {update}")
+        print(f"DEBUG: Accept request - current_user: {current_user['uid']}")
+        
+        result = await friends_service.update_friend_request(
             request_id,
             current_user["uid"],
             update
         )
+        
+        print(f"DEBUG: Accept request - result: {result}")
+        return result
     except ValueError as e:
+        print(f"DEBUG: Accept request - ValueError: {e}")
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
+        print(f"DEBUG: Accept request - Exception: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
