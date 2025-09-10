@@ -24,7 +24,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.11'
-  FIREBASE_PROJECT_ID: 'whats-the-chance-game'
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_TEST_PROJECT_ID || 'whats-the-chance-test' }}
   ALGORITHM: 'HS256'
   ACCESS_TOKEN_EXPIRE_MINUTES: '30'
   REDIS_URL: 'redis://localhost:6379'
@@ -32,7 +32,7 @@ env:
   DEBUG: 'true'
   TESTING: 'true'
   FIREBASE_SERVICE_ACCOUNT_PATH: 'firebase-service-account.json'
-  FIRESTORE_COLLECTION_PREFIX: ''
+  FIRESTORE_COLLECTION_PREFIX: 'test_'
 
 jobs:
   # B-01: User Model Tests
@@ -202,11 +202,42 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov pytest-html allure-pytest
 
+      - name: 🔍 Debug pytest-asyncio installation
+        working-directory: ./backend
+        run: |
+          echo "=== Checking pytest-asyncio installation ==="
+          pip list | grep pytest
+          echo ""
+          echo "=== Checking pytest plugins ==="
+          pytest --collect-only --quiet 2>&1 | head -20
+          echo ""
+          echo "=== Checking pytest configuration ==="
+          cat pytest.ini
+          echo ""
+          echo "=== Testing async support ==="
+          python -c "import pytest_asyncio; print('pytest-asyncio version:', pytest_asyncio.__version__)"
+
       - name: 🔥 Setup Firebase Credentials
         working-directory: ./backend
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
-                echo "✅ Firebase credentials configured for production database"
+          echo "✅ Firebase credentials configured"
+
+      - name: 🧪 Test async functionality
+        working-directory: ./backend
+        run: |
+          echo "=== Testing async test execution ==="
+          python -c "
+          import asyncio
+          import pytest
+          
+          async def test_async():
+              return 'async works'
+          
+          # Test if we can run async functions
+          result = asyncio.run(test_async())
+          print(f'Async test result: {result}')
+          "
 
       - name: 🧪 Run Friend ID API Tests
         working-directory: ./backend
@@ -285,7 +316,7 @@ jobs:
         working-directory: ./backend
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
-                echo "✅ Firebase credentials configured for production database"
+          echo "✅ Firebase credentials configured"
 
       - name: 🧪 Run Firebase Service Tests
         working-directory: ./backend
@@ -363,7 +394,7 @@ jobs:
         working-directory: ./backend
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
-                echo "✅ Firebase credentials configured for production database"
+          echo "✅ Firebase credentials configured"
 
       - name: 🧪 Run Game Stats Tests
         working-directory: ./backend
