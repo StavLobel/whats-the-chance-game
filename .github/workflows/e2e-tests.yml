@@ -43,12 +43,10 @@ on:
 env:
   NODE_VERSION: '18'
   PYTHON_VERSION: '3.11'
-  FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
   VITE_API_BASE_URL: 'http://localhost:8000'
   VITE_WEBSOCKET_URL: 'ws://localhost:8000/ws'
   # Docker environment variables
-  FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-  FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
   SECRET_KEY: ${{ secrets.SECRET_KEY }}
   ALGORITHM: 'HS256'
   REDIS_URL: 'redis://redis:6379'
@@ -68,7 +66,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🐳 Create Docker network
-        run: docker network create whats-the-chance-e2e
+        run: docker network create whats-the-chance-e2e || true
 
       - name: 🚀 Start Redis container
         run: |
@@ -87,13 +85,29 @@ jobs:
           API_HOST=0.0.0.0
           API_PORT=8000
           FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}
-          FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
-          FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           ALGORITHM=HS256
           REDIS_URL=redis://redis-e2e:6379
           REDIS_DB=0
           EOF
+
+      - name: 📝 Write Firebase Service Account (ADC)
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p backend
+          if [ -z "${SA_JSON:-}" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_KEY secret" >&2
+            exit 1
+          fi
+          # If it looks like JSON, write as-is; otherwise try to base64-decode first
+          if printf '%s' "$SA_JSON" | head -c 1 | grep -q '{'; then
+            printf '%s' "$SA_JSON" > backend/firebase-sa.json
+          else
+            echo "$SA_JSON" | base64 -d > backend/firebase-sa.json
+          fi
+          chmod 600 backend/firebase-sa.json
 
       - name: 🏗️ Build backend Docker image
         run: |
@@ -106,7 +120,12 @@ jobs:
             --network whats-the-chance-e2e \
             -p 8000:8000 \
             -v ${{ github.workspace }}/backend:/app \
+            -e GOOGLE_APPLICATION_CREDENTIALS=/app/firebase-sa.json \
             --env-file backend/.env \
+            --health-cmd "python -c 'import sys,urllib.request; u=\"http://localhost:8000/api/health\";\ntry:\n r=urllib.request.urlopen(u, timeout=2); sys.exit(0 if getattr(r, \"status\", 200)==200 else 1)\nexcept Exception:\n sys.exit(1)'" \
+            --health-interval 2s \
+            --health-timeout 2s \
+            --health-retries 60 \
             whats-the-chance-backend-e2e
 
       - name: 🏗️ Build frontend Docker image
@@ -120,9 +139,15 @@ jobs:
             --network whats-the-chance-e2e \
             -p 5173:5173 \
             -v ${{ github.workspace }}:/app \
+            -w /app \
             -e VITE_API_BASE_URL=http://localhost:8000 \
             -e VITE_WEBSOCKET_URL=ws://localhost:8000/ws \
-            whats-the-chance-frontend-e2e
+            --health-cmd "node -e \"require('http').get('http://localhost:5173', r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\"" \
+            --health-interval 2s \
+            --health-timeout 2s \
+            --health-retries 60 \
+            whats-the-chance-frontend-e2e \
+            sh -lc "npm ci && npx vite --host 0.0.0.0"
 
       - name: ⏳ Wait for Redis to be ready
         run: |
@@ -138,27 +163,29 @@ jobs:
       - name: ⏳ Wait for backend to be ready
         id: backend-health
         run: |
-          for i in {1..60}; do
-            if curl -f http://localhost:8000/api/health; then
+          for i in {1..120}; do
+            status=$(docker inspect --format '{{json .State.Health.Status}}' backend-e2e 2>/dev/null | tr -d '"')
+            if [ "$status" = "healthy" ]; then
               echo "ready=true" >> $GITHUB_OUTPUT
-              echo "✅ Backend is ready"
+              echo "✅ Backend is healthy"
               break
             fi
-            echo "⏳ Waiting for backend... ($i/60)"
-            sleep 3
+            echo "⏳ Waiting for backend health... ($i/120) status=$status"
+            sleep 1
           done
 
       - name: ⏳ Wait for frontend to be ready
         id: frontend-health
         run: |
-          for i in {1..60}; do
-            if curl -f http://localhost:5173; then
+          for i in {1..120}; do
+            status=$(docker inspect --format '{{json .State.Health.Status}}' frontend-e2e 2>/dev/null | tr -d '"')
+            if [ "$status" = "healthy" ]; then
               echo "ready=true" >> $GITHUB_OUTPUT
-              echo "✅ Frontend is ready"
+              echo "✅ Frontend is healthy"
               break
             fi
-            echo "⏳ Waiting for frontend... ($i/60)"
-            sleep 3
+            echo "⏳ Waiting for frontend health... ($i/120) status=$status"
+            sleep 1
           done
 
       - name: 📊 Show container status
@@ -171,9 +198,57 @@ jobs:
           echo "=== Frontend Logs ==="
           docker logs frontend-e2e --tail 20
 
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install test dependencies
+        run: |
+          npm ci
+          npx playwright install ${{ inputs.browser == 'all' && 'chromium firefox webkit' || inputs.browser }}
+
+      - name: 🎭 Run E2E Tests (single-job)
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+        run: |
+          if [ "${{ inputs.test_suite }}" = "all" ]; then
+            SPEC_GLOB="tests/e2e/**/*.spec.{ts,js}"
+          else
+            # Map input to a file if it exists, otherwise fallback to glob
+            case "${{ inputs.test_suite }}" in
+              auth) SPEC_GLOB="tests/e2e/auth.spec.ts" ;;
+              game-flow) SPEC_GLOB="tests/e2e/game-flow.spec.ts" ;;
+              friend-request) SPEC_GLOB="tests/e2e/friend-request-flow.spec.ts" ;;
+              friend-id-workflow) SPEC_GLOB="tests/e2e/friend-id-workflow.spec.ts" ;;
+              friends-management) SPEC_GLOB="tests/e2e/friends-flow.spec.ts" ;;
+              ui-features) SPEC_GLOB="tests/e2e/ui-features.spec.ts" ;;
+              error-handling) SPEC_GLOB="tests/e2e/error-handling.spec.ts" ;;
+              performance) SPEC_GLOB="tests/e2e/performance.spec.ts" ;;
+              health-check) SPEC_GLOB="tests/e2e/health-check.spec.ts" ;;
+              *) SPEC_GLOB="tests/e2e/**/*.spec.{ts,js}" ;;
+            esac
+          fi
+          echo "Running specs: $SPEC_GLOB"
+          npx playwright test "$SPEC_GLOB" \
+            --project=${{ inputs.browser == 'all' && 'chromium' || inputs.browser }} \
+            --reporter=html,json \
+            --output-dir=test-results/${{ inputs.test_suite }}-${{ inputs.browser }}
+
+      - name: 📊 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ inputs.test_suite }}-results-${{ inputs.browser }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
   # E2E-01: Authentication Flow
   auth-flow-tests:
-    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'auth' }}
+    if: false
     needs: setup-application
     runs-on: ubuntu-latest
     name: 'E2E-01: Authentication Flow'
@@ -233,7 +308,7 @@ jobs:
 
   # E2E-02: Complete Game Flow
   game-flow-tests:
-    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-flow' }}
+    if: false
     needs: setup-application
     runs-on: ubuntu-latest
     name: 'E2E-02: Complete Game Flow'
@@ -295,7 +370,7 @@ jobs:
 
   # E2E-03: Friend Request Flow
   friend-request-tests:
-    if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-request' }}
+    if: false
     needs: setup-application
     runs-on: ubuntu-latest
     name: 'E2E-03: Friend Request Flow'
@@ -347,7 +422,7 @@ jobs:
 
   # E2E-04 to E2E-09: Additional test suites (using Docker containers)
   additional-e2e-tests:
-    if: ${{ inputs.test_suite == 'all' || contains(fromJSON('["friend-id-workflow", "friends-management", "ui-features", "error-handling", "performance", "health-check"]'), inputs.test_suite) }}
+    if: false
     needs: setup-application
     runs-on: ubuntu-latest
     name: 'E2E-04-09: Additional Tests'
@@ -408,7 +483,7 @@ jobs:
   # Summary Job
   e2e-tests-summary:
     if: always()
-    needs: [setup-application, auth-flow-tests, game-flow-tests, friend-request-tests, additional-e2e-tests]
+    needs: [setup-application]
     runs-on: ubuntu-latest
     name: '📊 E2E Tests Summary'
     
@@ -456,7 +531,7 @@ jobs:
   # Cleanup Docker containers
   cleanup-containers:
     if: always()
-    needs: [setup-application, auth-flow-tests, game-flow-tests, friend-request-tests, additional-e2e-tests]
+    needs: [setup-application]
     runs-on: ubuntu-latest
     name: '🧹 Cleanup Docker Containers'
     
