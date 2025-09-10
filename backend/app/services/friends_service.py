@@ -197,16 +197,63 @@ class FriendService:
             request_data = doc.to_dict()
             request_data['id'] = doc.id
             
-            # Get user details
+            # Get user details - fallback to basic info if user doc doesn't exist
+            print(f"DEBUG: Looking up fromUserId: {request_data['fromUserId']}")
+            print(f"DEBUG: Looking up toUserId: {request_data['toUserId']}")
             from_user = await self.firebase_service.get_user(request_data['fromUserId'])
             to_user = await self.firebase_service.get_user(request_data['toUserId'])
+            print(f"DEBUG: from_user result: {from_user}")
+            print(f"DEBUG: to_user result: {to_user}")
             
-            request_with_users = FriendRequestWithUsers(
+            # If user data is missing from Firestore, get it from Firebase Auth
+            if not from_user:
+                auth_user = await self.firebase_service.get_user_by_uid(request_data['fromUserId'])
+                from_user = auth_user or {
+                    'uid': request_data['fromUserId'],
+                    'email': 'unknown@example.com',
+                    'displayName': 'Unknown User',
+                    'photoURL': None
+                }
+            else:
+                # Convert to plain dict and map snake_case to camelCase for frontend
+                from_user_clean = {
+                    'uid': from_user.get('id'),
+                    'email': from_user.get('email'),
+                    'displayName': from_user.get('display_name') or from_user.get('displayName'),
+                    'photoURL': from_user.get('photo_url') or from_user.get('photoURL'),
+                    'username': from_user.get('username')
+                }
+                from_user = from_user_clean
+                print(f"DEBUG: Mapped from_user: displayName={from_user.get('displayName')}, photoURL={from_user.get('photoURL')}")
+            
+            if not to_user:
+                auth_user = await self.firebase_service.get_user_by_uid(request_data['toUserId'])
+                to_user = auth_user or {
+                    'uid': request_data['toUserId'],
+                    'email': 'unknown@example.com',
+                    'displayName': 'Unknown User', 
+                    'photoURL': None
+                }
+            else:
+                # Convert to plain dict and map snake_case to camelCase for frontend
+                to_user_clean = {
+                    'uid': to_user.get('id'),
+                    'email': to_user.get('email'),
+                    'displayName': to_user.get('display_name') or to_user.get('displayName'),
+                    'photoURL': to_user.get('photo_url') or to_user.get('photoURL'),
+                    'username': to_user.get('username')
+                }
+                to_user = to_user_clean
+                print(f"DEBUG: Mapped to_user: displayName={to_user.get('displayName')}, photoURL={to_user.get('photoURL')}")
+            
+            # Return plain dict instead of Pydantic model to avoid serialization issues
+            request_with_users_dict = {
                 **request_data,
-                from_user=from_user,
-                to_user=to_user
-            )
-            requests_with_users.append(request_with_users)
+                'from_user': from_user,
+                'to_user': to_user
+            }
+            print(f"DEBUG: Created request dict: from_user={from_user}, to_user={to_user}")
+            requests_with_users.append(request_with_users_dict)
         
         return {
             'requests': requests_with_users,
@@ -284,38 +331,54 @@ class FriendService:
         # Combine results
         friendships = []
         for doc in docs1:
-            data = doc.to_dict()
-            data['id'] = doc.id
-            friend_id = data['user2Id']
-            friend = await self.firebase_service.get_user(friend_id)
-            
-            if online_only and not friend.get('isOnline', False):
-                continue
+            try:
+                data = doc.to_dict()
+                data['id'] = doc.id
+                friend_id = data['user2Id']
+                friend = await self.firebase_service.get_user(friend_id)
                 
-            friendship = FriendshipWithUser(
-                **data,
-                friend=friend,
-                online_status=friend.get('isOnline', False),
-                last_active=friend.get('lastActive')
-            )
-            friendships.append(friendship)
+                # Skip if friend data is missing
+                if not friend:
+                    continue
+                
+                if online_only and not friend.get('isOnline', False):
+                    continue
+                    
+                friendship = FriendshipWithUser(
+                    **data,
+                    friend=friend,
+                    online_status=friend.get('isOnline', False),
+                    last_active=friend.get('lastActive')
+                )
+                friendships.append(friendship)
+            except Exception as e:
+                print(f"DEBUG: Error processing friendship doc1: {e}")
+                continue
         
         for doc in docs2:
-            data = doc.to_dict()
-            data['id'] = doc.id
-            friend_id = data['user1Id']
-            friend = await self.firebase_service.get_user(friend_id)
-            
-            if online_only and not friend.get('isOnline', False):
-                continue
+            try:
+                data = doc.to_dict()
+                data['id'] = doc.id
+                friend_id = data['user1Id']
+                friend = await self.firebase_service.get_user(friend_id)
                 
-            friendship = FriendshipWithUser(
-                **data,
-                friend=friend,
-                online_status=friend.get('isOnline', False),
-                last_active=friend.get('lastActive')
-            )
-            friendships.append(friendship)
+                # Skip if friend data is missing
+                if not friend:
+                    continue
+                
+                if online_only and not friend.get('isOnline', False):
+                    continue
+                    
+                friendship = FriendshipWithUser(
+                    **data,
+                    friend=friend,
+                    online_status=friend.get('isOnline', False),
+                    last_active=friend.get('lastActive')
+                )
+                friendships.append(friendship)
+            except Exception as e:
+                print(f"DEBUG: Error processing friendship doc2: {e}")
+                continue
         
         # Sort by online status and last active
         friendships.sort(key=lambda f: (not f.online_status, f.last_active or datetime.min), reverse=True)

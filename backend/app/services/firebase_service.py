@@ -439,6 +439,66 @@ class FirebaseService:
             logger.error(f"Failed to unsubscribe devices from topic {topic}: {e}")
             return False
 
+    async def get_user(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get user data from Firestore users collection.
+
+        Args:
+            user_id: Firebase user UID
+
+        Returns:
+            User data dict or None if not found
+        """
+        try:
+            user_doc = await self.get_document('users', user_id)
+            if user_doc:
+                return user_doc
+            return None
+        except Exception as e:
+            logger.error(f"Failed to get user {user_id}: {e}")
+            return None
+
+    async def create_notification(
+        self,
+        user_id: str,
+        notification_type: str,
+        title: str,
+        message: str,
+        data: Optional[Dict[str, Any]] = None,
+    ) -> bool:
+        """
+        Create a notification record in Firestore for a user.
+
+        Args:
+            user_id: Target user ID
+            notification_type: Type of notification (e.g., 'friend_request')
+            title: Notification title
+            message: Notification message
+            data: Optional data payload
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            from firebase_admin import firestore
+            notification_data = {
+                'userId': user_id,
+                'type': notification_type,
+                'title': title,
+                'message': message,
+                'data': data or {},
+                'isRead': False,
+                'createdAt': firestore.SERVER_TIMESTAMP,
+                'updatedAt': firestore.SERVER_TIMESTAMP,
+            }
+            
+            await self.create_document('notifications', notification_data)
+            logger.info(f"Created notification for user {user_id}: {title}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to create notification for user {user_id}: {e}")
+            return False
+
 
 # Global Firebase service instance
 firebase_service = FirebaseService()

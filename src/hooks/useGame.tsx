@@ -35,9 +35,9 @@ export function useGame() {
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => {
-          console.log('⏰ Frontend: Request timeout after 10 seconds');
+          console.log('⏰ Frontend: Request timeout after 30 seconds');
           controller.abort();
-        }, 10000); // 10 second timeout
+        }, 30000); // 30 second timeout
 
         const response = await fetch(url, {
           signal: controller.signal,

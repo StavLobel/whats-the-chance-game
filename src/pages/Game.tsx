@@ -99,7 +99,7 @@ export default function Game() {
 
   const handleAcceptFriendRequest = async (requestId: string) => {
     try {
-      await updateFriendRequest.mutateAsync({ requestId, status: 'accepted' });
+      await updateFriendRequest.mutateAsync({ requestId, update: { status: 'accepted' } });
       toast({
         title: 'Friend request accepted!',
         description: 'You are now friends!',
@@ -115,7 +115,7 @@ export default function Game() {
 
   const handleRejectFriendRequest = async (requestId: string) => {
     try {
-      await updateFriendRequest.mutateAsync({ requestId, status: 'rejected' });
+      await updateFriendRequest.mutateAsync({ requestId, update: { status: 'rejected' } });
       toast({
         title: 'Friend request rejected',
         description: 'The friend request has been rejected.',
@@ -337,13 +337,13 @@ export default function Game() {
                         <div className='flex items-center justify-between'>
                           <div className='flex items-center space-x-3'>
                             <Avatar>
-                              <AvatarImage src={request.fromUser.photoURL || undefined} />
+                              <AvatarImage src={request.from_user?.photoURL || undefined} />
                               <AvatarFallback>
-                                {request.fromUser.displayName?.charAt(0) || request.fromUser.email?.charAt(0) || 'U'}
+                                {request.from_user?.displayName?.charAt(0) || request.from_user?.email?.charAt(0) || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className='font-medium'>{request.fromUser.displayName || request.fromUser.email}</div>
+                              <div className='font-medium'>{request.from_user?.displayName || request.from_user?.email || 'Unknown User'}</div>
                               {request.message && (
                                 <div className='text-sm text-muted-foreground'>{request.message}</div>
                               )}
@@ -391,13 +391,13 @@ export default function Game() {
                         <div className='flex items-center justify-between'>
                           <div className='flex items-center space-x-3'>
                             <Avatar>
-                              <AvatarImage src={request.toUser.photoURL || undefined} />
+                              <AvatarImage src={request.to_user?.photoURL || undefined} />
                               <AvatarFallback>
-                                {request.toUser.displayName?.charAt(0) || request.toUser.email?.charAt(0) || 'U'}
+                                {request.to_user?.displayName?.charAt(0) || request.to_user?.email?.charAt(0) || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className='font-medium'>{request.toUser.displayName || request.toUser.email}</div>
+                              <div className='font-medium'>{request.to_user?.displayName || request.to_user?.email || 'Unknown User'}</div>
                               <div className='text-sm text-muted-foreground flex items-center space-x-2'>
                                 <Clock className='h-4 w-4' />
                                 <span>Pending</span>

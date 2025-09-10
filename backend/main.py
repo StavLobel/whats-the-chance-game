@@ -10,9 +10,12 @@ Follows the project structure outlined in the SRD.
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from app.core.config import settings
 from app.routers import challenges, friends, game_stats, notifications, websocket
@@ -44,6 +47,23 @@ app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=["localhost", "127.0.0.1", "*.vercel.app"],
 )
+
+
+# Custom validation error handler
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors with detailed information."""
+    print(f"🚨 VALIDATION ERROR on {request.method} {request.url}")
+    print(f"🚨 Validation errors: {exc.errors()}")
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "url": str(request.url),
+            "method": request.method
+        },
+    )
 
 
 # Health check endpoint

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createTestUser, deleteTestUser } from '../utils/auth-helpers';
+import { createTestUser, deleteTestUser } from './utils/auth-helpers';
 
 test.describe('Friends Search Feature', () => {
   let testUser1: any;

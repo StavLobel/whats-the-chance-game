@@ -10,22 +10,30 @@ This module defines the data models for:
 """
 
 from datetime import datetime
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Any
 from pydantic import BaseModel, Field, field_validator
+from pydantic import ConfigDict
 
 
 class FriendRequestBase(BaseModel):
     """Base friend request model."""
+    model_config = ConfigDict(populate_by_name=True)
     
-    from_user_id: str = Field(..., description="User ID sending the request")
-    to_user_id: str = Field(..., description="User ID receiving the request")
+    from_user_id: str = Field(..., description="User ID sending the request", alias="fromUserId")
+    to_user_id: str = Field(..., description="User ID receiving the request", alias="toUserId")
     message: Optional[str] = Field(None, max_length=500, description="Optional message with request")
 
 
 class FriendRequestCreate(BaseModel):
     """Schema for creating a friend request."""
-    
-    toUserId: str = Field(..., description="User ID to send request to", alias="to_user_id")
+    # Accept both camelCase (toUserId) and snake_case (to_user_id)
+    model_config = ConfigDict(populate_by_name=True)
+
+    toUserId: str = Field(
+        ..., 
+        description="User ID to send request to", 
+        alias="to_user_id"
+    )
     message: Optional[str] = Field(None, max_length=500, description="Optional message with request")
     
     @field_validator("message")
@@ -39,29 +47,32 @@ class FriendRequestCreate(BaseModel):
 
 class FriendRequestUpdate(BaseModel):
     """Schema for updating friend request status."""
+    model_config = ConfigDict(populate_by_name=True)
     
     status: Literal["accepted", "rejected"] = Field(..., description="New status for the request")
 
 
 class FriendRequest(FriendRequestBase):
     """Complete friend request model for API responses."""
+    model_config = ConfigDict(
+        populate_by_name=True,
+        json_encoders={datetime: lambda v: v.isoformat()}
+    )
     
     id: str = Field(..., description="Friend request ID")
     status: Literal["pending", "accepted", "rejected", "cancelled"] = Field(
         ..., description="Current status of the request"
     )
-    created_at: datetime = Field(..., description="Request creation timestamp")
-    updated_at: datetime = Field(..., description="Last update timestamp")
-    
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat()}
+    created_at: datetime = Field(..., description="Request creation timestamp", alias="createdAt")
+    updated_at: datetime = Field(..., description="Last update timestamp", alias="updatedAt")
 
 
 class FriendRequestWithUsers(FriendRequest):
     """Friend request with user details."""
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
     
-    from_user: dict = Field(..., description="User sending the request")
-    to_user: dict = Field(..., description="User receiving the request")
+    from_user: Any = Field(..., description="User sending the request")
+    to_user: Any = Field(..., description="User receiving the request")
 
 
 class FriendshipBase(BaseModel):

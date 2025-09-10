@@ -10,7 +10,7 @@ test.describe('Friend ID System - Complete Workflow', () => {
     user1: {
       email: 'testuser1@example.com',
       password: 'TestPassword123!',
-      friendId: '8259255297762312', // John Doe's Friend ID
+      friendId: '8638712740019442', // John Doe's Friend ID
       displayName: 'John Doe'
     },
     user2: {

@@ -63,6 +63,13 @@ export const friendsApiService = {
     requestId: string,
     update: FriendRequestUpdate
   ): Promise<FriendRequest> => {
+    console.log('🔍 Frontend sending accept request:', { 
+      requestId, 
+      update, 
+      updateJSON: JSON.stringify(update),
+      updateType: typeof update,
+      updateKeys: Object.keys(update)
+    });
     const response = await apiClient.put(`/api/friends/request/${requestId}`, update);
     return response.data;
   },

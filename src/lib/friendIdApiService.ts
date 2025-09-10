@@ -37,8 +37,9 @@ class FriendIdApiService {
    */
   async validateFriendId(friendId: string): Promise<FriendIdValidationResponse> {
     try {
+      // api.get returns raw JSON, not an axios-like object
       const response = await api.get(`/api/friends/unique-id/validate/${friendId}`);
-      return response.data;
+      return response as unknown as FriendIdValidationResponse;
     } catch (error) {
       console.error('Error validating Friend ID:', error);
       throw error;
@@ -51,7 +52,7 @@ class FriendIdApiService {
   async lookupUserByFriendId(friendId: string): Promise<User> {
     try {
       const response = await api.get(`/api/friends/unique-id/lookup/${friendId}`);
-      return response.data;
+      return response as unknown as User;
     } catch (error) {
       console.error('Error looking up user by Friend ID:', error);
       throw error;
@@ -65,15 +66,14 @@ class FriendIdApiService {
     try {
       const response = await api.post('/api/friends/unique-id/generate');
       console.log('Generate Friend ID Response:', response);
-      console.log('Generate Response data:', response.data);
       
-      if (!response || !response.data || !response.data.unique_id) {
+      if (!response || !(response as any).unique_id) {
         throw new Error('Invalid response from generate Friend ID API');
       }
       
       return {
-        friend_id: response.data.unique_id,
-        message: response.data.message || 'Friend ID generated'
+        friend_id: (response as any).unique_id,
+        message: (response as any).message || 'Friend ID generated'
       };
     } catch (error) {
       console.error('Error generating Friend ID:', error);
@@ -89,16 +89,13 @@ class FriendIdApiService {
     try {
       const response = await api.get('/api/friends/unique-id/my');
       console.log('Friend ID API Response:', response);
-      console.log('Response data:', response.data);
-      console.log('Response status:', response.status);
-      console.log('Full response:', JSON.stringify(response, null, 2));
       
-      if (!response || !response.data) {
+      if (!response) {
         throw new Error('No data received from Friend ID API');
       }
       
       // Handle the actual backend response format
-      const data = response.data;
+      const data: any = response;
       if (!data.unique_id) {
         throw new Error('Invalid response format: missing unique_id');
       }

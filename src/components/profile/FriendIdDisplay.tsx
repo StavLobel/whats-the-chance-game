@@ -19,7 +19,7 @@ interface FriendIdDisplayProps {
 }
 
 export const FriendIdDisplay: React.FC<FriendIdDisplayProps> = ({ className, compact = false, onShowQRCode }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const { toast } = useToast();
   const { formatForDisplay } = useFriendIdValidation();
 
