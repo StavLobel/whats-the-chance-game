@@ -90,6 +90,7 @@ jobs:
           name: backend-coverage-models
           path: backend/coverage-html/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 📋 Upload test reports
         uses: actions/upload-artifact@v4
@@ -98,6 +99,7 @@ jobs:
           name: backend-reports-models
           path: backend/reports/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 🎯 Upload Allure results
         uses: actions/upload-artifact@v4
@@ -106,6 +108,7 @@ jobs:
           name: backend-allure-models
           path: backend/allure-results/
           retention-days: 30
+          if-no-files-found: ignore
 
   # B-02: Challenge Validation Tests
   validation-tests:
@@ -162,6 +165,7 @@ jobs:
           name: backend-coverage-validation
           path: backend/coverage-html/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 📋 Upload test reports
         uses: actions/upload-artifact@v4
@@ -170,6 +174,7 @@ jobs:
           name: backend-reports-validation
           path: backend/reports/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 🎯 Upload Allure results
         uses: actions/upload-artifact@v4
@@ -178,12 +183,24 @@ jobs:
           name: backend-allure-validation
           path: backend/allure-results/
           retention-days: 30
+          if-no-files-found: ignore
 
   # B-03: Friend ID API Tests
   friend-id-api-tests:
     if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'friend-id-api' }}
     runs-on: ubuntu-latest
     name: 'B-03: Friend ID API'
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     steps:
       - name: 🔄 Checkout code
@@ -272,6 +289,7 @@ jobs:
           name: backend-coverage-friend-id-api
           path: backend/coverage-html/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 📋 Upload test reports
         uses: actions/upload-artifact@v4
@@ -280,6 +298,7 @@ jobs:
           name: backend-reports-friend-id-api
           path: backend/reports/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 🎯 Upload Allure results
         uses: actions/upload-artifact@v4
@@ -288,6 +307,7 @@ jobs:
           name: backend-allure-friend-id-api
           path: backend/allure-results/
           retention-days: 30
+          if-no-files-found: ignore
 
   # B-04: Firebase Service Tests
   firebase-service-tests:
@@ -350,6 +370,7 @@ jobs:
           name: backend-coverage-firebase-service
           path: backend/coverage-html/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 📋 Upload test reports
         uses: actions/upload-artifact@v4
@@ -358,6 +379,7 @@ jobs:
           name: backend-reports-firebase-service
           path: backend/reports/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 🎯 Upload Allure results
         uses: actions/upload-artifact@v4
@@ -366,12 +388,24 @@ jobs:
           name: backend-allure-firebase-service
           path: backend/allure-results/
           retention-days: 30
+          if-no-files-found: ignore
 
   # B-05: Game Stats Tests
   game-stats-tests:
     if: ${{ inputs.test_suite == 'all' || inputs.test_suite == 'game-stats' }}
     runs-on: ubuntu-latest
     name: 'B-05: Game Stats'
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     steps:
       - name: 🔄 Checkout code
@@ -428,6 +462,7 @@ jobs:
           name: backend-coverage-game-stats
           path: backend/coverage-html/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 📋 Upload test reports
         uses: actions/upload-artifact@v4
@@ -436,6 +471,7 @@ jobs:
           name: backend-reports-game-stats
           path: backend/reports/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: 🎯 Upload Allure results
         uses: actions/upload-artifact@v4
@@ -444,6 +480,7 @@ jobs:
           name: backend-allure-game-stats
           path: backend/allure-results/
           retention-days: 30
+          if-no-files-found: ignore
 
   # Summary Job
   backend-unit-tests-summary:
