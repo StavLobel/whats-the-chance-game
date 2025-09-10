@@ -25,6 +25,14 @@ on:
 env:
   PYTHON_VERSION: '3.11'
   FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+  ALGORITHM: 'HS256'
+  ACCESS_TOKEN_EXPIRE_MINUTES: '30'
+  REDIS_URL: 'redis://localhost:6379'
+  REDIS_DB: '1'
+  DEBUG: 'true'
+  TESTING: 'true'
+  FIREBASE_SERVICE_ACCOUNT_PATH: 'firebase-service-account.json'
+  FIRESTORE_COLLECTION_PREFIX: 'test_'
 
 jobs:
   # B-01: User Model Tests
@@ -65,6 +73,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ env.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          REDIS_DB: ${{ env.REDIS_DB }}
+          DEBUG: ${{ env.DEBUG }}
+          TESTING: ${{ env.TESTING }}
+          FIREBASE_SERVICE_ACCOUNT_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_PATH }}
+          FIRESTORE_COLLECTION_PREFIX: ${{ env.FIRESTORE_COLLECTION_PREFIX }}
 
       - name: 📊 Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -128,6 +145,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ env.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          REDIS_DB: ${{ env.REDIS_DB }}
+          DEBUG: ${{ env.DEBUG }}
+          TESTING: ${{ env.TESTING }}
+          FIREBASE_SERVICE_ACCOUNT_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_PATH }}
+          FIRESTORE_COLLECTION_PREFIX: ${{ env.FIRESTORE_COLLECTION_PREFIX }}
 
       - name: 📊 Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -192,6 +218,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ env.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          REDIS_DB: ${{ env.REDIS_DB }}
+          DEBUG: ${{ env.DEBUG }}
+          TESTING: ${{ env.TESTING }}
+          FIREBASE_SERVICE_ACCOUNT_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_PATH }}
+          FIRESTORE_COLLECTION_PREFIX: ${{ env.FIRESTORE_COLLECTION_PREFIX }}
 
       - name: 📊 Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -255,6 +290,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ env.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          REDIS_DB: ${{ env.REDIS_DB }}
+          DEBUG: ${{ env.DEBUG }}
+          TESTING: ${{ env.TESTING }}
+          FIREBASE_SERVICE_ACCOUNT_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_PATH }}
+          FIRESTORE_COLLECTION_PREFIX: ${{ env.FIRESTORE_COLLECTION_PREFIX }}
 
       - name: 📊 Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -318,6 +362,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ env.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          REDIS_DB: ${{ env.REDIS_DB }}
+          DEBUG: ${{ env.DEBUG }}
+          TESTING: ${{ env.TESTING }}
+          FIREBASE_SERVICE_ACCOUNT_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_PATH }}
+          FIRESTORE_COLLECTION_PREFIX: ${{ env.FIRESTORE_COLLECTION_PREFIX }}
 
       - name: 📊 Upload coverage reports
         uses: actions/upload-artifact@v4
