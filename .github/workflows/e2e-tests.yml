@@ -218,9 +218,8 @@ jobs:
           echo "Running E2E tests for suite: ${{ inputs.test_suite }}"
           npx playwright test tests/e2e/ \
             --project=${{ inputs.browser == 'all' && 'chromium' || inputs.browser }} \
-            --reporter=html,json \
-            --output=test-results/${{ inputs.test_suite }}-${{ inputs.browser }} \
-            --verbose
+            --reporter=html,json,line \
+            --output=test-results/${{ inputs.test_suite }}-${{ inputs.browser }}
 
       - name: 📊 Upload test results
         if: always()
