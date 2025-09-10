@@ -215,25 +215,8 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:5173
         run: |
-          if [ "${{ inputs.test_suite }}" = "all" ]; then
-            SPEC_GLOB="tests/e2e/**/*.spec.ts"
-          else
-            # Map input to a file if it exists, otherwise fallback to glob
-            case "${{ inputs.test_suite }}" in
-              auth) SPEC_GLOB="tests/e2e/auth.spec.ts" ;;
-              game-flow) SPEC_GLOB="tests/e2e/game-flow.spec.ts" ;;
-              friend-request) SPEC_GLOB="tests/e2e/friend-request-flow.spec.ts" ;;
-              friend-id-workflow) SPEC_GLOB="tests/e2e/friend-id-workflow.spec.ts" ;;
-              friends-management) SPEC_GLOB="tests/e2e/friends-flow.spec.ts" ;;
-              ui-features) SPEC_GLOB="tests/e2e/ui-features.spec.ts" ;;
-              error-handling) SPEC_GLOB="tests/e2e/error-handling.spec.ts" ;;
-              performance) SPEC_GLOB="tests/e2e/performance.spec.ts" ;;
-              health-check) SPEC_GLOB="tests/e2e/health-check.spec.ts" ;;
-              *) SPEC_GLOB="tests/e2e/**/*.spec.ts" ;;
-            esac
-          fi
-          echo "Running specs: $SPEC_GLOB"
-          npx playwright test "$SPEC_GLOB" \
+          echo "Running E2E tests for suite: ${{ inputs.test_suite }}"
+          npx playwright test tests/e2e/ \
             --project=${{ inputs.browser == 'all' && 'chromium' || inputs.browser }} \
             --reporter=html,json \
             --output=test-results/${{ inputs.test_suite }}-${{ inputs.browser }}
