@@ -20,7 +20,7 @@ from app.services.firebase_service import firebase_service
 logger = logging.getLogger(__name__)
 
 # Security scheme for Bearer token authentication
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 # Optional security scheme for endpoints that don't require authentication
 optional_security = HTTPBearer(auto_error=False)
@@ -41,6 +41,14 @@ async def get_current_user(
     Raises:
         HTTPException: If token is invalid or user not found
     """
+    # Check if credentials are provided
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     try:
         # Extract token from Bearer header
         token = credentials.credentials
@@ -83,6 +91,9 @@ async def get_current_user(
             "disabled": user_record.get("disabled", False),
         }
 
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except FirebaseError as e:
         logger.error(f"Firebase authentication error: {e}")
         raise HTTPException(
