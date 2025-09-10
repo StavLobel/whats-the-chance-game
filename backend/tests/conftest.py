@@ -1,10 +1,34 @@
 import asyncio
+import os
 from unittest.mock import AsyncMock, Mock
 
 import pytest
 
 # Import your FastAPI app (this will need to be created)
 # from app.main import app
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_environment():
+    """Set up test environment variables before any tests run."""
+    # Set required environment variables for testing
+    os.environ.setdefault("SECRET_KEY", "test_secret_key_for_testing_only_not_for_production_use_12345")
+    os.environ.setdefault("FIREBASE_PROJECT_ID", "whats-the-chance-test")
+    os.environ.setdefault("ALGORITHM", "HS256")
+    os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+    os.environ.setdefault("REDIS_URL", "redis://localhost:6379")
+    os.environ.setdefault("REDIS_DB", "1")
+    os.environ.setdefault("DEBUG", "true")
+    os.environ.setdefault("TESTING", "true")
+    
+    # Optional Firebase settings for tests
+    os.environ.setdefault("FIREBASE_SERVICE_ACCOUNT_PATH", "firebase-service-account.json")
+    os.environ.setdefault("FIRESTORE_COLLECTION_PREFIX", "test_")
+    
+    yield
+    
+    # Clean up environment variables after tests (optional)
+    # We don't need to clean up since these are test-specific values
 
 
 # Mock Firebase dependencies

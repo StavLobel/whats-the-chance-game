@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
 
-from app.main import app
+from main import app
 from app.services.unique_id_service import UniqueIDService
 
 
