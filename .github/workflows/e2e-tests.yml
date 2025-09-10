@@ -60,7 +60,7 @@ jobs:
     outputs:
       frontend-ready: ${{ steps.frontend-health.outputs.ready }}
       backend-ready: ${{ steps.backend-health.outputs.ready }}
-      tests-outcome: ${{ steps.run-tests.outcome }}
+      tests_outcome: ${{ steps.run-tests.outcome }}
     
     steps:
       - name: 🔄 Checkout code
@@ -273,7 +273,7 @@ jobs:
 
       - name: 📈 Generate E2E test summary
         run: |
-          OUTCOME='${{ needs.setup-application.outputs["tests-outcome"] }}'
+          OUTCOME='${{ needs.setup-application.outputs.tests_outcome }}'
           echo "## 🎭 End-to-End Tests Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status | Browser |" >> $GITHUB_STEP_SUMMARY
@@ -283,11 +283,11 @@ jobs:
           echo "**Artifacts:** Playwright HTML report & JSON results uploaded as e2e-${{ inputs.test_suite }}-results-${{ inputs.browser }}" >> $GITHUB_STEP_SUMMARY
 
       - name: ✅ Mark as successful
-        if: ${{ needs.setup-application.outputs["tests-outcome"] == 'success' }}
+        if: ${{ needs.setup-application.outputs.tests_outcome == 'success' }}
         run: echo "🎉 All E2E tests passed!"
 
       - name: ❌ Mark as failed
-        if: ${{ needs.setup-application.outputs["tests-outcome"] != 'success' }}
+        if: ${{ needs.setup-application.outputs.tests_outcome != 'success' }}
         run: |
           echo "❌ Some E2E tests failed!"
           exit 1
