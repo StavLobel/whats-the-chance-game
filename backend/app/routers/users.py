@@ -50,17 +50,17 @@ async def lookup_users(
         try:
             user_data = await firebase_service.get_user_by_uid(uid)
             if user_data:
-        # Determine the best display name using priority order
-        # Check multiple field variations for maximum compatibility
-        display_name = (
-            user_data.get("username") or
-            user_data.get("displayName") or
-            user_data.get("display_name") or
-            user_data.get("first_name") or
-            user_data.get("firstName") or
-            (user_data.get("email", "").split("@")[0] if user_data.get("email") else None) or
-            f"User {uid[:8]}..."
-        )
+                # Determine the best display name using priority order
+                # Check multiple field variations for maximum compatibility
+                display_name = (
+                    user_data.get("username") or
+                    user_data.get("displayName") or
+                    user_data.get("display_name") or
+                    user_data.get("first_name") or
+                    user_data.get("firstName") or
+                    (user_data.get("email", "").split("@")[0] if user_data.get("email") else None) or
+                    f"User {uid[:8]}..."
+                )
                 
                 users.append(UserDisplayInfo(
                     uid=uid,
