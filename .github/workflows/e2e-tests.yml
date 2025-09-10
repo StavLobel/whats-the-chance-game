@@ -216,7 +216,7 @@ jobs:
           PLAYWRIGHT_BASE_URL: http://localhost:5173
         run: |
           if [ "${{ inputs.test_suite }}" = "all" ]; then
-            SPEC_GLOB="tests/e2e/**/*.spec.{ts,js}"
+            SPEC_GLOB="tests/e2e/**/*.spec.ts"
           else
             # Map input to a file if it exists, otherwise fallback to glob
             case "${{ inputs.test_suite }}" in
@@ -229,7 +229,7 @@ jobs:
               error-handling) SPEC_GLOB="tests/e2e/error-handling.spec.ts" ;;
               performance) SPEC_GLOB="tests/e2e/performance.spec.ts" ;;
               health-check) SPEC_GLOB="tests/e2e/health-check.spec.ts" ;;
-              *) SPEC_GLOB="tests/e2e/**/*.spec.{ts,js}" ;;
+              *) SPEC_GLOB="tests/e2e/**/*.spec.ts" ;;
             esac
           fi
           echo "Running specs: $SPEC_GLOB"
