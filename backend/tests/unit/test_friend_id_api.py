@@ -77,8 +77,10 @@ class TestFriendIdAPI:
             "display_name": "Test User"
         }
 
-    async def teardown_method(self):
+    @pytest.fixture(autouse=True)
+    async def cleanup_client(self):
         """Clean up test fixtures."""
+        yield
         await self.client.aclose()
         
     @pytest.mark.asyncio
@@ -474,8 +476,10 @@ class TestFriendIdSecurity:
         """Set up test fixtures."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
 
-    async def teardown_method(self):
+    @pytest.fixture(autouse=True)
+    async def cleanup_client(self):
         """Clean up test fixtures."""
+        yield
         await self.client.aclose()
 
     def test_friend_id_uniqueness(self):
@@ -559,8 +563,10 @@ class TestFriendIdIntegration:
             "display_name": "Test User"
         }
 
-    async def teardown_method(self):
+    @pytest.fixture(autouse=True)
+    async def cleanup_client(self):
         """Clean up test fixtures."""
+        yield
         await self.client.aclose()
 
     @pytest.mark.asyncio
