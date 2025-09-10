@@ -24,7 +24,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.11'
-  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_TEST_PROJECT_ID || 'whats-the-chance-test' }}
+  FIREBASE_PROJECT_ID: 'whats-the-chance-game'
   ALGORITHM: 'HS256'
   ACCESS_TOKEN_EXPIRE_MINUTES: '30'
   REDIS_URL: 'redis://localhost:6379'
@@ -32,7 +32,7 @@ env:
   DEBUG: 'true'
   TESTING: 'true'
   FIREBASE_SERVICE_ACCOUNT_PATH: 'firebase-service-account.json'
-  FIRESTORE_COLLECTION_PREFIX: 'test_'
+  FIRESTORE_COLLECTION_PREFIX: ''
 
 jobs:
   # B-01: User Model Tests
@@ -206,7 +206,7 @@ jobs:
         working-directory: ./backend
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
-          echo "✅ Firebase credentials configured"
+                echo "✅ Firebase credentials configured for production database"
 
       - name: 🧪 Run Friend ID API Tests
         working-directory: ./backend
@@ -285,7 +285,7 @@ jobs:
         working-directory: ./backend
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
-          echo "✅ Firebase credentials configured"
+                echo "✅ Firebase credentials configured for production database"
 
       - name: 🧪 Run Firebase Service Tests
         working-directory: ./backend
@@ -363,7 +363,7 @@ jobs:
         working-directory: ./backend
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
-          echo "✅ Firebase credentials configured"
+                echo "✅ Firebase credentials configured for production database"
 
       - name: 🧪 Run Game Stats Tests
         working-directory: ./backend
