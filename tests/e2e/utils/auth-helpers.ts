@@ -6,6 +6,11 @@
 import { Page } from '@playwright/test';
 import { TestUser } from '../fixtures/test-users';
 
+// For creating/deleting test users
+interface CreatedTestUser extends TestUser {
+  uid: string;
+}
+
 export class AuthHelpers {
   /**
    * Login a test user
@@ -144,4 +149,33 @@ export class AuthHelpers {
     // Reload page
     await page.reload();
   }
+}
+
+/**
+ * Create a test user for E2E testing
+ */
+export async function createTestUser(): Promise<CreatedTestUser> {
+  // Generate a unique test user
+  const timestamp = Date.now();
+  const randomId = Math.random().toString(36).substring(2, 15);
+  
+  return {
+    uid: `test_${timestamp}_${randomId}`,
+    email: `test_${timestamp}_${randomId}@example.com`,
+    password: 'TestPassword123!',
+    displayName: `Test User ${timestamp}`,
+    friendId: `test_${randomId}`
+  };
+}
+
+/**
+ * Delete a test user (cleanup)
+ */
+export async function deleteTestUser(uid: string): Promise<void> {
+  // In a real implementation, this would call the backend API to delete the user
+  // For now, this is a placeholder for cleanup
+  console.log(`Cleaning up test user: ${uid}`);
+  
+  // TODO: Implement actual user deletion via API call
+  // This might involve calling your backend's user deletion endpoint
 }
