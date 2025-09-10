@@ -24,7 +24,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.11'
-  FIREBASE_PROJECT_ID: 'whats-the-chance-test'
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_TEST_PROJECT_ID || 'whats-the-chance-test' }}
   ALGORITHM: 'HS256'
   ACCESS_TOKEN_EXPIRE_MINUTES: '30'
   REDIS_URL: 'redis://localhost:6379'
@@ -202,6 +202,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov pytest-html allure-pytest
 
+      - name: 🔥 Setup Firebase Credentials
+        working-directory: ./backend
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
+          echo "✅ Firebase credentials configured"
+
       - name: 🧪 Run Friend ID API Tests
         working-directory: ./backend
         run: |
@@ -275,6 +281,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov pytest-html allure-pytest
 
+      - name: 🔥 Setup Firebase Credentials
+        working-directory: ./backend
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
+          echo "✅ Firebase credentials configured"
+
       - name: 🧪 Run Firebase Service Tests
         working-directory: ./backend
         run: |
@@ -346,6 +358,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest-cov pytest-html allure-pytest
+
+      - name: 🔥 Setup Firebase Credentials
+        working-directory: ./backend
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > firebase-service-account.json
+          echo "✅ Firebase credentials configured"
 
       - name: 🧪 Run Game Stats Tests
         working-directory: ./backend
