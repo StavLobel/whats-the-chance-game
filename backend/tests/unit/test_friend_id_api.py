@@ -5,7 +5,7 @@ Unit tests for Friend ID endpoints with updated terminology
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi.testclient import TestClient
+import httpx
 from fastapi import HTTPException
 
 from main import app
@@ -15,14 +15,18 @@ from app.services.unique_id_service import UniqueIDService
 class TestFriendIdAPI:
     """Test cases for Friend ID API endpoints."""
 
-    def setup_method(self):
+    async def setup_method(self):
         """Set up test fixtures."""
-        self.client = TestClient(app)
+        self.client = httpx.AsyncClient(app=app, base_url="http://test")
         self.mock_current_user = {
             "uid": "test-user-123",
             "email": "test@example.com",
             "display_name": "Test User"
         }
+
+    async def teardown_method(self):
+        """Clean up test fixtures."""
+        await self.client.aclose()
         
     @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
@@ -40,7 +44,7 @@ class TestFriendIdAPI:
         mock_service.db.collection.return_value.document.return_value.get.return_value = mock_user_doc
         
         # Make request
-        response = self.client.get('/api/friends/unique-id/my')
+        response = await self.client.get('/api/friends/unique-id/my')
         
         # Verify response
         assert response.status_code == 200
@@ -61,7 +65,7 @@ class TestFriendIdAPI:
         mock_service.assign_unique_id_to_user = AsyncMock(return_value='9876543210987654')
         
         # Make request
-        response = self.client.get('/api/friends/unique-id/my')
+        response = await self.client.get('/api/friends/unique-id/my')
         
         # Verify response
         assert response.status_code == 200
@@ -84,7 +88,7 @@ class TestFriendIdAPI:
         })
         
         # Make request
-        response = self.client.get('/api/friends/unique-id/validate/1234567890123456')
+        response = await self.client.get('/api/friends/unique-id/validate/1234567890123456')
         
         # Verify response
         assert response.status_code == 200
@@ -103,7 +107,7 @@ class TestFriendIdAPI:
         mock_service.validate_unique_id_format = AsyncMock(return_value=False)
         
         # Make request
-        response = self.client.get('/api/friends/unique-id/validate/12345')
+        response = await self.client.get('/api/friends/unique-id/validate/12345')
         
         # Verify response
         assert response.status_code == 200
@@ -132,7 +136,7 @@ class TestFriendIdAPI:
         })
         
         # Make request
-        response = self.client.get('/api/friends/unique-id/lookup/1234567890123456')
+        response = await self.client.get('/api/friends/unique-id/lookup/1234567890123456')
         
         # Verify response
         assert response.status_code == 200
@@ -152,7 +156,7 @@ class TestFriendIdAPI:
         mock_service.find_user_by_unique_id = AsyncMock(return_value=None)
         
         # Make request
-        response = self.client.get('/api/friends/unique-id/lookup/9999999999999999')
+        response = await self.client.get('/api/friends/unique-id/lookup/9999999999999999')
         
         # Verify response
         assert response.status_code == 404
@@ -169,7 +173,7 @@ class TestFriendIdAPI:
         mock_service.assign_unique_id_to_user = AsyncMock(return_value='5555666677778888')
         
         # Make request
-        response = self.client.post('/api/friends/unique-id/generate')
+        response = await self.client.post('/api/friends/unique-id/generate')
         
         # Verify response
         assert response.status_code == 200
@@ -177,7 +181,8 @@ class TestFriendIdAPI:
         assert data['unique_id'] == '5555666677778888'
         assert data['message'] == 'Unique ID generated successfully'
 
-    def test_friend_id_endpoints_require_authentication(self):
+    @pytest.mark.asyncio
+    async def test_friend_id_endpoints_require_authentication(self):
         """Test that Friend ID endpoints require authentication."""
         endpoints = [
             ('/api/friends/unique-id/my', 'GET'),
@@ -188,9 +193,9 @@ class TestFriendIdAPI:
         
         for endpoint, method in endpoints:
             if method == 'GET':
-                response = self.client.get(endpoint)
+                response = await self.client.get(endpoint)
             else:
-                response = self.client.post(endpoint)
+                response = await self.client.post(endpoint)
             
             # Should require authentication
             assert response.status_code == 403  # Forbidden without auth
@@ -215,7 +220,7 @@ class TestFriendIdAPI:
         for invalid_id, description in invalid_ids:
             mock_service.validate_unique_id_format = AsyncMock(return_value=False)
             
-            response = self.client.get(f'/api/friends/unique-id/validate/{invalid_id}')
+            response = await self.client.get(f'/api/friends/unique-id/validate/{invalid_id}')
             
             assert response.status_code == 200
             data = response.json()
@@ -231,7 +236,7 @@ class TestFriendIdAPI:
         mock_service.validate_unique_id_format = AsyncMock(return_value=False)
         
         # Make request with invalid Friend ID
-        response = self.client.get('/api/friends/unique-id/lookup/invalid-id')
+        response = await self.client.get('/api/friends/unique-id/lookup/invalid-id')
         
         # Verify response
         assert response.status_code == 400
@@ -250,7 +255,7 @@ class TestFriendIdAPI:
         )
         
         # Make request
-        response = self.client.post('/api/friends/unique-id/generate')
+        response = await self.client.post('/api/friends/unique-id/generate')
         
         # Verify error response
         assert response.status_code == 500
@@ -275,7 +280,7 @@ class TestFriendIdAPI:
         # Make multiple concurrent requests
         responses = []
         for _ in range(5):
-            response = self.client.get('/api/friends/unique-id/my')
+            response = await self.client.get('/api/friends/unique-id/my')
             responses.append(response)
         
         # All should succeed with same Friend ID
@@ -300,11 +305,11 @@ class TestFriendIdAPI:
         mock_service.db.collection.return_value.document.return_value.get.return_value = mock_user_doc
         
         # Make first request
-        response1 = self.client.get('/api/friends/unique-id/my')
+        response1 = await self.client.get('/api/friends/unique-id/my')
         assert response1.status_code == 200
         
         # Make second request (should use same data)
-        response2 = self.client.get('/api/friends/unique-id/my')
+        response2 = await self.client.get('/api/friends/unique-id/my')
         assert response2.status_code == 200
         
         # Both should return same Friend ID
@@ -373,6 +378,14 @@ class TestFriendIdValidation:
 class TestFriendIdSecurity:
     """Test cases for Friend ID security considerations."""
 
+    async def setup_method(self):
+        """Set up test fixtures."""
+        self.client = httpx.AsyncClient(app=app, base_url="http://test")
+
+    async def teardown_method(self):
+        """Clean up test fixtures."""
+        await self.client.aclose()
+
     def test_friend_id_uniqueness(self):
         """Test that Friend IDs are unique across users."""
         # Mock multiple users with different Friend IDs
@@ -432,12 +445,11 @@ class TestFriendIdSecurity:
             ('/api/friends/unique-id/generate', 'POST'),
         ]
         
-        client = TestClient(app)
         for endpoint, method in endpoints:
             if method == 'GET':
-                response = client.get(endpoint)
+                response = await self.client.get(endpoint)
             else:
-                response = client.post(endpoint)
+                response = await self.client.post(endpoint)
             
             # Should be unauthorized
             assert response.status_code == 401
@@ -445,6 +457,19 @@ class TestFriendIdSecurity:
 
 class TestFriendIdIntegration:
     """Test cases for Friend ID integration with friend requests."""
+
+    async def setup_method(self):
+        """Set up test fixtures."""
+        self.client = httpx.AsyncClient(app=app, base_url="http://test")
+        self.mock_current_user = {
+            "uid": "test-user-123",
+            "email": "test@example.com",
+            "display_name": "Test User"
+        }
+
+    async def teardown_method(self):
+        """Clean up test fixtures."""
+        await self.client.aclose()
 
     @pytest.mark.asyncio
     @patch('app.routers.friends.get_current_user')
@@ -466,10 +491,8 @@ class TestFriendIdIntegration:
             'status': 'pending'
         })
         
-        client = TestClient(app)
-        
         # First lookup user by Friend ID
-        lookup_response = client.get('/api/friends/unique-id/lookup/1234567890123456')
+        lookup_response = await self.client.get('/api/friends/unique-id/lookup/1234567890123456')
         assert lookup_response.status_code == 200
         user_data = lookup_response.json()
         
@@ -478,7 +501,7 @@ class TestFriendIdIntegration:
             'toUserId': user_data['uid'],
             'message': 'Found you via Friend ID!'
         }
-        request_response = client.post('/api/friends/request', json=request_data)
+        request_response = await self.client.post('/api/friends/request', json=request_data)
         assert request_response.status_code == 200
 
     def test_friend_id_workflow_integration(self):
