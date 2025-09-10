@@ -1,26 +1,23 @@
 /**
- * Protected Route Component
+ * Public Route Component
  *
- * Wraps routes that require authentication and redirects unauthenticated
- * users to the landing page.
+ * Wraps routes that should only be accessible to unauthenticated users
+ * (like landing page) and redirects authenticated users to the app.
  */
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Card, CardContent } from '../ui/card';
 import { Loader2 } from 'lucide-react';
 
-interface ProtectedRouteProps {
+interface PublicRouteProps {
   children: React.ReactNode;
-  fallback?: React.ReactNode;
   redirectTo?: string;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+export const PublicRoute: React.FC<PublicRouteProps> = ({
   children,
-  fallback,
-  redirectTo = '/',
+  redirectTo = '/app',
 }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -36,18 +33,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // User is authenticated - show protected content
+  // User is authenticated - redirect to app
   if (isAuthenticated) {
-    return <>{children}</>;
+    return <Navigate to={redirectTo} replace />;
   }
 
-  // User is not authenticated - redirect or show fallback
-  if (fallback) {
-    return <>{fallback}</>;
-  }
-
-  // Redirect to landing page (or specified redirect path)
-  return <Navigate to={redirectTo} replace />;
+  // User is not authenticated - show public content
+  return <>{children}</>;
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

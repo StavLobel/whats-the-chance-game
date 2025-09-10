@@ -1,16 +1,35 @@
+/**
+ * Landing Page Component
+ * 
+ * Public landing page for unauthenticated users.
+ * Shows app description and authentication options.
+ */
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Users, Zap, Trophy, ArrowRight, Dice1 } from 'lucide-react';
+import { Play, Users, Zap, Trophy, ArrowRight, Dice1, LogIn, UserPlus } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import Game from './Game';
+import { AuthModal } from '@/components/auth/AuthModal';
 
-const Index = () => {
-  const [showGame, setShowGame] = useState(false);
+const Landing = () => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
-  if (showGame) {
-    return <Game />;
-  }
+  const handleGetStarted = () => {
+    setAuthMode('register');
+    setShowAuthModal(true);
+  };
+
+  const handleSignIn = () => {
+    setAuthMode('login');
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    // User will be redirected automatically by the routing logic
+  };
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5'>
@@ -44,21 +63,33 @@ const Index = () => {
             </p>
           </div>
 
-          {/* CTA */}
+          {/* Authentication CTAs */}
           <div className='space-y-4 animate-slide-up'>
-            <Button
-              variant='game'
-              data-testid='start-playing-button'
-              size='lg'
-              onClick={() => setShowGame(true)}
-              className='text-lg px-8 py-6 h-auto'
-            >
-              <Play className='mr-2 h-5 w-5' />
-              Start Playing
-              <ArrowRight className='ml-2 h-5 w-5' />
-            </Button>
+            <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+              <Button
+                variant='game'
+                data-testid='get-started-button'
+                size='lg'
+                onClick={handleGetStarted}
+                className='text-lg px-8 py-6 h-auto'
+              >
+                <Play className='mr-2 h-5 w-5' />
+                Get Started
+                <ArrowRight className='ml-2 h-5 w-5' />
+              </Button>
+              <Button
+                variant='outline'
+                data-testid='sign-in-button'
+                size='lg'
+                onClick={handleSignIn}
+                className='text-lg px-8 py-6 h-auto'
+              >
+                <LogIn className='mr-2 h-5 w-5' />
+                Sign In
+              </Button>
+            </div>
             <p className='text-sm text-muted-foreground'>
-              No registration required • Start instantly
+              Join thousands of players • Free to play
             </p>
           </div>
         </div>
@@ -162,7 +193,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Call to Action */}
+        {/* Final Call to Action */}
         <div className='mt-24 text-center space-y-8'>
           <div className='space-y-4'>
             <div className='w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto'>
@@ -173,20 +204,39 @@ const Index = () => {
               Join thousands of players having fun with friends. What's the chance you'll love it?
             </p>
           </div>
-          <Button
-            variant='game'
-            size='lg'
-            onClick={() => setShowGame(true)}
-            className='text-lg px-8 py-6 h-auto'
-          >
-            <Play className='mr-2 h-5 w-5' />
-            Start Your First Challenge
-            <ArrowRight className='ml-2 h-5 w-5' />
-          </Button>
+          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+            <Button
+              variant='game'
+              size='lg'
+              onClick={handleGetStarted}
+              className='text-lg px-8 py-6 h-auto'
+            >
+              <UserPlus className='mr-2 h-5 w-5' />
+              Create Account
+              <ArrowRight className='ml-2 h-5 w-5' />
+            </Button>
+            <Button
+              variant='outline'
+              size='lg'
+              onClick={handleSignIn}
+              className='text-lg px-8 py-6 h-auto'
+            >
+              <LogIn className='mr-2 h-5 w-5' />
+              Sign In
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+        defaultMode={authMode}
+      />
     </div>
   );
 };
 
-export default Index;
+export default Landing;

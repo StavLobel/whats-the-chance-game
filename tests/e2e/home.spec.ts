@@ -56,18 +56,31 @@ test.describe('Home Page E2E Tests', () => {
     });
   });
 
-  test('should navigate to game when start playing button is clicked', async ({ page }) => {
-    await test.step('Click start playing button', async () => {
-      await homePage.clickStartPlaying();
+  test('should show authentication modal when get started button is clicked', async ({ page }) => {
+    await test.step('Click get started button', async () => {
+      await homePage.clickGetStarted();
     });
 
-    await test.step('Verify game page loads', async () => {
-      // The game component loads but keeps the navbar with title
-      // Instead, check for game-specific elements
-      await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({ timeout: 10000 });
+    await test.step('Verify auth modal opens in register mode', async () => {
+      // Check that the authentication modal opens
+      await expect(page.getByTestId('auth-modal')).toBeVisible({ timeout: 10000 });
       
-      // Verify we're on the game page by checking for game-specific content
-      await expect(page.getByText(/welcome back/i)).toBeVisible();
+      // Should be in register mode by default when clicking "Get Started"
+      await expect(page.getByText(/create account/i)).toBeVisible();
+    });
+  });
+
+  test('should show authentication modal when sign in button is clicked', async ({ page }) => {
+    await test.step('Click sign in button', async () => {
+      await homePage.clickSignIn();
+    });
+
+    await test.step('Verify auth modal opens in login mode', async () => {
+      // Check that the authentication modal opens
+      await expect(page.getByTestId('auth-modal')).toBeVisible({ timeout: 10000 });
+      
+      // Should be in login mode when clicking "Sign In"
+      await expect(page.getByText(/sign in/i)).toBeVisible();
     });
   });
 
@@ -85,17 +98,24 @@ test.describe('Home Page E2E Tests', () => {
       const firstFocusedElement = await page.evaluate(() => document.activeElement?.tagName);
       expect(firstFocusedElement).toBeTruthy();
       
-      // Continue tabbing to find the start playing button
+      // Continue tabbing to find one of the CTA buttons
       let maxTabs = 10;
-      while (maxTabs > 0) {
-        const isFocused = await homePage.startPlayingButton.evaluate(el => el === document.activeElement);
-        if (isFocused) break;
+      let foundButton = false;
+      while (maxTabs > 0 && !foundButton) {
+        const isFocusedGetStarted = await homePage.getStartedButton.evaluate(el => el === document.activeElement);
+        const isFocusedSignIn = await homePage.signInButton.evaluate(el => el === document.activeElement);
+        if (isFocusedGetStarted || isFocusedSignIn) {
+          foundButton = true;
+          break;
+        }
         await page.keyboard.press('Tab');
         maxTabs--;
       }
       
-      // Verify we found the start playing button
-      await expect(homePage.startPlayingButton).toBeFocused();
+      // Verify we found one of the CTA buttons (get started or sign in)
+      const isFocusedGetStarted = await homePage.getStartedButton.evaluate(el => el === document.activeElement);
+      const isFocusedSignIn = await homePage.signInButton.evaluate(el => el === document.activeElement);
+      expect(isFocusedGetStarted || isFocusedSignIn).toBe(true);
     });
 
     await test.step('Check color contrast and readability', async () => {
@@ -137,8 +157,10 @@ test.describe('Home Page E2E Tests', () => {
 
     await test.step('Verify elements remain functional after interaction', async () => {
       await homePage.gameTitle.scrollIntoViewIfNeeded();
-      await expect(homePage.startPlayingButton).toBeVisible();
-      await expect(homePage.startPlayingButton).toBeEnabled();
+      await expect(homePage.getStartedButton).toBeVisible();
+      await expect(homePage.getStartedButton).toBeEnabled();
+      await expect(homePage.signInButton).toBeVisible();
+      await expect(homePage.signInButton).toBeEnabled();
     });
   });
 

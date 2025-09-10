@@ -6,7 +6,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { NotificationProvider } from './contexts/NotificationContext';
-import Index from './pages/Index';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { PublicRoute } from './components/auth/PublicRoute';
+import Landing from './pages/Landing';
+import Game from './pages/Game';
 import NotFound from './pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -21,8 +24,37 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path='/' element={<Index />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                {/* Public route - Landing page for unauthenticated users */}
+                <Route 
+                  path='/' 
+                  element={
+                    <PublicRoute>
+                      <Landing />
+                    </PublicRoute>
+                  } 
+                />
+                
+                {/* Protected routes - Main app for authenticated users */}
+                <Route 
+                  path='/app/*' 
+                  element={
+                    <ProtectedRoute>
+                      <Game />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Legacy route redirect for backward compatibility */}
+                <Route 
+                  path='/game' 
+                  element={
+                    <ProtectedRoute redirectTo="/app">
+                      <Game />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Catch-all route */}
                 <Route path='*' element={<NotFound />} />
               </Routes>
             </BrowserRouter>
