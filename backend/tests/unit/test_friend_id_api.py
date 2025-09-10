@@ -15,7 +15,8 @@ from app.services.unique_id_service import UniqueIDService
 class TestFriendIdAPI:
     """Test cases for Friend ID API endpoints."""
 
-    async def setup_method(self):
+    @pytest.fixture(autouse=True)
+    async def setup_client(self):
         """Set up test fixtures."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
         self.mock_current_user = {
@@ -23,9 +24,7 @@ class TestFriendIdAPI:
             "email": "test@example.com",
             "display_name": "Test User"
         }
-
-    async def teardown_method(self):
-        """Clean up test fixtures."""
+        yield
         await self.client.aclose()
         
     @pytest.mark.asyncio
@@ -378,12 +377,11 @@ class TestFriendIdValidation:
 class TestFriendIdSecurity:
     """Test cases for Friend ID security considerations."""
 
-    async def setup_method(self):
+    @pytest.fixture(autouse=True)
+    async def setup_client(self):
         """Set up test fixtures."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
-
-    async def teardown_method(self):
-        """Clean up test fixtures."""
+        yield
         await self.client.aclose()
 
     def test_friend_id_uniqueness(self):
@@ -458,7 +456,8 @@ class TestFriendIdSecurity:
 class TestFriendIdIntegration:
     """Test cases for Friend ID integration with friend requests."""
 
-    async def setup_method(self):
+    @pytest.fixture(autouse=True)
+    async def setup_client(self):
         """Set up test fixtures."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
         self.mock_current_user = {
@@ -466,9 +465,7 @@ class TestFriendIdIntegration:
             "email": "test@example.com",
             "display_name": "Test User"
         }
-
-    async def teardown_method(self):
-        """Clean up test fixtures."""
+        yield
         await self.client.aclose()
 
     @pytest.mark.asyncio
