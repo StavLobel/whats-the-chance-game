@@ -406,6 +406,8 @@ async def get_my_unique_id(
     If the user doesn't have one, it will be generated automatically.
     """
     try:
+        print(f"Getting unique ID for user: {current_user['uid']}")
+        
         # Check if user already has a unique ID
         users_ref = unique_id_service.db.collection('users').document(current_user["uid"])
         user_doc = users_ref.get()
@@ -413,18 +415,29 @@ async def get_my_unique_id(
         if user_doc.exists:
             user_data = user_doc.to_dict()
             existing_unique_id = user_data.get('unique_id')
+            print(f"User document exists, unique_id: {existing_unique_id}")
             
             if existing_unique_id:
-                return {
+                result = {
                     "unique_id": existing_unique_id,
                     "message": "Existing unique ID retrieved"
                 }
+                print(f"Returning existing unique ID: {result}")
+                return result
+        else:
+            print(f"User document does not exist for UID: {current_user['uid']}")
         
         # Generate new unique ID if none exists
+        print("Generating new unique ID...")
         unique_id = await unique_id_service.assign_unique_id_to_user(current_user["uid"])
-        return {
+        result = {
             "unique_id": unique_id,
             "message": "New unique ID generated"
         }
+        print(f"Generated new unique ID: {result}")
+        return result
     except Exception as e:
+        print(f"Error in get_my_unique_id: {e}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
