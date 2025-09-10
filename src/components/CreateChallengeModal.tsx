@@ -45,6 +45,14 @@ export function CreateChallengeModal({ open, onOpenChange, preselectedUserId }: 
 
   const friends = friendsData?.friends || [];
 
+  // Helper function to get display name
+  const getDisplayName = (user: any) => {
+    if (user.displayName) return user.displayName;
+    if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
+    if (user.username) return user.username;
+    return user.email;
+  };
+
   // Filter friends based on search
   const filteredFriends = friends.filter((friendship) => {
     const friend = friendship.friend;
@@ -83,13 +91,6 @@ export function CreateChallengeModal({ open, onOpenChange, preselectedUserId }: 
       return user.displayName.substring(0, 2).toUpperCase();
     }
     return user.email.substring(0, 2).toUpperCase();
-  };
-
-  const getDisplayName = (user: any) => {
-    if (user.displayName) return user.displayName;
-    if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
-    if (user.username) return user.username;
-    return user.email;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -337,15 +337,42 @@ class FriendService:
                 friend_id = data['user2Id']
                 friend = await self.firebase_service.get_user(friend_id)
                 
-                # Skip if friend data is missing
+                # FIX: Fallback to Firebase Auth if Firestore user data is missing
                 if not friend:
-                    continue
+                    print(f"DEBUG: User data missing for {friend_id}, falling back to Firebase Auth")
+                    auth_user = await self.firebase_service.get_user_by_uid(friend_id)
+                    if auth_user:
+                        friend = {
+                            'uid': auth_user.get('uid', friend_id),
+                            'email': auth_user.get('email', 'unknown@example.com'),
+                            'displayName': auth_user.get('displayName', 'Unknown User'),
+                            'photoURL': auth_user.get('photoURL'),
+                            'isOnline': False,  # Default to offline for missing data
+                            'lastActive': None
+                        }
+                        print(f"DEBUG: Created friend data from Firebase Auth: {friend}")
+                    else:
+                        # FIX: Create minimal friend data instead of skipping
+                        friend = {
+                            'uid': friend_id,
+                            'email': 'unknown@example.com', 
+                            'displayName': 'Unknown User',
+                            'photoURL': None,
+                            'isOnline': False,
+                            'lastActive': None
+                        }
+                        print(f"DEBUG: Created minimal friend data: {friend}")
                 
                 if online_only and not friend.get('isOnline', False):
                     continue
                     
                 friendship = FriendshipWithUser(
-                    **data,
+                    id=data['id'],
+                    user1_id=data['user1Id'],
+                    user2_id=data['user2Id'],
+                    category=data.get('category'),
+                    created_at=data.get('createdAt', datetime.now()),
+                    is_active=data.get('isActive', True),
                     friend=friend,
                     online_status=friend.get('isOnline', False),
                     last_active=friend.get('lastActive')
@@ -353,7 +380,35 @@ class FriendService:
                 friendships.append(friendship)
             except Exception as e:
                 print(f"DEBUG: Error processing friendship doc1: {e}")
-                continue
+                # FIX: Don't skip - try to create minimal friendship data
+                try:
+                    data = doc.to_dict()
+                    data['id'] = doc.id
+                    friend_id = data['user2Id']
+                    minimal_friend = {
+                        'uid': friend_id,
+                        'email': 'unknown@example.com',
+                        'displayName': 'Unknown User', 
+                        'photoURL': None,
+                        'isOnline': False,
+                        'lastActive': None
+                    }
+                    friendship = FriendshipWithUser(
+                        id=data['id'],
+                        user1_id=data['user1Id'],
+                        user2_id=data['user2Id'],
+                        category=data.get('category'),
+                        created_at=data.get('createdAt', datetime.now()),
+                        is_active=data.get('isActive', True),
+                        friend=minimal_friend,
+                        online_status=False,
+                        last_active=None
+                    )
+                    friendships.append(friendship)
+                    print(f"DEBUG: Added minimal friendship data for {friend_id}")
+                except Exception as e2:
+                    print(f"DEBUG: Failed to create minimal friendship: {e2}")
+                    continue  # Only skip if absolutely cannot process
         
         for doc in docs2:
             try:
@@ -362,15 +417,42 @@ class FriendService:
                 friend_id = data['user1Id']
                 friend = await self.firebase_service.get_user(friend_id)
                 
-                # Skip if friend data is missing
+                # FIX: Fallback to Firebase Auth if Firestore user data is missing
                 if not friend:
-                    continue
+                    print(f"DEBUG: User data missing for {friend_id}, falling back to Firebase Auth")
+                    auth_user = await self.firebase_service.get_user_by_uid(friend_id)
+                    if auth_user:
+                        friend = {
+                            'uid': auth_user.get('uid', friend_id),
+                            'email': auth_user.get('email', 'unknown@example.com'),
+                            'displayName': auth_user.get('displayName', 'Unknown User'),
+                            'photoURL': auth_user.get('photoURL'),
+                            'isOnline': False,  # Default to offline for missing data
+                            'lastActive': None
+                        }
+                        print(f"DEBUG: Created friend data from Firebase Auth: {friend}")
+                    else:
+                        # FIX: Create minimal friend data instead of skipping
+                        friend = {
+                            'uid': friend_id,
+                            'email': 'unknown@example.com',
+                            'displayName': 'Unknown User',
+                            'photoURL': None,
+                            'isOnline': False,
+                            'lastActive': None
+                        }
+                        print(f"DEBUG: Created minimal friend data: {friend}")
                 
                 if online_only and not friend.get('isOnline', False):
                     continue
                     
                 friendship = FriendshipWithUser(
-                    **data,
+                    id=data['id'],
+                    user1_id=data['user1Id'],
+                    user2_id=data['user2Id'],
+                    category=data.get('category'),
+                    created_at=data.get('createdAt', datetime.now()),
+                    is_active=data.get('isActive', True),
                     friend=friend,
                     online_status=friend.get('isOnline', False),
                     last_active=friend.get('lastActive')
@@ -378,7 +460,35 @@ class FriendService:
                 friendships.append(friendship)
             except Exception as e:
                 print(f"DEBUG: Error processing friendship doc2: {e}")
-                continue
+                # FIX: Don't skip - try to create minimal friendship data
+                try:
+                    data = doc.to_dict()
+                    data['id'] = doc.id
+                    friend_id = data['user1Id']
+                    minimal_friend = {
+                        'uid': friend_id,
+                        'email': 'unknown@example.com',
+                        'displayName': 'Unknown User',
+                        'photoURL': None,
+                        'isOnline': False,
+                        'lastActive': None
+                    }
+                    friendship = FriendshipWithUser(
+                        id=data['id'],
+                        user1_id=data['user1Id'],
+                        user2_id=data['user2Id'],
+                        category=data.get('category'),
+                        created_at=data.get('createdAt', datetime.now()),
+                        is_active=data.get('isActive', True),
+                        friend=minimal_friend,
+                        online_status=False,
+                        last_active=None
+                    )
+                    friendships.append(friendship)
+                    print(f"DEBUG: Added minimal friendship data for {friend_id}")
+                except Exception as e2:
+                    print(f"DEBUG: Failed to create minimal friendship: {e2}")
+                    continue  # Only skip if absolutely cannot process
         
         # Sort by online status and last active
         friendships.sort(key=lambda f: (not f.online_status, f.last_active or datetime.min), reverse=True)

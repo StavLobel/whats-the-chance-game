@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { StorageHelpers } from './storage-helpers';
 
 export class TestHelpers {
   static async waitForNetworkIdle(page: Page, timeout = 5000) {
@@ -75,25 +76,18 @@ export class TestHelpers {
   }
 
   static async clearLocalStorage(page: Page) {
-    await page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-    });
+    // Use storage abstraction to avoid security errors
+    await StorageHelpers.clearStorage(page);
   }
 
   static async setLocalStorage(page: Page, key: string, value: string) {
-    await page.evaluate(
-      ({ key, value }) => {
-        localStorage.setItem(key, value);
-      },
-      { key, value }
-    );
+    // Use storage abstraction for consistent behavior
+    await StorageHelpers.setStorageItem(page, key, value);
   }
 
   static async getLocalStorage(page: Page, key: string): Promise<string | null> {
-    return await page.evaluate(key => {
-      return localStorage.getItem(key);
-    }, key);
+    // Use storage abstraction for consistent behavior
+    return await StorageHelpers.getStorageItem(page, key);
   }
 
   static async verifyPagePerformance(page: Page) {

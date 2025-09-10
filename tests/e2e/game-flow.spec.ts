@@ -6,6 +6,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { AuthHelpers } from './utils/auth-helpers';
 import { TestHelpers } from './utils/test-helpers';
+import { StorageHelpers } from './utils/storage-helpers';
 import { GamePage } from './pages/GamePage';
 import testUsers from './fixtures/test-users';
 
@@ -13,10 +14,15 @@ test.describe('Complete Game Flow E2E Tests', () => {
   let gamePage: GamePage;
   
   test.beforeEach(async ({ page }) => {
+    // Set up test storage before any page operations
+    await StorageHelpers.setupTestStorage(page);
+    
     gamePage = new GamePage(page);
-    await TestHelpers.clearLocalStorage(page);
     await gamePage.goto();
     await gamePage.waitForLoad();
+    
+    // Clear storage after page is ready
+    await StorageHelpers.clearStorage(page);
   });
 
   test('should complete full challenge lifecycle with matching numbers', async ({ browser }) => {

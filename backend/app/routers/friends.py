@@ -441,3 +441,85 @@ async def get_my_unique_id(
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/debug/consistency-check")
+async def check_friendship_consistency(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Debug endpoint to check friendship data consistency.
+    Identifies friendships that exist but can't be displayed due to missing user data.
+    """
+    try:
+        user_id = current_user["uid"]
+        
+        # Get friendships where user is involved
+        friendships_ref = friends_service.db.collection('friendships')
+        query1 = friendships_ref.where('user1Id', '==', user_id).where('isActive', '==', True)
+        query2 = friendships_ref.where('user2Id', '==', user_id).where('isActive', '==', True)
+        
+        docs1 = query1.get()
+        docs2 = query2.get()
+        
+        issues = []
+        total_friendships = 0
+        
+        # Check docs1 (user is user1)
+        for doc in docs1:
+            total_friendships += 1
+            data = doc.to_dict()
+            friend_id = data['user2Id']
+            
+            # Check Firestore user data
+            friend = await friends_service.firebase_service.get_user(friend_id)
+            if not friend:
+                # Check Firebase Auth
+                auth_user = await friends_service.firebase_service.get_user_by_uid(friend_id)
+                issues.append({
+                    'friendship_id': doc.id,
+                    'friend_id': friend_id,
+                    'issue': 'Missing user data in Firestore',
+                    'direction': 'user1->user2',
+                    'has_auth_data': bool(auth_user),
+                    'auth_display_name': auth_user.get('displayName') if auth_user else None,
+                    'created_at': data.get('createdAt'),
+                    'updated_at': data.get('updatedAt')
+                })
+        
+        # Check docs2 (user is user2)
+        for doc in docs2:
+            total_friendships += 1
+            data = doc.to_dict()
+            friend_id = data['user1Id']
+            
+            # Check Firestore user data
+            friend = await friends_service.firebase_service.get_user(friend_id)
+            if not friend:
+                # Check Firebase Auth
+                auth_user = await friends_service.firebase_service.get_user_by_uid(friend_id)
+                issues.append({
+                    'friendship_id': doc.id,
+                    'friend_id': friend_id,
+                    'issue': 'Missing user data in Firestore',
+                    'direction': 'user2->user1',
+                    'has_auth_data': bool(auth_user),
+                    'auth_display_name': auth_user.get('displayName') if auth_user else None,
+                    'created_at': data.get('createdAt'),
+                    'updated_at': data.get('updatedAt')
+                })
+        
+        return {
+            'user_id': user_id,
+            'user_email': current_user.get('email'),
+            'total_friendships': total_friendships,
+            'issues_found': len(issues),
+            'issues': issues,
+            'summary': {
+                'friendships_with_missing_firestore_data': len(issues),
+                'friendships_with_auth_fallback_available': len([i for i in issues if i['has_auth_data']]),
+                'completely_broken_friendships': len([i for i in issues if not i['has_auth_data']])
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to check consistency: {str(e)}")

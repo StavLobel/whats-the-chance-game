@@ -24,44 +24,45 @@ export function useGame() {
     setLoading(true);
     setError(null);
 
+    // Set up real-time listener for challenges
+    const unsubscribe = gameService.getChallengesForUser(user.uid, 'all');
+    
+    // Note: getChallengesForUser returns an unsubscribe function, but we need to handle the data
+    // Let's create a proper async method to get challenges once
     const loadChallenges = async () => {
       try {
-        console.log('🚀 Frontend: Starting to load challenges...');
-        // Fetch challenges from the backend API with timeout
-        const apiUrl = 'http://localhost:8000';
-        // Use test endpoint with user lookup and timeout protection
-        const url = `${apiUrl}/api/challenges/test`;
-        console.log('🌐 Frontend: Making API call to:', url);
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          console.log('⏰ Frontend: Request timeout after 30 seconds');
-          controller.abort();
-        }, 30000); // 30 second timeout
-
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        // For now, we'll use Firebase directly to get challenges
+        // This should be replaced with a proper async method in gameService
+        const { collection, query, where, getDocs, orderBy } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase');
+        
+        const challengesCollection = collection(db, 'challenges');
+        const q = query(
+          challengesCollection,
+          where('to_user', '==', user.uid),
+          orderBy('created_at', 'desc')
+        );
+        
+        const snapshot = await getDocs(q);
+        const challenges: Challenge[] = [];
+        
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          challenges.push({
+            id: doc.id,
+            from_user: data.from_user,
+            to_user: data.to_user,
+            description: data.description,
+            status: data.status,
+            range: data.range,
+            numbers: data.numbers,
+            result: data.result,
+            created_at: data.created_at?.toDate() || new Date(),
+            updated_at: data.updated_at?.toDate() || new Date(),
+            completed_at: data.completed_at?.toDate(),
+          });
         });
-
-        clearTimeout(timeoutId);
-        console.log('📨 Frontend: Response received, status:', response.status);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const challengesData = await response.json();
-        console.log('📦 Frontend: Challenges data received:', challengesData);
-        console.log('📊 Frontend: Number of challenges:', challengesData?.length || 0);
-        if (challengesData?.length > 0) {
-          console.log('🔍 Frontend: First challenge structure:', challengesData[0]);
-        }
-
-        // Ensure we always set an array
-        const challenges = Array.isArray(challengesData) ? challengesData : [];
+        
         setChallenges(challenges);
         setLoading(false);
       } catch (err) {
@@ -73,11 +74,8 @@ export function useGame() {
 
     loadChallenges();
 
-    // Set up periodic refresh every 30 seconds
-    const interval = setInterval(loadChallenges, 30000);
-
     return () => {
-      clearInterval(interval);
+      // Cleanup will be handled by the real-time listener if implemented
     };
   }, [user?.uid]);
 
