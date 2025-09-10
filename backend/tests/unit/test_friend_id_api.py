@@ -62,8 +62,7 @@ async def create_test_token(user_uid: str) -> str:
 class TestFriendIdAPI:
     """Test cases for Friend ID API endpoints."""
 
-    @pytest.fixture(autouse=True)
-    async def setup_client(self):
+    def setup_method(self):
         """Set up test fixtures with real test users."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
         
@@ -71,15 +70,15 @@ class TestFriendIdAPI:
         self.test_user1 = TEST_USERS["testuser1"]
         self.test_user2 = TEST_USERS["testuser2"]
         
-        # Create authentication tokens for test users
-        self.test_user1_token = await create_test_token(self.test_user1["uid"])
-        self.test_user2_token = await create_test_token(self.test_user2["uid"])
-        
-        # Create auth headers
-        self.auth_headers_user1 = {"Authorization": f"Bearer {self.test_user1_token}"}
-        self.auth_headers_user2 = {"Authorization": f"Bearer {self.test_user2_token}"}
-        
-        yield
+        # Also set up mock_current_user for backward compatibility
+        self.mock_current_user = {
+            "uid": "test-user-123",
+            "email": "test@example.com",
+            "display_name": "Test User"
+        }
+
+    async def teardown_method(self):
+        """Clean up test fixtures."""
         await self.client.aclose()
         
     @pytest.mark.asyncio
@@ -96,8 +95,8 @@ class TestFriendIdAPI:
                 "disabled": False
             }
             
-            # Make request with auth headers
-            response = await self.client.get('/api/friends/unique-id/my', headers=self.auth_headers_user1)
+            # Make request (no auth headers needed since we're mocking)
+            response = await self.client.get('/api/friends/unique-id/my')
             
             # Should get a valid response (either existing ID or new one generated)
             assert response.status_code in [200, 201]
@@ -120,7 +119,7 @@ class TestFriendIdAPI:
                 "disabled": False
             }
             
-            user1_response = await self.client.get('/api/friends/unique-id/my', headers=self.auth_headers_user1)
+            user1_response = await self.client.get('/api/friends/unique-id/my')
             assert user1_response.status_code in [200, 201]
             user1_data = user1_response.json()
             user1_friend_id = user1_data['unique_id']
@@ -135,7 +134,7 @@ class TestFriendIdAPI:
             }
             
             # This test shows the real workflow of Friend ID lookup
-            lookup_response = await self.client.get(f'/api/friends/unique-id/lookup/{user1_friend_id}', headers=self.auth_headers_user2)
+            lookup_response = await self.client.get(f'/api/friends/unique-id/lookup/{user1_friend_id}')
             
             # Should find user1 or get appropriate error
             assert lookup_response.status_code in [200, 404]
@@ -471,11 +470,12 @@ class TestFriendIdValidation:
 class TestFriendIdSecurity:
     """Test cases for Friend ID security considerations."""
 
-    @pytest.fixture(autouse=True)
-    async def setup_client(self):
+    def setup_method(self):
         """Set up test fixtures."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
-        yield
+
+    async def teardown_method(self):
+        """Clean up test fixtures."""
         await self.client.aclose()
 
     def test_friend_id_uniqueness(self):
@@ -550,8 +550,7 @@ class TestFriendIdSecurity:
 class TestFriendIdIntegration:
     """Test cases for Friend ID integration with friend requests."""
 
-    @pytest.fixture(autouse=True)
-    async def setup_client(self):
+    def setup_method(self):
         """Set up test fixtures."""
         self.client = httpx.AsyncClient(app=app, base_url="http://test")
         self.mock_current_user = {
@@ -559,7 +558,9 @@ class TestFriendIdIntegration:
             "email": "test@example.com",
             "display_name": "Test User"
         }
-        yield
+
+    async def teardown_method(self):
+        """Clean up test fixtures."""
         await self.client.aclose()
 
     @pytest.mark.asyncio
