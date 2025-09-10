@@ -46,12 +46,19 @@ env:
   FIREBASE_PROJECT_ID: 'whats-the-chance-test'
   VITE_API_BASE_URL: 'http://localhost:8000'
   VITE_WEBSOCKET_URL: 'ws://localhost:8000/ws'
+  # Docker environment variables
+  FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+  FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  ALGORITHM: 'HS256'
+  REDIS_URL: 'redis://redis:6379'
+  REDIS_DB: '0'
 
 jobs:
-  # Setup full application stack
+  # Setup full application stack with Docker
   setup-application:
     runs-on: ubuntu-latest
-    name: '🚀 Setup Application Stack'
+    name: '🚀 Setup Application Stack (Docker)'
     outputs:
       frontend-ready: ${{ steps.frontend-health.outputs.ready }}
       backend-ready: ${{ steps.backend-health.outputs.ready }}
@@ -60,65 +67,109 @@ jobs:
       - name: 🔄 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+      - name: 🐳 Create Docker network
+        run: docker network create whats-the-chance-e2e
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📥 Install dependencies
+      - name: 🚀 Start Redis container
         run: |
-          npm ci
-          cd backend && pip install -r requirements.txt
+          docker run -d \
+            --name redis-e2e \
+            --network whats-the-chance-e2e \
+            -p 6379:6379 \
+            redis:7-alpine \
+            redis-server --appendonly yes --requirepass ""
 
-      - name: 🚀 Start backend service
-        working-directory: ./backend
+      - name: 🔧 Create environment file for backend
         run: |
-          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
-          echo $! > backend.pid
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
-          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
+          cat > backend/.env << EOF
+          ENVIRONMENT=test
+          DEBUG=true
+          API_HOST=0.0.0.0
+          API_PORT=8000
+          FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
+          FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          ALGORITHM=HS256
+          REDIS_URL=redis://redis-e2e:6379
+          REDIS_DB=0
+          EOF
 
-      - name: 🚀 Start frontend service
+      - name: 🏗️ Build backend Docker image
         run: |
-          npm run dev -- --host 0.0.0.0 --port 5173 &
-          echo $! > frontend.pid
-        env:
-          VITE_API_BASE_URL: http://localhost:8000
-          VITE_WEBSOCKET_URL: ws://localhost:8000/ws
+          docker build -t whats-the-chance-backend-e2e -f backend/Dockerfile.dev backend/
+
+      - name: 🚀 Start backend container
+        run: |
+          docker run -d \
+            --name backend-e2e \
+            --network whats-the-chance-e2e \
+            -p 8000:8000 \
+            -v ${{ github.workspace }}/backend:/app \
+            --env-file backend/.env \
+            whats-the-chance-backend-e2e
+
+      - name: 🏗️ Build frontend Docker image
+        run: |
+          docker build -t whats-the-chance-frontend-e2e -f Dockerfile.frontend.dev .
+
+      - name: 🚀 Start frontend container
+        run: |
+          docker run -d \
+            --name frontend-e2e \
+            --network whats-the-chance-e2e \
+            -p 5173:5173 \
+            -v ${{ github.workspace }}:/app \
+            -e VITE_API_BASE_URL=http://localhost:8000 \
+            -e VITE_WEBSOCKET_URL=ws://localhost:8000/ws \
+            whats-the-chance-frontend-e2e
+
+      - name: ⏳ Wait for Redis to be ready
+        run: |
+          for i in {1..30}; do
+            if docker exec redis-e2e redis-cli ping | grep -q PONG; then
+              echo "✅ Redis is ready"
+              break
+            fi
+            echo "⏳ Waiting for Redis... ($i/30)"
+            sleep 2
+          done
 
       - name: ⏳ Wait for backend to be ready
         id: backend-health
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -f http://localhost:8000/api/health; then
               echo "ready=true" >> $GITHUB_OUTPUT
               echo "✅ Backend is ready"
               break
             fi
-            echo "⏳ Waiting for backend... ($i/30)"
-            sleep 2
+            echo "⏳ Waiting for backend... ($i/60)"
+            sleep 3
           done
 
       - name: ⏳ Wait for frontend to be ready
         id: frontend-health
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -f http://localhost:5173; then
               echo "ready=true" >> $GITHUB_OUTPUT
               echo "✅ Frontend is ready"
               break
             fi
-            echo "⏳ Waiting for frontend... ($i/30)"
-            sleep 2
+            echo "⏳ Waiting for frontend... ($i/60)"
+            sleep 3
           done
+
+      - name: 📊 Show container status
+        if: always()
+        run: |
+          echo "=== Container Status ==="
+          docker ps -a --filter "name=e2e"
+          echo "=== Backend Logs ==="
+          docker logs backend-e2e --tail 20
+          echo "=== Frontend Logs ==="
+          docker logs frontend-e2e --tail 20
 
   # E2E-01: Authentication Flow
   auth-flow-tests:
@@ -141,27 +192,18 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-
       - name: 📥 Install dependencies
         run: |
           npm ci
-          cd backend && pip install -r requirements.txt
           npx playwright install ${{ matrix.browser }}
 
-      - name: 🚀 Start services
+      - name: 🔍 Verify services are running
         run: |
-          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
-          npm run dev -- --host 0.0.0.0 --port 5173 &
-          sleep 10
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
-          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
-          VITE_API_BASE_URL: http://localhost:8000
+          echo "Checking backend health..."
+          curl -f http://localhost:8000/api/health || (echo "❌ Backend not ready" && exit 1)
+          echo "Checking frontend availability..."
+          curl -f http://localhost:5173 || (echo "❌ Frontend not ready" && exit 1)
+          echo "✅ All services are ready for testing"
 
       - name: 🎭 Run Authentication E2E Tests
         run: |
@@ -211,27 +253,18 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-
       - name: 📥 Install dependencies
         run: |
           npm ci
-          cd backend && pip install -r requirements.txt
           npx playwright install ${{ matrix.browser }}
 
-      - name: 🚀 Start services
+      - name: 🔍 Verify services are running
         run: |
-          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
-          npm run dev -- --host 0.0.0.0 --port 5173 &
-          sleep 10
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
-          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
-          VITE_API_BASE_URL: http://localhost:8000
+          echo "Checking backend health..."
+          curl -f http://localhost:8000/api/health || (echo "❌ Backend not ready" && exit 1)
+          echo "Checking frontend availability..."
+          curl -f http://localhost:5173 || (echo "❌ Frontend not ready" && exit 1)
+          echo "✅ All services are ready for testing"
 
       - name: 🎭 Run Game Flow E2E Tests - ${{ matrix.test-case }}
         run: |
@@ -281,27 +314,18 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-
       - name: 📥 Install dependencies
         run: |
           npm ci
-          cd backend && pip install -r requirements.txt
           npx playwright install ${{ matrix.browser }}
 
-      - name: 🚀 Start services
+      - name: 🔍 Verify services are running
         run: |
-          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
-          npm run dev -- --host 0.0.0.0 --port 5173 &
-          sleep 10
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
-          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
-          VITE_API_BASE_URL: http://localhost:8000
+          echo "Checking backend health..."
+          curl -f http://localhost:8000/api/health || (echo "❌ Backend not ready" && exit 1)
+          echo "Checking frontend availability..."
+          curl -f http://localhost:5173 || (echo "❌ Frontend not ready" && exit 1)
+          echo "✅ All services are ready for testing"
 
       - name: 🎭 Run Friend Request E2E Tests
         run: |
@@ -321,7 +345,7 @@ jobs:
           path: test-results/
           retention-days: 30
 
-  # E2E-04 to E2E-09: Additional test suites (condensed for brevity)
+  # E2E-04 to E2E-09: Additional test suites (using Docker containers)
   additional-e2e-tests:
     if: ${{ inputs.test_suite == 'all' || contains(fromJSON('["friend-id-workflow", "friends-management", "ui-features", "error-handling", "performance", "health-check"]'), inputs.test_suite) }}
     needs: setup-application
@@ -349,27 +373,18 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-
       - name: 📥 Install dependencies
         run: |
           npm ci
-          cd backend && pip install -r requirements.txt
           npx playwright install ${{ matrix.browser }}
 
-      - name: 🚀 Start services
+      - name: 🔍 Verify services are running
         run: |
-          cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
-          npm run dev -- --host 0.0.0.0 --port 5173 &
-          sleep 10
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
-          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
-          VITE_API_BASE_URL: http://localhost:8000
+          echo "Checking backend health..."
+          curl -f http://localhost:8000/api/health || (echo "❌ Backend not ready" && exit 1)
+          echo "Checking frontend availability..."
+          curl -f http://localhost:5173 || (echo "❌ Frontend not ready" && exit 1)
+          echo "✅ All services are ready for testing"
 
       - name: 🎭 Run E2E Tests - ${{ matrix.test-suite.name }}
         if: ${{ inputs.test_suite == 'all' || inputs.test_suite == matrix.test-suite.name }}
@@ -393,7 +408,7 @@ jobs:
   # Summary Job
   e2e-tests-summary:
     if: always()
-    needs: [auth-flow-tests, game-flow-tests, friend-request-tests, additional-e2e-tests]
+    needs: [setup-application, auth-flow-tests, game-flow-tests, friend-request-tests, additional-e2e-tests]
     runs-on: ubuntu-latest
     name: '📊 E2E Tests Summary'
     
@@ -437,3 +452,24 @@ jobs:
         run: |
           echo "❌ Some E2E tests failed!"
           exit 1
+
+  # Cleanup Docker containers
+  cleanup-containers:
+    if: always()
+    needs: [setup-application, auth-flow-tests, game-flow-tests, friend-request-tests, additional-e2e-tests]
+    runs-on: ubuntu-latest
+    name: '🧹 Cleanup Docker Containers'
+    
+    steps:
+      - name: 🛑 Stop and remove containers
+        run: |
+          echo "Stopping and removing E2E containers..."
+          docker stop frontend-e2e backend-e2e redis-e2e 2>/dev/null || true
+          docker rm frontend-e2e backend-e2e redis-e2e 2>/dev/null || true
+          docker network rm whats-the-chance-e2e 2>/dev/null || true
+          echo "✅ Cleanup completed"
+
+      - name: 📊 Show final container status
+        run: |
+          echo "=== Final Container Status ==="
+          docker ps -a --filter "name=e2e" || echo "No E2E containers found"
