@@ -133,13 +133,23 @@ class FirebaseService:
                 "disabled": user_record.disabled,
             }
 
-            # Also try to get username from Firestore users collection
+            # Also try to get additional user data from Firestore users collection
             try:
                 user_doc = await self.get_document("users", uid)
-                if user_doc and user_doc.get("username"):
-                    result["username"] = user_doc.get("username")
+                if user_doc:
+                    # Add username if available
+                    if user_doc.get("username"):
+                        result["username"] = user_doc.get("username")
+                    
+                    # Add first_name if available (fallback for display_name)
+                    if user_doc.get("first_name"):
+                        result["first_name"] = user_doc.get("first_name")
+                    
+                    # Add display_name from Firestore if not in Auth
+                    if user_doc.get("display_name") and not result.get("display_name"):
+                        result["display_name"] = user_doc.get("display_name")
             except Exception as e:
-                logger.debug(f"Could not fetch username from Firestore for {uid}: {e}")
+                logger.debug(f"Could not fetch additional user data from Firestore for {uid}: {e}")
 
             return result
         except FirebaseError as e:

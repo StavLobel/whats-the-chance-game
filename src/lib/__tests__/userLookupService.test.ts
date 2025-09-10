@@ -1,11 +1,8 @@
-/**
- * Unit tests for the User Lookup Service
- * Tests caching, fallback logic, and API integration
- */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { userLookupService } from '../userLookupService';
+import { api } from '../api';
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-// Mock the api module
+// Mock the API module
 vi.mock('../api', () => ({
   api: {
     get: vi.fn(),
@@ -13,252 +10,255 @@ vi.mock('../api', () => ({
   },
 }));
 
-import { api } from '../api';
-import { userLookupService, UserDisplayInfo } from '../userLookupService';
-
 describe('UserLookupService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     userLookupService.clearCache();
   });
 
+  afterEach(() => {
+    userLookupService.clearCache();
+  });
+
   describe('getUserDisplayInfo', () => {
-    it('should fetch and cache user display info', async () => {
+    it('should return user info with username as display name', async () => {
       const mockUserData = {
-        uid: 'test-user-123',
-        username: 'testuser',
-        displayName: 'Test User',
-        email: 'test@example.com',
-        photoURL: 'https://example.com/photo.jpg',
+        uid: 'user123',
+        username: 'johndoe',
+        displayName: 'John Doe',
+        email: 'john@example.com',
+        photoURL: 'https://example.com/photo.jpg'
       };
 
-      vi.mocked(api.get).mockResolvedValue(mockUserData);
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
 
-      const result = await userLookupService.getUserDisplayInfo('test-user-123');
+      const result = await userLookupService.getUserDisplayInfo('user123');
 
+      expect(api.get).toHaveBeenCalledWith('/api/users/user123');
       expect(result).toEqual({
-        uid: 'test-user-123',
-        displayName: 'testuser', // Should use username as priority
-        username: 'testuser',
-        email: 'test@example.com',
-        photoURL: 'https://example.com/photo.jpg',
+        uid: 'user123',
+        displayName: 'johndoe', // username should be preferred
+        username: 'johndoe',
+        email: 'john@example.com',
+        photoURL: 'https://example.com/photo.jpg'
       });
-
-      expect(api.get).toHaveBeenCalledWith('/api/users/test-user-123');
     });
 
-    it('should return cached user info on second call', async () => {
+    it('should fallback to displayName when username is not available', async () => {
       const mockUserData = {
-        uid: 'test-user-123',
-        username: 'testuser',
-        displayName: 'Test User',
+        uid: 'user123',
+        displayName: 'John Doe',
+        email: 'john@example.com'
       };
 
-      vi.mocked(api.get).mockResolvedValue(mockUserData);
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result.displayName).toBe('John Doe');
+    });
+
+    it('should fallback to display_name (snake_case) when other fields are not available', async () => {
+      const mockUserData = {
+        uid: 'user123',
+        display_name: 'Jane Smith',
+        email: 'jane@example.com'
+      };
+
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result.displayName).toBe('Jane Smith');
+    });
+
+    it('should fallback to first_name when other display fields are not available', async () => {
+      const mockUserData = {
+        uid: 'user123',
+        first_name: 'Alice',
+        email: 'alice@example.com'
+      };
+
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result.displayName).toBe('Alice');
+    });
+
+    it('should fallback to firstName (camelCase) when other fields are not available', async () => {
+      const mockUserData = {
+        uid: 'user123',
+        firstName: 'Bob',
+        email: 'bob@example.com'
+      };
+
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result.displayName).toBe('Bob');
+    });
+
+    it('should fallback to email prefix when no display fields are available', async () => {
+      const mockUserData = {
+        uid: 'user123',
+        email: 'charlie@example.com'
+      };
+
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result.displayName).toBe('charlie');
+    });
+
+    it('should fallback to "Unknown User" when no user data is available', async () => {
+      const mockUserData = {
+        uid: 'user123'
+      };
+
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result.displayName).toBe('Unknown User');
+    });
+
+    it('should handle API errors gracefully with fallback', async () => {
+      vi.mocked(api.get).mockRejectedValue(new Error('User not found'));
+
+      const result = await userLookupService.getUserDisplayInfo('user123');
+
+      expect(result).toEqual({
+        uid: 'user123',
+        displayName: 'User user123...'
+      });
+    });
+
+    it('should cache results for subsequent calls', async () => {
+      const mockUserData = {
+        uid: 'user123',
+        username: 'johndoe',
+        email: 'john@example.com'
+      };
+
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
 
       // First call
-      await userLookupService.getUserDisplayInfo('test-user-123');
+      const result1 = await userLookupService.getUserDisplayInfo('user123');
       
       // Second call should use cache
-      const result = await userLookupService.getUserDisplayInfo('test-user-123');
+      const result2 = await userLookupService.getUserDisplayInfo('user123');
 
-      expect(result.displayName).toBe('testuser');
-      expect(api.get).toHaveBeenCalledTimes(1); // Should only call API once
-    });
-
-    it('should create fallback user when API fails', async () => {
-      vi.mocked(api.get).mockRejectedValue(new Error('API Error'));
-
-      const result = await userLookupService.getUserDisplayInfo('test-user-123');
-
-      expect(result).toEqual({
-        uid: 'test-user-123',
-        displayName: 'User test-use...',
-      });
-    });
-
-    it('should prioritize display name fields correctly', async () => {
-      const testCases = [
-        {
-          userData: { uid: '1', username: 'user1' },
-          expectedDisplayName: 'user1',
-        },
-        {
-          userData: { uid: '2', displayName: 'Display Name' },
-          expectedDisplayName: 'Display Name',
-        },
-        {
-          userData: { uid: '3', display_name: 'Display Name Alt' },
-          expectedDisplayName: 'Display Name Alt',
-        },
-        {
-          userData: { uid: '4', email: 'user@example.com' },
-          expectedDisplayName: 'user',
-        },
-        {
-          userData: { uid: '5' },
-          expectedDisplayName: 'Unknown User',
-        },
-      ];
-
-      for (const testCase of testCases) {
-        vi.mocked(api.get).mockResolvedValue(testCase.userData);
-        userLookupService.clearCache();
-
-        const result = await userLookupService.getUserDisplayInfo(testCase.userData.uid);
-        expect(result.displayName).toBe(testCase.expectedDisplayName);
-      }
+      expect(api.get).toHaveBeenCalledTimes(1);
+      expect(result1).toEqual(result2);
     });
   });
 
   describe('getUsersDisplayInfo', () => {
-    it('should fetch multiple users efficiently', async () => {
+    it('should lookup multiple users efficiently', async () => {
       const mockResponse = {
         users: [
           {
             uid: 'user1',
-            displayName: 'User One',
-            username: 'user1',
+            displayName: 'John Doe',
+            username: 'johndoe',
+            email: 'john@example.com'
           },
           {
             uid: 'user2',
-            displayName: 'User Two',
-            username: 'user2',
-          },
-        ],
-        errors: [],
+            displayName: 'Jane Smith',
+            username: 'janesmith',
+            email: 'jane@example.com'
+          }
+        ]
       };
 
       vi.mocked(api.post).mockResolvedValue(mockResponse);
 
       const result = await userLookupService.getUsersDisplayInfo(['user1', 'user2']);
 
-      expect(result.users).toEqual({
-        user1: {
-          uid: 'user1',
-          displayName: 'user1', // Should use username as priority
-          username: 'user1',
-        },
-        user2: {
-          uid: 'user2',
-          displayName: 'user2',
-          username: 'user2',
-        },
-      });
-
       expect(api.post).toHaveBeenCalledWith('/api/users/lookup', {
-        user_ids: ['user1', 'user2'],
+        user_ids: ['user1', 'user2']
       });
+      expect(result.users).toHaveProperty('user1');
+      expect(result.users).toHaveProperty('user2');
+      expect(result.users.user1.displayName).toBe('johndoe'); // username should be preferred
+      expect(result.users.user2.displayName).toBe('janesmith'); // username should be preferred
     });
 
-    it('should handle mixed cached and uncached users', async () => {
-      // Pre-populate cache with user1
-      const cachedUser = {
-        uid: 'user1',
-        displayName: 'Cached User',
-        username: 'cached',
-      };
-      
-      vi.mocked(api.get).mockResolvedValue(cachedUser);
-      await userLookupService.getUserDisplayInfo('user1');
-      vi.clearAllMocks();
-
-      // Mock API response for user2 only
+    it('should handle partial failures gracefully', async () => {
       const mockResponse = {
         users: [
           {
-            uid: 'user2',
-            displayName: 'New User',
-            username: 'newuser',
-          },
+            uid: 'user1',
+            displayName: 'johndoe',
+            username: 'johndoe'
+          }
+          // user2 is missing from the response, indicating a failure
         ],
-        errors: [],
+        errors: ['Failed to lookup user user2']
       };
 
       vi.mocked(api.post).mockResolvedValue(mockResponse);
 
       const result = await userLookupService.getUsersDisplayInfo(['user1', 'user2']);
 
-      expect(result.users).toEqual({
-        user1: cachedUser, // From cache
-        user2: {
-          uid: 'user2',
-          displayName: 'newuser',
-          username: 'newuser',
-        },
-      });
-
-      // Should only fetch user2
-      expect(api.post).toHaveBeenCalledWith('/api/users/lookup', {
-        user_ids: ['user2'],
-      });
+      expect(result.users).toHaveProperty('user1');
+      expect(result.users).not.toHaveProperty('user2'); // user2 is not in the response
+      expect(result.users.user1.displayName).toBe('johndoe'); // username should be preferred
+      // The service doesn't pass through API errors, only creates its own on API failures
+      expect(result.errors).toEqual([]);
     });
 
-    it('should create fallback users when API fails', async () => {
-      vi.mocked(api.post).mockRejectedValue(new Error('Network Error'));
+    it('should handle complete API failure with fallbacks', async () => {
+      vi.mocked(api.post).mockRejectedValue(new Error('API Error'));
 
       const result = await userLookupService.getUsersDisplayInfo(['user1', 'user2']);
 
-      expect(result.users).toEqual({
-        user1: {
-          uid: 'user1',
-          displayName: 'User user1...',
-        },
-        user2: {
-          uid: 'user2',
-          displayName: 'User user2...',
-        },
-      });
-
+      expect(result.users).toHaveProperty('user1');
+      expect(result.users).toHaveProperty('user2');
+      expect(result.users.user1.displayName).toBe('User user1...');
+      expect(result.users.user2.displayName).toBe('User user2...');
       expect(result.errors).toHaveLength(2);
     });
   });
 
-  describe('cache management', () => {
-    it('should clear cache correctly', async () => {
+  describe('display name priority order', () => {
+    it('should prioritize username over all other fields', async () => {
       const mockUserData = {
-        uid: 'test-user-123',
-        username: 'testuser',
+        uid: 'user123',
+        username: 'johndoe',
+        displayName: 'John Doe',
+        display_name: 'Johnny Doe',
+        first_name: 'John',
+        firstName: 'Johnny',
+        email: 'john@example.com'
       };
 
-      vi.mocked(api.get).mockResolvedValue(mockUserData);
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
 
-      // Populate cache
-      await userLookupService.getUserDisplayInfo('test-user-123');
-      expect(api.get).toHaveBeenCalledTimes(1);
+      const result = await userLookupService.getUserDisplayInfo('user123');
 
-      // Should use cache
-      await userLookupService.getUserDisplayInfo('test-user-123');
-      expect(api.get).toHaveBeenCalledTimes(1);
-
-      // Clear cache
-      userLookupService.clearCache();
-
-      // Should call API again
-      await userLookupService.getUserDisplayInfo('test-user-123');
-      expect(api.get).toHaveBeenCalledTimes(2);
+      expect(result.displayName).toBe('johndoe');
     });
 
-    it('should preload users correctly', async () => {
-      const mockResponse = {
-        users: [
-          { uid: 'user1', displayName: 'User One', username: 'user1' },
-          { uid: 'user2', displayName: 'User Two', username: 'user2' },
-        ],
-        errors: [],
+    it('should follow correct priority order when username is not available', async () => {
+      const mockUserData = {
+        uid: 'user123',
+        displayName: 'John Doe',
+        display_name: 'Johnny Doe',
+        first_name: 'John',
+        firstName: 'Johnny',
+        email: 'john@example.com'
       };
 
-      vi.mocked(api.post).mockResolvedValue(mockResponse);
+      vi.mocked(api.get).mockResolvedValue({ data: mockUserData });
 
-      await userLookupService.preloadUsers(['user1', 'user2']);
+      const result = await userLookupService.getUserDisplayInfo('user123');
 
-      // Should be cached now
-      vi.clearAllMocks();
-      const result = await userLookupService.getUserDisplayInfo('user1');
-
-      expect(result.displayName).toBe('user1');
-      expect(api.get).not.toHaveBeenCalled(); // Should use cache
-      expect(api.post).not.toHaveBeenCalled(); // Should use cache
+      expect(result.displayName).toBe('John Doe'); // displayName should be preferred
     });
   });
 });

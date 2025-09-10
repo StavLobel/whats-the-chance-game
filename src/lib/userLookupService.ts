@@ -103,9 +103,23 @@ class UserLookupService {
       const response = await api.get(`/api/users/${userId}`);
       const userData = response.data || response;
       
+      // Debug logging to help identify user data issues
+      console.log(`🔍 UserLookupService: Fetched user data for ${userId}:`, {
+        uid: userData.uid,
+        username: userData.username,
+        displayName: userData.displayName,
+        display_name: userData.display_name,
+        first_name: userData.first_name,
+        firstName: userData.firstName,
+        email: userData.email
+      });
+      
+      const displayName = this.getDisplayName(userData);
+      console.log(`📝 UserLookupService: Resolved display name for ${userId}: "${displayName}"`);
+      
       const displayInfo: UserDisplayInfo = {
         uid: userData.uid,
-        displayName: this.getDisplayName(userData),
+        displayName,
         username: userData.username,
         email: userData.email,
         photoURL: userData.photoURL,
@@ -120,9 +134,19 @@ class UserLookupService {
   }
 
   private getDisplayName(userData: any): string {
+    // Priority order for display name resolution:
+    // 1. username (most preferred for @mentions)
+    // 2. displayName (from Firebase Auth)
+    // 3. display_name (from Firestore, snake_case variation)
+    // 4. first_name (fallback from user profile)
+    // 5. firstName (camelCase variation)
+    // 6. email prefix (extract before @)
+    // 7. fallback to "Unknown User"
     return userData.username || 
            userData.displayName || 
            userData.display_name ||
+           userData.first_name ||
+           userData.firstName ||
            (userData.email ? userData.email.split('@')[0] : null) ||
            'Unknown User';
   }
